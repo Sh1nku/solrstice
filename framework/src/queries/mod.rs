@@ -8,6 +8,8 @@ pub mod collection;
 pub mod components;
 /// Config API
 pub mod config;
+/// Def types for select queries. Eg: `luscene`, `edismax`
+pub mod def_type;
 /// Helper functions
 pub mod helpers;
 /// Index and Delete API

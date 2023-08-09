@@ -2,6 +2,7 @@ use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
 use crate::queries::components::grouping::GroupingComponentBuilder;
+use crate::queries::def_type::DefType;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
@@ -33,6 +34,8 @@ pub struct SelectQueryBuilder {
     pub cursor_mark: Option<String>,
     #[serde(flatten)]
     pub grouping: Option<GroupingComponentBuilder>,
+    #[serde(flatten)]
+    pub def_type: Option<DefType>,
 }
 
 impl SelectQueryBuilder {
@@ -54,6 +57,7 @@ impl SelectQueryBuilder {
             start: 0,
             cursor_mark: None,
             grouping: None,
+            def_type: None,
         }
     }
 
@@ -171,6 +175,31 @@ impl SelectQueryBuilder {
         self
     }
 
+    /// Specify an alternate query parser. Default is "lucene", but can also be "dismax" or "edismax"
+    ///
+    /// Note. The default q parameter is *:*, which will not work on `dismax` or `edismax`. So you need to specify a query.
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
+    /// use solrstice::queries::def_type::{DefType, Edismax};
+    /// use solrstice::queries::select::SelectQueryBuilder;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
+    /// let builder = SelectQueryBuilder::new()
+    ///     .q("outdoors")
+    ///     .def_type(&DefType::Edismax(Edismax::new().qf("interests^20").bq(&["interests:cars^20"])));
+    /// let response = client.select(&builder, "collection").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn def_type(mut self, def_type: &DefType) -> Self {
+        self.def_type = Some(def_type.clone());
+        self
+    }
+
     pub async fn execute(
         &self,
         builder: &SolrServerContext,
@@ -275,7 +304,6 @@ pub mod tests {
                 .limit(10),
         );
         let serialized = serde_json::to_string(&builder).unwrap();
-        println!("{}", serialized);
         let deserialized = serde_json::from_str::<SelectQueryBuilder>(&serialized).unwrap();
         assert_eq!(builder, deserialized);
     }

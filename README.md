@@ -1,5 +1,3 @@
-
-
 # Solrstice: A Solr 8+ Client for Rust and Python
 
 ![Lines of code](https://api.badgestore.dev/badge/ef573e3335d97409/local?style=flat-square)
@@ -14,6 +12,7 @@ Use the [Rust documentation](https://docs.rs/solrstice) or the [Python documenta
 * Alias API
 * Select Documents
   * Grouping Component Query
+  * DefTypes (lucene, dismax, edismax)
 * Indexing Documents
 * Deleting Documents
 ## Examples

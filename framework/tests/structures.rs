@@ -107,21 +107,20 @@ impl FunctionalityTestsBuildup {
 
 #[derive(Deserialize, Serialize, Eq, PartialEq, Debug)]
 pub struct City {
-    id: String,
-    city_name: String,
-    population: Vec<Population>,
+    pub id: String,
+    pub city_name: String,
+    pub population: Vec<Population>,
 }
 
 #[derive(Deserialize, Serialize, Eq, PartialEq, Debug)]
 pub struct Population {
-    id: String,
-    age: usize,
-    count: usize,
+    pub id: String,
+    pub age: usize,
+    pub count: usize,
+    pub interests: Vec<String>,
 }
 
 pub fn get_test_data() -> Vec<City> {
-    // Load data from json file using serde, and deserialize it into a Vec<City>
-
     let data: Vec<City> =
         serde_json::from_reader(std::fs::File::open("../test_setup/test_data.json").unwrap())
             .unwrap();

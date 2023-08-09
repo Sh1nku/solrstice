@@ -6,39 +6,45 @@
       {
         "id": "city_Alta_20",
         "age": 20,
-        "count": 100
+        "count": 100,
+        "interests": ["Cars", "Partying", "Outdoors"]
       },
       {
         "id": "city_Alta_40",
         "age": 40,
-        "count": 50
+        "count": 50,
+        "interests": ["Partying", "Outdoors"]
       },
       {
         "id": "city_Alta_60",
         "age": 60,
-        "count": 50
+        "count": 50,
+        "interests": ["Outdoors"]
       }
     ]
   },
   {
-      "id": "city_Tromsø",
-      "city_name": "Tromsø",
-      "population": [
+    "id": "city_Tromsø",
+    "city_name": "Tromsø",
+    "population": [
       {
           "id": "city_Tromsø_20",
           "age": 20,
-          "count": 400
+          "count": 400,
+          "interests": ["Partying", "Outdoors"]
       },
       {
           "id": "city_Tromsø_40",
           "age": 40,
-          "count": 200
+          "count": 200,
+          "interests": ["Partying", "Outdoors"]
       },
       {
           "id": "city_Tromsø_60",
           "age": 60,
-          "count": 200
+          "count": 200,
+          "interests": ["Outdoors"]
       }
-      ]
+    ]
   }
 ]
