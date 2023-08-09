@@ -23,9 +23,9 @@ if __name__ == '__main__':
     shutil.copyfile('README.md', os.path.join(tmpdir.name, 'README.md'))
     with open(os.path.join(package_path, '__init__.py'), 'w') as f:
         f.write('''
-    """
-    .. include:: ../README.md
-    """
+"""
+.. include:: ../README.md
+"""
     ''')
 
     pdoc.pdoc(os.path.join(tmpdir.name, package_name), output_directory=docs_directory)

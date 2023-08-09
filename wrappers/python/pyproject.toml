@@ -9,6 +9,7 @@ readme = "README.md"
 license = "MIT OR Apache-2.0"
 description = "A Solr client library written in Rust"
 keywords = ["solr", "rust", "search"]
+documentation = "https://sh1nku.github.io/solrstice/python"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",

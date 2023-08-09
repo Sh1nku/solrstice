@@ -31,7 +31,7 @@ def create_config() -> Config:
     solr_auth = None
     solr_username = os.getenv('SOLR_USERNAME')
     solr_password = os.getenv('SOLR_PASSWORD')
-    if solr_password is not None and solr_username is not '':
+    if solr_username:
         solr_auth = SolrBasicAuth(
             solr_username, solr_password
         )

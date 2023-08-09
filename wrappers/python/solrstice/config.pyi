@@ -1,9 +1,14 @@
 from os import PathLike
 
 from solrstice.hosts import SolrServerContext
-from typing import List, Union
+from typing import List, Union, TYPE_CHECKING
 
-async def upload_config(context: SolrServerContext, config_name: str, config_path: Union[PathLike[str], str]) -> None:
+if TYPE_CHECKING:
+    Somepath = Union[PathLike[str], str]
+else:
+    Somepath = Union[PathLike, str]
+
+async def upload_config(context: SolrServerContext, config_name: str, config_path: Somepath) -> None:
     """Uploads a Solr config to a Solr instance
 
         :param context: SolrServerRequest context
@@ -12,7 +17,7 @@ async def upload_config(context: SolrServerContext, config_name: str, config_pat
     """
     pass
 
-def upload_config_blocking(context: SolrServerContext, config_name: str, config_path: Union[PathLike[str], str]) -> None:
+def upload_config_blocking(context: SolrServerContext, config_name: str, config_path: Somepath) -> None:
     """Uploads a Solr config to a Solr instance
 
         :param context: SolrServerRequest context

@@ -6,7 +6,7 @@
 //! use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 //! use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 //! use solrstice::models::auth::SolrBasicAuth;
-//! use solrstice::models::context::SolrServerContext;
+//! use solrstice::models::context::{SolrServerContextBuilder};
 //! use solrstice::models::error::SolrError;
 //! use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
 //! use solrstice::queries::select::SelectQueryBuilder;
@@ -21,8 +21,8 @@
 //! pub async fn example() -> Result<(), SolrError> {
 //!
 //!     //Create a solr client. You can also use a list of zookeeper hosts instead of a single server.
-//!     let context = SolrServerContext::new(SolrSingleServerHost::new("http://localhost:8983"))
-//!         .with_auth(SolrBasicAuth::new("solr", Some("SolrRocks")));
+//!     let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
+//!         .with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
 //!     let client = AsyncSolrCloudClient::new(context);
 //!
 //!     // Upload config

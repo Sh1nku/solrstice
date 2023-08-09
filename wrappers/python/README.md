@@ -1,7 +1,8 @@
-# Solrstice Python Wrapper
-Solrstice is a solr 8+ cloud aware client library written in rust. With this wrapper, you can use it in python.
+# Solrstice: A Solr 8+ Client for Rust and Python
+Solrstice is a solr client library written in rust. With this wrapper you can use it in python.
 
 Both asyncio and blocking clients are provided. All apis have type hints.
+Documentation can be found at [sh1nku.github.io/solrstice/python](https://sh1nku.github.io/solrstice/python)
 ## Installation
 ```bash
 pip install solrstice

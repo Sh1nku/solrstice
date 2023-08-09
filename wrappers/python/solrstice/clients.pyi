@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from solrstice.hosts import SolrServerContext
     from solrstice.queries import SelectQueryBuilder, UpdateQueryBuilder, DeleteQueryBuilder
     from solrstice.response import SolrResponse
+Somepath = Union[PathLike, str]
 
 class AsyncSolrCloudClient:
     """
@@ -15,7 +16,7 @@ class AsyncSolrCloudClient:
     def __init__(self, context: 'SolrServerContext'):
         pass
 
-    async def upload_config(self, config_name: str, config_path: Union[PathLike[str], str]) -> None:
+    async def upload_config(self, config_name: str, config_path: Somepath) -> None:
         """Uploads a Solr config to a Solr instance
 
             :param config_name: Name of the config
@@ -139,7 +140,7 @@ class BlockingSolrCloudClient:
     def __init__(self, context: 'SolrServerContext'):
         pass
 
-    def upload_config(self, config_name: str, config_path: Union[PathLike[str], str]) -> None:
+    def upload_config(self, config_name: str, config_path: Somepath) -> None:
         """Uploads a Solr config to a Solr instance
 
             :param config_name: Name of the config
