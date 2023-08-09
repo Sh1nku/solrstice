@@ -1,0 +1,146 @@
+use crate::hosts::solr_host::SolrHost;
+use crate::models::error::SolrError;
+use async_trait::async_trait;
+use log::info;
+use std::borrow::{Borrow, Cow};
+use std::sync::Arc;
+use std::time::Duration;
+use zookeeper_async::{WatchedEvent, Watcher, ZkResult, ZooKeeper};
+
+/// Connect to zookeeper instances to get a list of solr nodes to connect to. Select randomly from the list of live nodes.
+/// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
+/// ```no_run
+/// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+/// use solrstice::models::context::{SolrServerContextBuilder};
+///
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+/// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
+/// # Ok(())
+/// # }
+/// ```
+#[derive(Clone)]
+pub struct ZookeeperEnsembleHostConnector {
+    pub hosts: Vec<String>,
+    pub timeout: Duration,
+}
+
+impl ZookeeperEnsembleHostConnector {
+    /// Connect to zookeeper instances to get a list of solr nodes to connect to. Select randomly from the list of live nodes.
+    /// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
+    /// ```no_run
+    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+    /// use solrstice::models::context::{SolrServerContextBuilder};
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+    /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn new(hosts: &[&str], timeout: Duration) -> ZookeeperEnsembleHostConnector {
+        ZookeeperEnsembleHostConnector {
+            hosts: hosts.iter().map(|x| x.to_string()).collect(),
+            timeout,
+        }
+    }
+
+    /// Connect to zookeeper instances to get a list of solr nodes to connect to. Select randomly from the list of live nodes.
+    /// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
+    /// ```no_run
+    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+    /// use solrstice::models::context::{SolrServerContextBuilder};
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+    /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn connect(&self) -> Result<ZookeeperEnsembleHost, SolrError> {
+        ZookeeperEnsembleHost::new(&self.hosts, self.timeout).await
+    }
+}
+
+#[cfg(feature = "blocking")]
+use crate::runtime::RUNTIME;
+#[cfg(feature = "blocking")]
+impl ZookeeperEnsembleHostConnector {
+    /// Connect to zookeeper instances to get a list of solr nodes to connect to. Select randomly from the list of live nodes.
+    /// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
+    /// ```no_run
+    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
+    /// use solrstice::hosts::solr_server_host::{SolrMultipleServerHost};
+    /// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+    /// use solrstice::models::context::{SolrServerContextBuilder};
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect_blocking()?;
+    /// let client = BlockingSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn connect_blocking(&self) -> Result<ZookeeperEnsembleHost, SolrError> {
+        RUNTIME.block_on(self.connect())
+    }
+}
+
+/// Connect to zookeeper instances to get a list of solr nodes to connect to. Select randomly from the list of live nodes.
+/// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
+/// ```rust
+/// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+/// use solrstice::models::context::{SolrServerContextBuilder};
+///
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+/// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
+/// # Ok(())
+/// # }
+/// ```
+#[derive(Clone)]
+pub struct ZookeeperEnsembleHost {
+    client: Arc<ZooKeeper>,
+}
+
+impl ZookeeperEnsembleHost {
+    pub(crate) async fn new<T: Borrow<str>>(
+        hosts: &[T],
+        timeout: Duration,
+    ) -> Result<ZookeeperEnsembleHost, SolrError> {
+        Ok(ZookeeperEnsembleHost {
+            client: Arc::new(ZooKeeper::connect(&hosts.join(","), timeout, LoggingWatcher).await?),
+        })
+    }
+}
+
+#[async_trait]
+impl SolrHost for ZookeeperEnsembleHost {
+    async fn get_solr_node(&self) -> Result<Cow<str>, SolrError> {
+        let hosts = get_hosts_from_zookeeper(&self.client).await?;
+        match hosts.get(fastrand::usize(0..hosts.len())) {
+            None => Err(SolrError::SolrConnectionError(
+                "No ready Solr nodes from Zookeeper".to_string(),
+            )),
+            //TODO Investigate this further. Is it always http://, and do people use auth?
+            Some(r) => Ok(Cow::Owned(format!(
+                "http://{}",
+                r.strip_suffix("_solr").unwrap_or(r)
+            ))),
+        }
+    }
+}
+
+pub struct LoggingWatcher;
+impl Watcher for LoggingWatcher {
+    fn handle(&self, e: WatchedEvent) {
+        info!("{:?}", e)
+    }
+}
+
+pub async fn get_hosts_from_zookeeper(client: &ZooKeeper) -> ZkResult<Vec<String>> {
+    client.get_children("/live_nodes", true).await
+}

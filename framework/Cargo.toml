@@ -1,0 +1,34 @@
+[package]
+name = "solrstice"
+description = "A Solr 8+ client"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+keywords = ["solr", "search"]
+categories = ["api-bindings"]
+readme = "README.md"
+repository = "https://github.com/Sh1nku/solrstice"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde_json = { version = "1", features = ["raw_value"]}
+serde = { version = "1", features = ["derive"]}
+reqwest = { version = "0.11", features = ["serde_json", "json"]}
+async-trait = "0.1"
+thiserror = { version = "1", features = []}
+zookeeper-async = "4.2"
+fastrand = "2.0"
+log = "0.4"
+zip = { version = "0.6", default-features = false }
+tempfile = "3.3"
+walkdir = "2.3"
+tokio = { version = "1.25", optional = true }
+lazy_static = {version = "1.4", optional = true}
+dyn-clone = "1.0"
+[features]
+blocking = ["tokio", "lazy_static"]
+
+[dev-dependencies]
+tokio = { features = ["macros", "rt", "rt-multi-thread"], version = "1.25.0"}
+dotenv = "0.15.0"

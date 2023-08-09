@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config>
+    <luceneMatchVersion>8.11.1</luceneMatchVersion>
+    <dataDir>${solr.data.dir:}</dataDir>
+    <directoryFactory name="DirectoryFactory"
+                      class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+    <codecFactory class="solr.SchemaCodecFactory"/>
+    <indexConfig>
+        <lockType>${solr.lock.type:native}</lockType>
+    </indexConfig>
+
+    <updateHandler class="solr.DirectUpdateHandler2">
+        <updateLog>
+            <str name="dir">${solr.ulog.dir:}</str>
+            <int name="numVersionBuckets">${solr.ulog.numVersionBuckets:65536}</int>
+        </updateLog>
+
+        <autoCommit>
+            <maxTime>${solr.autoCommit.maxTime:15000}</maxTime>
+            <openSearcher>false</openSearcher>
+        </autoCommit>
+
+        <autoSoftCommit>
+            <maxTime>${solr.autoSoftCommit.maxTime:-1}</maxTime>
+        </autoSoftCommit>
+    </updateHandler>
+
+    <query>
+        <maxBooleanClauses>${solr.max.booleanClauses:1024}</maxBooleanClauses>
+        <filterCache size="512"
+                     initialSize="512"
+                     autowarmCount="0"/>
+        <queryResultCache size="512"
+                          initialSize="512"
+                          autowarmCount="0"/>
+        <documentCache size="512"
+                       initialSize="512"
+                       autowarmCount="0"/>
+        <queryResultWindowSize>20</queryResultWindowSize>
+        <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+    </query>
+
+    <circuitBreakers enabled="true" />
+
+    <requestDispatcher>
+        <httpCaching never304="true" />
+    </requestDispatcher>
+
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">10</int>
+        </lst>
+    </requestHandler>
+
+    <initParams path="/update/**,/query,/select,/spell">
+        <lst name="defaults">
+            <str name="df">_text_</str>
+        </lst>
+    </initParams>
+
+    <queryResponseWriter name="json" class="solr.JSONResponseWriter" />
+
+
+</config>

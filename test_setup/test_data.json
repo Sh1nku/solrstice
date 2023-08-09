@@ -1,0 +1,44 @@
+[
+  {
+    "id": "city_Alta",
+    "city_name": "Alta",
+    "population": [
+      {
+        "id": "city_Alta_20",
+        "age": 20,
+        "count": 100
+      },
+      {
+        "id": "city_Alta_40",
+        "age": 40,
+        "count": 50
+      },
+      {
+        "id": "city_Alta_60",
+        "age": 60,
+        "count": 50
+      }
+    ]
+  },
+  {
+      "id": "city_Tromsø",
+      "city_name": "Tromsø",
+      "population": [
+      {
+          "id": "city_Tromsø_20",
+          "age": 20,
+          "count": 400
+      },
+      {
+          "id": "city_Tromsø_40",
+          "age": 40,
+          "count": 200
+      },
+      {
+          "id": "city_Tromsø_60",
+          "age": 60,
+          "count": 200
+      }
+      ]
+  }
+]

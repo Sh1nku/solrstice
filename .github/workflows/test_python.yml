@@ -1,0 +1,42 @@
+name: Test python wrapper
+on: [push]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.11" ]
+        docker-version: [ "8_11", "9_3" ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Update Rust
+        run: |
+          rustup override set stable
+          rustup update stable
+      - name: Set up venv
+        working-directory: ./wrappers/python
+        run: |
+          python -m venv venv
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          pip3 install -r requirements-dev.txt
+        working-directory: ./wrappers/python
+      - name: Install module
+        run: |
+          source venv/bin/activate
+          maturin develop
+        working-directory: ./wrappers/python
+      - name: Start docker containers
+        run: docker-compose up -d
+        working-directory: ./docker/${{ matrix.docker-version }}
+      - name: Run tests
+        working-directory: ./wrappers/python
+        run: |
+          source venv/bin/activate
+          pytest

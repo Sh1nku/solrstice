@@ -1,0 +1,20 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "solrstice"
+requires-python = ">=3.8"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+description = "A Solr client library written in Rust"
+keywords = ["solr", "rust", "search"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+
+[tool.maturin]
+features = ["pyo3/extension-module"]

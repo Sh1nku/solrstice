@@ -1,0 +1,61 @@
+import pytest
+
+from helpers import Config, create_config
+from solrstice.collection import delete_collection, collection_exists, create_collection, delete_collection_blocking, \
+    collection_exists_blocking, create_collection_blocking
+from solrstice.config import delete_config, config_exists, upload_config, delete_config_blocking, \
+    upload_config_blocking, config_exists_blocking
+
+
+@pytest.fixture()
+def config() -> Config:
+    yield create_config()
+
+
+@pytest.mark.asyncio
+async def test_collection_all_async_functions_exported(config: Config):
+    name = "CollectionConfig"
+
+    try:
+        await delete_collection(config.context, name)
+    except RuntimeError:
+        pass
+    try:
+        await delete_config(config.context, name)
+    except RuntimeError:
+        pass
+    assert not await collection_exists(config.context, name)
+    assert not await config_exists(config.context, name)
+    await upload_config(
+        config.context,
+        name,
+        config.config_path,
+    )
+    await create_collection(config.context, name, name, 1, 1)
+    assert await collection_exists(config.context, name)
+    await delete_collection(config.context, name)
+    await delete_config(config.context, name)
+
+
+def test_collection_all_blocking_functions_exported(config: Config):
+    name = "CollectionBlockingConfig"
+
+    try:
+        delete_collection_blocking(config.context, name)
+    except RuntimeError:
+        pass
+    try:
+        delete_config_blocking(config.context, name)
+    except RuntimeError:
+        pass
+    assert not collection_exists_blocking(config.context, name)
+    assert not config_exists_blocking(config.context, name)
+    upload_config_blocking(
+        config.context,
+        name,
+        config.config_path,
+    )
+    create_collection_blocking(config.context, name, name, 1, 1)
+    assert collection_exists_blocking(config.context, name)
+    delete_collection_blocking(config.context, name)
+    delete_config_blocking(config.context, name)

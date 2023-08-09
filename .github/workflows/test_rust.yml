@@ -1,0 +1,23 @@
+name: Unit tests, linting, and formatting
+on: [push]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        docker-version: [ "8_11", "9_3" ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update Rust
+        run: |
+          rustup override set stable
+          rustup update stable
+      - name: Start docker containers
+        run: docker-compose up -d
+        working-directory: ./docker/${{ matrix.docker-version }}
+      - name: Run tests
+        run: cargo test --all-features
+      - name: Lint
+        run: cargo clippy
+      - name: Check formatting
+        run: cargo fmt --check
