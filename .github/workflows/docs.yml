@@ -34,7 +34,7 @@ jobs:
         run: |
           mdbook build
           mkdir ../../docs
-          mv book ../../docs
+          mv book/* ../../docs
       - uses: actions/setup-python@v4
         with:
           python-version: 3.8
