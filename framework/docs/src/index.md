@@ -43,22 +43,22 @@ client
 ```
 ### Selecting data
 ```rust
-    let docs = client
-        .select(
-            &SelectQueryBuilder::new().fq(&["id:example_document"]),
-            "example_collection",
-        )
-        .await?
-        .get_response()
-        .ok_or("No response provided")?
-        .get_docs::<TestData>()?;
+let docs = client
+    .select(
+        &SelectQueryBuilder::new().fq(&["id:example_document"]),
+        "example_collection",
+    )
+    .await?
+    .get_response()
+    .ok_or("No response provided")?
+    .get_docs::<TestData>()?;
 ```
 ### Deleting data
 ```rust
-    client
-        .delete(
-            &DeleteQueryBuilder::new().ids(&["example_document"]),
-            "example_collection",
-        )
-        .await?;
+client
+    .delete(
+        &DeleteQueryBuilder::new().ids(&["example_document"]),
+        "example_collection",
+    )
+    .await?;
 ```

@@ -54,12 +54,6 @@
         </lst>
     </requestHandler>
 
-    <initParams path="/update/**,/query,/select,/spell">
-        <lst name="defaults">
-            <str name="df">_text_</str>
-        </lst>
-    </initParams>
-
     <queryResponseWriter name="json" class="solr.JSONResponseWriter" />
 
 

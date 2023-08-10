@@ -1,12 +1,30 @@
 import pytest
-
 from helpers import Config, create_config
-from solrstice.alias import delete_alias, alias_exists, create_alias, create_alias_blocking, alias_exists_blocking, \
-    delete_alias_blocking
-from solrstice.collection import delete_collection, collection_exists, create_collection, delete_collection_blocking, \
-    collection_exists_blocking, create_collection_blocking
-from solrstice.config import delete_config, config_exists, upload_config, delete_config_blocking, \
-    upload_config_blocking, config_exists_blocking
+
+from solrstice.alias import (
+    alias_exists,
+    alias_exists_blocking,
+    create_alias,
+    create_alias_blocking,
+    delete_alias,
+    delete_alias_blocking,
+)
+from solrstice.collection import (
+    collection_exists,
+    collection_exists_blocking,
+    create_collection,
+    create_collection_blocking,
+    delete_collection,
+    delete_collection_blocking,
+)
+from solrstice.config import (
+    config_exists,
+    config_exists_blocking,
+    delete_config,
+    delete_config_blocking,
+    upload_config,
+    upload_config_blocking,
+)
 
 
 @pytest.fixture()
@@ -18,7 +36,11 @@ def config() -> Config:
 async def test_alias_all_async_functions_exported(config: Config):
     name = "AliasConfig"
 
-    functions = [delete_alias_blocking, delete_collection_blocking, delete_config_blocking]
+    functions = [
+        delete_alias_blocking,
+        delete_collection_blocking,
+        delete_config_blocking,
+    ]
 
     for function in functions:
         try:
@@ -44,8 +66,11 @@ async def test_alias_all_async_functions_exported(config: Config):
 def test_alias_all_blocking_functions_exported(config: Config):
     name = "AliasBlockingConfig"
 
-
-    functions = [delete_alias_blocking, delete_collection_blocking, delete_config_blocking]
+    functions = [
+        delete_alias_blocking,
+        delete_collection_blocking,
+        delete_config_blocking,
+    ]
 
     for function in functions:
         try:

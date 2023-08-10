@@ -1,8 +1,14 @@
 import pytest
+from helpers import Config, create_config
 
-from helpers import create_config, Config
-from solrstice.config import upload_config, upload_config_blocking, delete_config, delete_config_blocking, \
-    config_exists, config_exists_blocking
+from solrstice.config import (
+    config_exists,
+    config_exists_blocking,
+    delete_config,
+    delete_config_blocking,
+    upload_config,
+    upload_config_blocking,
+)
 
 
 @pytest.fixture()

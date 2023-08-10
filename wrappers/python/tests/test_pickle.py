@@ -1,11 +1,19 @@
 import pickle
 
 from solrstice.group import GroupingComponent
-from solrstice.queries import SelectQueryBuilder, UpdateQueryBuilder, CommitType, DeleteQueryBuilder
+from solrstice.queries import (
+    CommitType,
+    DeleteQueryBuilder,
+    SelectQueryBuilder,
+    UpdateQueryBuilder,
+)
 
 
 def test_pickle_works_select_query_builder():
-    builder = SelectQueryBuilder(fq=['test', 'test'], grouping=GroupingComponent(fields=['test'], main=True, facet=False))
+    builder = SelectQueryBuilder(
+        fq=["test", "test"],
+        grouping=GroupingComponent(fields=["test"], main=True, facet=False),
+    )
     string = pickle.dumps(builder)
     builder_copy: SelectQueryBuilder = pickle.loads(string)
     assert builder_copy.fq == builder.fq
@@ -15,7 +23,7 @@ def test_pickle_works_select_query_builder():
 
 
 def test_pickle_works_update_query_builder():
-    builder = UpdateQueryBuilder(handler='test', commit_type=CommitType.Soft)
+    builder = UpdateQueryBuilder(handler="test", commit_type=CommitType.Soft)
     string = pickle.dumps(builder)
     builder_copy: UpdateQueryBuilder = pickle.loads(string)
     assert builder_copy.handler == builder.handler
