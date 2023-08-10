@@ -37,6 +37,7 @@ async def test_get_group_field_result_works(config: Config):
     finally:
         await teardown_collection(config.context, name)
 
+
 @pytest.mark.asyncio
 async def test_get_group_query_result_works(config: Config):
     name = "GroupQueryQuery"
@@ -46,12 +47,14 @@ async def test_get_group_query_result_works(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        group_builder = GroupingComponent(queries=["age:[0 TO 59]", "age:[60 TO *]"], limit=10)
+        group_builder = GroupingComponent(
+            queries=["age:[0 TO 59]", "age:[60 TO *]"], limit=10
+        )
         select_builder = SelectQueryBuilder(fq=["age:[* TO *]"], grouping=group_builder)
         groups = (await select_builder.execute(config.context, name)).get_groups()
         age_group = groups["age:[0 TO 59]"]
         group = age_group.get_query_result()
-        docs = group.docs
+        group.docs
         assert len(group.docs) > 0
     finally:
         await teardown_collection(config.context, name)
