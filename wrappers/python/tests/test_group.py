@@ -1,6 +1,13 @@
 import pytest
+from helpers import (
+    Config,
+    create_config,
+    index_test_data,
+    setup_collection,
+    teardown_collection,
+    wait_for_solr,
+)
 
-from helpers import Config, create_config, wait_for_solr, setup_collection, teardown_collection, index_test_data
 from solrstice.group import GroupingComponent
 from solrstice.queries import SelectQueryBuilder
 
@@ -19,7 +26,7 @@ async def test_get_field_result_works(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        group_builder = GroupingComponent(fields=['age'], limit=10)
+        group_builder = GroupingComponent(fields=["age"], limit=10)
         select_builder = SelectQueryBuilder(fq=["age:[* TO *]"], grouping=group_builder)
         groups = (await select_builder.execute(config.context, name)).get_groups()
         age_group = groups["age"]

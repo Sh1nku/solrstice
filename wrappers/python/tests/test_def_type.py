@@ -1,7 +1,14 @@
 import pytest
+from helpers import (
+    Config,
+    create_config,
+    index_test_data,
+    setup_collection,
+    teardown_collection,
+    wait_for_solr,
+)
 
-from helpers import Config, create_config, wait_for_solr, setup_collection, teardown_collection, index_test_data
-from solrstice.def_type import DefTypeLucene
+from solrstice.def_type import DefTypeDismax, DefTypeEdismax, DefTypeLucene
 from solrstice.queries import SelectQueryBuilder
 
 
@@ -20,7 +27,43 @@ async def test_lucene_query_parser(config: Config):
         await index_test_data(config.context, name)
 
         query_parser = DefTypeLucene(df="population")
-        select_builder = SelectQueryBuilder(q='outdoors', def_type=query_parser)
+        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
         (await select_builder.execute(config.context, name)).get_response()
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_dismax_query_parser(config: Config):
+    name = "DismaxQueryParser"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+        await index_test_data(config.context, name)
+
+        query_parser = DefTypeDismax(qf="interests^20", bq=["interests:cars^20"])
+        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
+        response = (await select_builder.execute(config.context, name)).get_response()
+        first_doc = response.docs[0]
+        assert first_doc["id"] == "city_Alta_20"
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_edismax_query_parser(config: Config):
+    name = "EDismaxQueryParser"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+        await index_test_data(config.context, name)
+
+        query_parser = DefTypeEdismax(qf="interests^20", bq=["interests:cars^20"])
+        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
+        response = (await select_builder.execute(config.context, name)).get_response()
+        first_doc = response.docs[0]
+        assert first_doc["id"] == "city_Alta_20"
     finally:
         await teardown_collection(config.context, name)

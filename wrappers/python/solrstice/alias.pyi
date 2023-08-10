@@ -1,9 +1,10 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from solrstice.hosts import SolrServerContext
 
-
-async def create_alias(context: SolrServerContext, name: str, collections: List[str]) -> None:
+async def create_alias(
+    context: SolrServerContext, name: str, collections: List[str]
+) -> None:
     """
     Create an alias for a collection on the Solr server
 
@@ -12,8 +13,9 @@ async def create_alias(context: SolrServerContext, name: str, collections: List[
     :param collections: The collections to alias
     """
 
-
-def create_alias_blocking(context: SolrServerContext, name: str, collections: List[str]) -> None:
+def create_alias_blocking(
+    context: SolrServerContext, name: str, collections: List[str]
+) -> None:
     """
     Create an alias for a collection on the Solr server
 
@@ -21,7 +23,6 @@ def create_alias_blocking(context: SolrServerContext, name: str, collections: Li
     :param name: The name of the alias to create
     :param collections: The collections to alias
     """
-
 
 async def get_aliases(context: SolrServerContext) -> Dict[str, List[str]]:
     """
@@ -31,7 +32,6 @@ async def get_aliases(context: SolrServerContext) -> Dict[str, List[str]]:
     :return: A dictionary of aliases to collections
     """
 
-
 def get_aliases_blocking(context: SolrServerContext) -> Dict[str, List[str]]:
     """
     Get all aliases on the Solr server
@@ -39,7 +39,6 @@ def get_aliases_blocking(context: SolrServerContext) -> Dict[str, List[str]]:
     :param context: The Solr server context
     :return: A dictionary of aliases to collections
     """
-
 
 async def alias_exists(context: SolrServerContext, name: str) -> bool:
     """
@@ -50,7 +49,6 @@ async def alias_exists(context: SolrServerContext, name: str) -> bool:
     :return: True if the alias exists, False otherwise
     """
 
-
 def alias_exists_blocking(context: SolrServerContext, name: str) -> bool:
     """
     Check if an alias exists on the Solr server
@@ -60,7 +58,6 @@ def alias_exists_blocking(context: SolrServerContext, name: str) -> bool:
     :return: True if the alias exists, False otherwise
     """
 
-
 async def delete_alias(context: SolrServerContext, name: str) -> None:
     """
     Delete an alias from the Solr server
@@ -68,7 +65,6 @@ async def delete_alias(context: SolrServerContext, name: str) -> None:
     :param context: The Solr server context
     :param name: The name of the alias to delete
     """
-
 
 def delete_alias_blocking(context: SolrServerContext, name: str) -> None:
     """

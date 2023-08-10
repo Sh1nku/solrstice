@@ -1,8 +1,13 @@
-import json
-
 import pytest
+from helpers import (
+    Config,
+    create_config,
+    index_test_data,
+    setup_collection,
+    teardown_collection,
+    wait_for_solr,
+)
 
-from helpers import Config, create_config, wait_for_solr, index_test_data, setup_collection, teardown_collection
 from solrstice.queries import SelectQueryBuilder
 
 
@@ -21,7 +26,6 @@ async def test_get_response_gets_response(config: Config):
 
         await index_test_data(config.context, name)
 
-        pass
         builder = SelectQueryBuilder()
         solr_response = await builder.execute(config.context, name)
         docs_response = solr_response.get_response()
@@ -42,7 +46,7 @@ async def test_select_works_when_no_result(config: Config):
 
         await index_test_data(config.context, name)
 
-        builder = SelectQueryBuilder(fq=['id:non_existent_id'])
+        builder = SelectQueryBuilder(fq=["id:non_existent_id"])
         solr_response = await builder.execute(config.context, name)
         docs_response = solr_response.get_response()
         assert docs_response.num_found == 0
@@ -50,6 +54,7 @@ async def test_select_works_when_no_result(config: Config):
         assert len(docs_response.docs) == 0
     finally:
         await teardown_collection(config.context, name)
+
 
 @pytest.mark.asyncio
 async def test_select_works_with_cursor_mark(config: Config):
@@ -64,7 +69,9 @@ async def test_select_works_with_cursor_mark(config: Config):
         while True:
             if current_iteration > 100:
                 raise Exception("Cursor mark test failed. Too many iterations")
-            builder = SelectQueryBuilder(fq=['age:[* TO *]'], rows=1, sort=['id desc'], cursor_mark=cursor_mark)
+            builder = SelectQueryBuilder(
+                fq=["age:[* TO *]"], rows=1, sort=["id desc"], cursor_mark=cursor_mark
+            )
             result = await builder.execute(config.context, name)
             if result.next_cursor_mark is not None:
                 if cursor_mark == "*":

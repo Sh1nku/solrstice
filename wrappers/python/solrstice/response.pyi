@@ -1,8 +1,7 @@
-from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 if TYPE_CHECKING:
     from solrstice.group import SolrGroupResult
-
 
 class SolrDocsResponse:
     num_found: int
@@ -18,11 +17,10 @@ class SolrResponse:
     def get_response(self) -> SolrDocsResponse:
         """Get the response from a solr query
 
-            :raises RuntimeError if no response in query
+        :raises RuntimeError if no response in query
         """
-
-    def get_groups(self) -> Dict[str, 'SolrGroupResult']:
+    def get_groups(self) -> Dict[str, "SolrGroupResult"]:
         """Get the groups from a solr query
 
-            :raises RuntimeError if no groups in query
+        :raises RuntimeError if no groups in query
         """

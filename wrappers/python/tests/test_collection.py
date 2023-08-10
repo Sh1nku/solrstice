@@ -1,10 +1,22 @@
 import pytest
-
 from helpers import Config, create_config
-from solrstice.collection import delete_collection, collection_exists, create_collection, delete_collection_blocking, \
-    collection_exists_blocking, create_collection_blocking
-from solrstice.config import delete_config, config_exists, upload_config, delete_config_blocking, \
-    upload_config_blocking, config_exists_blocking
+
+from solrstice.collection import (
+    collection_exists,
+    collection_exists_blocking,
+    create_collection,
+    create_collection_blocking,
+    delete_collection,
+    delete_collection_blocking,
+)
+from solrstice.config import (
+    config_exists,
+    config_exists_blocking,
+    delete_config,
+    delete_config_blocking,
+    upload_config,
+    upload_config_blocking,
+)
 
 
 @pytest.fixture()

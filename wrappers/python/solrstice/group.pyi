@@ -1,15 +1,11 @@
 from enum import Enum
-from typing import List
-
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from solrstice.response import SolrDocsResponse
-
 
 class GroupFormatting(Enum):
     Simple = "Simple"
     Grouped = "Grouped"
-
 
 class GroupingComponent:
     """
@@ -26,12 +22,21 @@ class GroupingComponent:
     :param truncate: Truncate
     :param facet: Facet
     """
-    def __init__(self, fields: Optional[List[str]] = None, queries: Optional[List[str]] = None,
-                 limit: Optional[int] = None, offset: Optional[int] = None, sort: Optional[List[str]] = None,
-                 format: Optional[GroupFormatting] = None, main: Optional[bool] = None,
-                 n_groups: Optional[bool] = None, truncate: Optional[bool] = None, facet: Optional[bool] = None):
-        pass
 
+    def __init__(
+        self,
+        fields: Optional[List[str]] = None,
+        queries: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort: Optional[List[str]] = None,
+        format: Optional[GroupFormatting] = None,
+        main: Optional[bool] = None,
+        n_groups: Optional[bool] = None,
+        truncate: Optional[bool] = None,
+        facet: Optional[bool] = None,
+    ):
+        pass
     fields: Optional[List[str]]
     queries: Optional[List[str]]
     limit: Optional[int]
@@ -43,19 +48,19 @@ class GroupingComponent:
     truncate: Optional[bool]
     facet: Optional[bool]
 
-
 class SolrGroupFieldResult:
     """
     Represents a group field result
     """
+
     group_value: Any
     doc_list: SolrDocsResponse
-
 
 class SolrGroupResult:
     """
     Represents a group result
     """
+
     matches: int
     n_groups: Optional[int]
 
@@ -66,7 +71,6 @@ class SolrGroupResult:
 
         :raises: RuntimeError if conversion failed, or no field result existed
         """
-
     def get_query_result(self) -> SolrDocsResponse:
         """
         Gets the query result from a group query
@@ -74,7 +78,6 @@ class SolrGroupResult:
 
         :raises: RuntimeError if conversion failed, or no query result existed
         """
-
     def get_simple_result(self) -> SolrDocsResponse:
         """
         Gets the result from a group query where `GroupFormatting.Simple` was used

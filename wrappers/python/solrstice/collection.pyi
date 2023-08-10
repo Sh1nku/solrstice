@@ -2,7 +2,13 @@ from typing import List, Optional
 
 from solrstice.hosts import SolrServerContext
 
-async def create_collection(context: SolrServerContext, name: str, config: str, shards: Optional[int] = 1, replication_factor: Optional[int] = 1) -> None:
+async def create_collection(
+    context: SolrServerContext,
+    name: str,
+    config: str,
+    shards: Optional[int] = 1,
+    replication_factor: Optional[int] = 1,
+) -> None:
     """
     Create a collection on the Solr server.
 
@@ -13,8 +19,13 @@ async def create_collection(context: SolrServerContext, name: str, config: str, 
     :param replication_factor: The replication factor to use.
     """
 
-
-def create_collection_blocking(context: SolrServerContext, name: str, config: str, shards: Optional[int] = 1, replication_factor: Optional[int] = 1) -> None:
+def create_collection_blocking(
+    context: SolrServerContext,
+    name: str,
+    config: str,
+    shards: Optional[int] = 1,
+    replication_factor: Optional[int] = 1,
+) -> None:
     """
     Create a collection on the Solr server.
 

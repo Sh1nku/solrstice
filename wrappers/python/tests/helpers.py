@@ -5,11 +5,11 @@ from typing import List, Optional
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-from dataclasses_json import dataclass_json, DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
 from solrstice.auth import SolrBasicAuth
-from solrstice.collection import delete_collection, create_collection
+from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
 from solrstice.hosts import SolrServerContext, SolrSingleServerHost
 from solrstice.queries import UpdateQueryBuilder
@@ -26,33 +26,40 @@ class Config:
 
 
 def create_config() -> Config:
-    path = '../../test_setup/.env'
+    path = "../../test_setup/.env"
     load_dotenv(path)
     solr_auth = None
-    solr_username = os.getenv('SOLR_USERNAME')
-    solr_password = os.getenv('SOLR_PASSWORD')
+    solr_username = os.getenv("SOLR_USERNAME")
+    solr_password = os.getenv("SOLR_PASSWORD")
     if solr_username:
-        solr_auth = SolrBasicAuth(
-            solr_username, solr_password
-        )
-    host = os.getenv('SOLR_HOST')
-    speedbump_host = os.getenv('SPEEDBUMP_HOST')
+        solr_auth = SolrBasicAuth(solr_username, solr_password)
+    host = os.getenv("SOLR_HOST")
+    speedbump_host = os.getenv("SPEEDBUMP_HOST")
     solr_host = SolrSingleServerHost(host)
     wait_for_solr(host, 30)
-    return Config(host, speedbump_host, solr_username, solr_password, SolrServerContext(solr_host, solr_auth), "../../test_setup/test_collection")
+    return Config(
+        host,
+        speedbump_host,
+        solr_username,
+        solr_password,
+        SolrServerContext(solr_host, solr_auth),
+        "../../test_setup/test_collection",
+    )
 
 
 def wait_for_solr(host: str, max_time: int):
     end = time.time() + max_time
     while time.time() < end:
         try:
-            with urlopen(f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS') as response:
+            with urlopen(
+                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+            ) as response:
                 if response.status == 200:
                     return
         except HTTPError as e:
             if e.code == 401:
                 return
-        except Exception as _:
+        except Exception:
             pass
         time.sleep(1)
     raise RuntimeError(f"Solr did not respond within {max_time} seconds")
@@ -76,7 +83,7 @@ class City(DataClassJsonMixin):
 
 
 def load_test_data() -> List[City]:
-    with open('../../test_setup/test_data.json') as f:
+    with open("../../test_setup/test_data.json") as f:
         return City.schema().loads(f.read(), many=True)
 
 
@@ -86,7 +93,9 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
     await update_builder.execute(context, name, [City.to_dict(x) for x in data])
 
 
-async def setup_collection(context: SolrServerContext, name: str, config_path: str) -> None:
+async def setup_collection(
+    context: SolrServerContext, name: str, config_path: str
+) -> None:
     try:
         await delete_collection(context, name)
     except RuntimeError:
