@@ -1,0 +1,17 @@
+name: Publish cargo crate
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish to crates.io
+        working-directory: ./framework
+        run: cargo publish --token ${CRATES_IO_TOKEN}
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

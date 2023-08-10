@@ -184,13 +184,13 @@ impl SelectQueryBuilder {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
     /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// use solrstice::queries::def_type::{DefType, Edismax};
+    /// use solrstice::queries::def_type::{DefType, EdismaxQueryBuilder};
     /// use solrstice::queries::select::SelectQueryBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
     /// let builder = SelectQueryBuilder::new()
     ///     .q("outdoors")
-    ///     .def_type(&DefType::Edismax(Edismax::new().qf("interests^20").bq(&["interests:cars^20"])));
+    ///     .def_type(&DefType::Edismax(EdismaxQueryBuilder::new().qf("interests^20").bq(&["interests:cars^20"])));
     /// let response = client.select(&builder, "collection").await?;
     /// # Ok(())
     /// # }

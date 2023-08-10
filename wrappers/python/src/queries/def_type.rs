@@ -1,14 +1,16 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::queries::def_type::{DefType, Dismax, Edismax, Lucene, QueryOperator};
+use solrstice::queries::def_type::{
+    DefType, DismaxQueryBuilder, EdismaxQueryBuilder, LuceneQueryBuilder, QueryOperator,
+};
 
 #[pymodule]
 pub fn def_type(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<QueryOperatorWrapper>()?;
-    m.add_class::<DefTypeWrapper>()?;
-    m.add_class::<DefTypeLucene>()?;
-    m.add_class::<DefTypeDismax>()?;
-    m.add_class::<DefTypeEdismax>()?;
+    m.add_class::<DefTypeQueryBuilder>()?;
+    m.add_class::<LuceneQueryBuilderWrapper>()?;
+    m.add_class::<DismaxQueryBuilderWrapper>()?;
+    m.add_class::<EdismaxQueryBuilderWrapper>()?;
     Ok(())
 }
 
@@ -37,23 +39,23 @@ impl From<QueryOperator> for QueryOperatorWrapper {
     }
 }
 
-#[pyclass(name = "DefType", subclass, module = "solrstice.def_type")]
+#[pyclass(name = "DefTypeQueryBuilder", subclass, module = "solrstice.def_type")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct DefTypeWrapper(DefType);
+pub struct DefTypeQueryBuilder(DefType);
 
-impl From<DefTypeWrapper> for DefType {
-    fn from(w: DefTypeWrapper) -> Self {
+impl From<DefTypeQueryBuilder> for DefType {
+    fn from(w: DefTypeQueryBuilder) -> Self {
         w.0
     }
 }
 
-impl From<DefType> for DefTypeWrapper {
+impl From<DefType> for DefTypeQueryBuilder {
     fn from(d: DefType) -> Self {
         Self(d)
     }
 }
 
-impl DefTypeWrapper {
+impl DefTypeQueryBuilder {
     pub fn get_def_type(&self) -> &DefType {
         &self.0
     }
@@ -63,23 +65,23 @@ impl DefTypeWrapper {
     }
 }
 
-#[pyclass(name = "DefTypeLucene", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "LuceneQueryBuilder", extends=DefTypeQueryBuilder, module = "solrstice.def_type")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct DefTypeLucene {}
+pub struct LuceneQueryBuilderWrapper {}
 
 #[pymethods]
-impl DefTypeLucene {
+impl LuceneQueryBuilderWrapper {
     #[new]
     pub fn new(
         q_op: Option<QueryOperatorWrapper>,
         df: Option<String>,
         sow: Option<bool>,
-    ) -> (Self, DefTypeWrapper) {
-        let mut lucene = Lucene::new();
+    ) -> (Self, DefTypeQueryBuilder) {
+        let mut lucene = LuceneQueryBuilder::new();
         lucene.q_op = q_op.map(|q| q.into());
         lucene.df = df;
         lucene.sow = sow;
-        (Self {}, DefTypeWrapper(DefType::Lucene(lucene)))
+        (Self {}, DefTypeQueryBuilder(DefType::Lucene(lucene)))
     }
 
     #[getter]
@@ -99,7 +101,7 @@ impl DefTypeLucene {
         match def_type {
             DefType::Lucene(d) => d.q_op = q_op.map(|q| q.into()),
             _ => {
-                let mut lucene = Lucene::new();
+                let mut lucene = LuceneQueryBuilder::new();
                 lucene.q_op = q_op.map(|q| q.into());
                 *def_type = DefType::Lucene(lucene);
             }
@@ -123,7 +125,7 @@ impl DefTypeLucene {
         match def_type {
             DefType::Lucene(d) => d.df = df,
             _ => {
-                let mut lucene = Lucene::new();
+                let mut lucene = LuceneQueryBuilder::new();
                 lucene.df = df;
                 *def_type = DefType::Lucene(lucene);
             }
@@ -147,7 +149,7 @@ impl DefTypeLucene {
         match def_type {
             DefType::Lucene(d) => d.sow = sow,
             _ => {
-                let mut lucene = Lucene::new();
+                let mut lucene = LuceneQueryBuilder::new();
                 lucene.sow = sow;
                 *def_type = DefType::Lucene(lucene);
             }
@@ -155,12 +157,12 @@ impl DefTypeLucene {
     }
 }
 
-#[pyclass(name = "DefTypeDismax", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "DismaxQueryBuilder", extends=DefTypeQueryBuilder, module = "solrstice.def_type")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct DefTypeDismax {}
+pub struct DismaxQueryBuilderWrapper {}
 
 #[pymethods]
-impl DefTypeDismax {
+impl DismaxQueryBuilderWrapper {
     #[new]
     pub fn new(
         q_alt: Option<String>,
@@ -172,8 +174,8 @@ impl DefTypeDismax {
         tie: Option<String>,
         bq: Option<Vec<String>>,
         bf: Option<Vec<String>>,
-    ) -> (Self, DefTypeWrapper) {
-        let mut dismax = Dismax::new();
+    ) -> (Self, DefTypeQueryBuilder) {
+        let mut dismax = DismaxQueryBuilder::new();
         dismax.q_alt = q_alt;
         dismax.qf = qf;
         dismax.mm = mm;
@@ -183,7 +185,7 @@ impl DefTypeDismax {
         dismax.tie = tie;
         dismax.bq = bq;
         dismax.bf = bf;
-        (Self {}, DefTypeWrapper(DefType::Dismax(dismax)))
+        (Self {}, DefTypeQueryBuilder(DefType::Dismax(dismax)))
     }
 
     #[getter]
@@ -203,7 +205,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.q_alt = q_alt,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.q_alt = q_alt;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -227,7 +229,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.qf = qf,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.qf = qf;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -251,7 +253,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.mm = mm,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.mm = mm;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -275,7 +277,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.pf = pf,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.pf = pf;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -299,7 +301,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.ps = ps,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.ps = ps;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -323,7 +325,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.qs = qs,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.qs = qs;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -347,7 +349,7 @@ impl DefTypeDismax {
         match def_type {
             DefType::Dismax(d) => d.tie = tie,
             _ => {
-                let mut dismax = Dismax::new();
+                let mut dismax = DismaxQueryBuilder::new();
                 dismax.tie = tie;
                 *def_type = DefType::Dismax(dismax);
             }
@@ -355,12 +357,12 @@ impl DefTypeDismax {
     }
 }
 
-#[pyclass(name = "DefTypeEdismax", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "EdismaxQueryBuilder", extends=DefTypeQueryBuilder, module = "solrstice.def_type")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct DefTypeEdismax {}
+pub struct EdismaxQueryBuilderWrapper {}
 
 #[pymethods]
-impl DefTypeEdismax {
+impl EdismaxQueryBuilderWrapper {
     #[new]
     pub fn new(
         q_alt: Option<String>,
@@ -382,8 +384,8 @@ impl DefTypeEdismax {
         lowercase_operators: Option<bool>,
         stopwords: Option<bool>,
         uf: Option<String>,
-    ) -> (Self, DefTypeWrapper) {
-        let mut edismax = Edismax::new();
+    ) -> (Self, DefTypeQueryBuilder) {
+        let mut edismax = EdismaxQueryBuilder::new();
         edismax.q_alt = q_alt;
         edismax.qf = qf;
         edismax.mm = mm;
@@ -403,7 +405,7 @@ impl DefTypeEdismax {
         edismax.lowercase_operators = lowercase_operators;
         edismax.stopwords = stopwords;
         edismax.uf = uf;
-        (Self {}, DefTypeWrapper(DefType::Edismax(edismax)))
+        (Self {}, DefTypeQueryBuilder(DefType::Edismax(edismax)))
     }
 
     #[getter]
@@ -423,7 +425,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.q_alt = q_alt,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.q_alt = q_alt;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -447,7 +449,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.qf = qf,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.qf = qf;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -471,7 +473,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.mm = mm,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.mm = mm;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -495,7 +497,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.mm_auto_relax = mm_auto_relax,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.mm_auto_relax = mm_auto_relax;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -519,7 +521,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.pf = pf,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.pf = pf;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -543,7 +545,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.pf2 = pf2,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.pf2 = pf2;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -567,7 +569,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.pf3 = pf3,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.pf3 = pf3;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -591,7 +593,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.ps = ps,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.ps = ps;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -615,7 +617,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.ps2 = ps2,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.ps2 = ps2;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -639,7 +641,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.ps3 = ps3,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.ps3 = ps3;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -663,7 +665,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.qs = qs,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.qs = qs;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -687,7 +689,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.tie = tie,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.tie = tie;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -711,7 +713,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.bq = bq,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.bq = bq;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -735,7 +737,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.bf = bf,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.bf = bf;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -759,7 +761,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.sow = sow,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.sow = sow;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -783,7 +785,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.boost = boost,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.boost = boost;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -810,7 +812,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.lowercase_operators = lowercase_operators,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.lowercase_operators = lowercase_operators;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -834,7 +836,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.stopwords = stopwords,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.stopwords = stopwords;
                 *def_type = DefType::Edismax(edismax);
             }
@@ -858,7 +860,7 @@ impl DefTypeEdismax {
         match def_type {
             DefType::Edismax(d) => d.uf = uf,
             _ => {
-                let mut edismax = Edismax::new();
+                let mut edismax = EdismaxQueryBuilder::new();
                 edismax.uf = uf;
                 *def_type = DefType::Edismax(edismax);
             }

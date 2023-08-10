@@ -1,6 +1,8 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup, Population};
 use solrstice::models::error::SolrError;
-use solrstice::queries::def_type::{DefType, Dismax, Edismax, Lucene};
+use solrstice::queries::def_type::{
+    DefType, DismaxQueryBuilder, EdismaxQueryBuilder, LuceneQueryBuilder,
+};
 use solrstice::queries::index::UpdateQueryBuilder;
 use solrstice::queries::select::SelectQueryBuilder;
 
@@ -15,7 +17,9 @@ pub async fn test_dismax_query_parser() -> Result<(), SolrError> {
     let query = SelectQueryBuilder::new()
         .q("outdoors")
         .def_type(&DefType::Dismax(
-            Dismax::new().qf("interests^20").bq(&["interests:cars^20"]),
+            DismaxQueryBuilder::new()
+                .qf("interests^20")
+                .bq(&["interests:cars^20"]),
         ));
     let response = query
         .execute(&config.context, &config.collection_name)
@@ -42,7 +46,9 @@ pub async fn test_edismax_query_parser() -> Result<(), SolrError> {
     let response = SelectQueryBuilder::new()
         .q("outdoors")
         .def_type(&DefType::Edismax(
-            Edismax::new().qf("interests^20").bq(&["interests:cars^20"]),
+            EdismaxQueryBuilder::new()
+                .qf("interests^20")
+                .bq(&["interests:cars^20"]),
         ))
         .execute(&config.context, &config.collection_name)
         .await?;
@@ -65,7 +71,7 @@ pub async fn test_lucene_query_parser() -> Result<(), SolrError> {
 
     let response = SelectQueryBuilder::new()
         .q("outdoors")
-        .def_type(&DefType::Lucene(Lucene::new().df("interests")))
+        .def_type(&DefType::Lucene(LuceneQueryBuilder::new().df("interests")))
         .execute(&config.context, &config.collection_name)
         .await?;
     let response = response.get_response().ok_or("No response")?;

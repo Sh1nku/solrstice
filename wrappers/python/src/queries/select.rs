@@ -2,12 +2,12 @@ use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
 use crate::queries::components::grouping::GroupingComponentWrapper;
+use crate::queries::def_type::DefTypeQueryBuilder;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
 use solrstice::models::error::SolrError;
 use solrstice::queries::select::SelectQueryBuilder;
-use crate::queries::def_type::DefTypeWrapper;
 
 #[pyclass(name = "SelectQueryBuilder", module = "solrstice.queries")]
 #[derive(Clone, Serialize, Deserialize)]
@@ -25,7 +25,7 @@ impl SelectQueryBuilderWrapper {
         sort: Option<Vec<&str>>,
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
-        def_type: Option<DefTypeWrapper>,
+        def_type: Option<DefTypeQueryBuilder>,
     ) -> Self {
         let builder = SelectQueryBuilder::new();
         let mut s = Self(builder);
@@ -128,12 +128,12 @@ impl SelectQueryBuilderWrapper {
     }
 
     #[getter]
-    fn get_def_type(&self) -> Option<DefTypeWrapper> {
+    fn get_def_type(&self) -> Option<DefTypeQueryBuilder> {
         self.0.def_type.clone().map(|g| g.into())
     }
 
     #[setter]
-    fn set_def_type(&mut self, def_type: Option<DefTypeWrapper>) {
+    fn set_def_type(&mut self, def_type: Option<DefTypeQueryBuilder>) {
         self.0.def_type = def_type.map(|g| g.into())
     }
 

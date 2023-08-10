@@ -9,11 +9,18 @@ class QueryOperator(Enum):
 class DefType(abc.ABC):
     pass
 
-class DefTypeLucene(DefType):
+class LuceneQueryBuilder(DefType):
     q_op: Optional[QueryOperator]
     df: Optional[str]
     sow: Optional[bool]
 
+    """
+    Create a Lucene query builder.
+    
+    :param q_op: Query operator.
+    :param df: Default field
+    :param sow: Split on whitespace
+    """
     def __init__(
         self,
         q_op: Optional[QueryOperator] = None,
@@ -22,7 +29,7 @@ class DefTypeLucene(DefType):
     ):
         pass
 
-class DefTypeDismax(DefType):
+class DismaxQueryBuilder(DefType):
     q_alt: Optional[str]
     qf: Optional[str]
     mm: Optional[str]
@@ -33,6 +40,19 @@ class DefTypeDismax(DefType):
     bq: Optional[List[str]]
     bf: Optional[List[str]]
 
+    """
+    Create a DisMax query builder.
+    
+    :param q_alt: Alternate query
+    :param qf: Query fields
+    :param mm: Minimum match
+    :param pf: Phrase fields
+    :param ps: Phrase slop
+    :param qs: Query slop
+    :param tie: Tie breaker
+    :param bq: Boost query
+    :param bf: Boost functions
+    """
     def __init__(
         self,
         q_alt: Optional[str] = None,
@@ -47,7 +67,7 @@ class DefTypeDismax(DefType):
     ):
         pass
 
-class DefTypeEdismax(DefType):
+class EdismaxQueryBuilder(DefType):
     q_alt: Optional[str]
     qf: Optional[str]
     mm: Optional[str]
@@ -68,6 +88,29 @@ class DefTypeEdismax(DefType):
     stopwords: Optional[bool]
     uf: Optional[str]
 
+    """
+    Create an Edismax query builder.
+    
+    :param q_alt: Alternate query
+    :param qf: Query fields
+    :param mm: Minimum match
+    :param mm_auto_relax: Automatically relax mm
+    :param pf: Phrase fields
+    :param pf2: Phrase fields 2
+    :param pf3: Phrase fields 3
+    :param ps: Phrase slop
+    :param ps2: Phrase slop 2
+    :param ps3: Phrase slop 3
+    :param qs: Query slop
+    :param tie: Tie breaker
+    :param bq: Boost query
+    :param bf: Boost functions
+    :param sow: Split on whitespace
+    :param boost: Boost
+    :param lowercase_operators: Lowercase operators
+    :param stopwords: Stopwords
+    :param uf: User fields
+    """
     def __init__(
         self,
         q_alt: Optional[str] = None,

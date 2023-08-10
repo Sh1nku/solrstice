@@ -8,7 +8,7 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.def_type import DefTypeDismax, DefTypeEdismax, DefTypeLucene
+from solrstice.def_type import DismaxQueryBuilder, EdismaxQueryBuilder, LuceneQueryBuilder
 from solrstice.queries import SelectQueryBuilder
 
 
@@ -26,7 +26,7 @@ async def test_lucene_query_parser(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = DefTypeLucene(df="population")
+        query_parser = LuceneQueryBuilder(df="population")
         select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
         (await select_builder.execute(config.context, name)).get_response()
     finally:
@@ -42,7 +42,7 @@ async def test_dismax_query_parser(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = DefTypeDismax(qf="interests^20", bq=["interests:cars^20"])
+        query_parser = DismaxQueryBuilder(qf="interests^20", bq=["interests:cars^20"])
         select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
         response = (await select_builder.execute(config.context, name)).get_response()
         first_doc = response.docs[0]
@@ -60,7 +60,7 @@ async def test_edismax_query_parser(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = DefTypeEdismax(qf="interests^20", bq=["interests:cars^20"])
+        query_parser = EdismaxQueryBuilder(qf="interests^20", bq=["interests:cars^20"])
         select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
         response = (await select_builder.execute(config.context, name)).get_response()
         first_doc = response.docs[0]

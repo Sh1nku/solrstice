@@ -9,7 +9,8 @@ It also provides a wrapper to python.
 * Collection API
 * Alias API
 * Select Documents
-    * Grouping Component Query
+  * Grouping Component Query
+  * DefTypes (lucene, dismax, edismax)
 * Indexing Documents
 * Deleting Documents
 ## Examples
