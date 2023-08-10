@@ -7,6 +7,8 @@ use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
 use solrstice::models::error::SolrError;
 use solrstice::queries::select::SelectQueryBuilder;
+use crate::queries::def_type::DefTypeWrapper;
+
 #[pyclass(name = "SelectQueryBuilder", module = "solrstice.queries")]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SelectQueryBuilderWrapper(SelectQueryBuilder);
@@ -23,6 +25,7 @@ impl SelectQueryBuilderWrapper {
         sort: Option<Vec<&str>>,
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
+        def_type: Option<DefTypeWrapper>,
     ) -> Self {
         let builder = SelectQueryBuilder::new();
         let mut s = Self(builder);
@@ -40,6 +43,7 @@ impl SelectQueryBuilderWrapper {
         s.set_sort(sort);
         s.set_cursor_mark(cursor_mark);
         s.set_grouping(grouping);
+        s.set_def_type(def_type);
         s
     }
 
@@ -121,6 +125,16 @@ impl SelectQueryBuilderWrapper {
     #[setter]
     fn set_grouping(&mut self, grouping: Option<GroupingComponentWrapper>) {
         self.0.grouping = grouping.map(|g| g.into())
+    }
+
+    #[getter]
+    fn get_def_type(&self) -> Option<DefTypeWrapper> {
+        self.0.def_type.clone().map(|g| g.into())
+    }
+
+    #[setter]
+    fn set_def_type(&mut self, def_type: Option<DefTypeWrapper>) {
+        self.0.def_type = def_type.map(|g| g.into())
     }
 
     pub fn execute<'a>(

@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from solrstice.group import GroupingComponent
     from solrstice.hosts import SolrServerContext
     from solrstice.response import SolrResponse
+    from solrstice.def_type import DefType
 
 
 class SelectQueryBuilder:
@@ -18,8 +19,9 @@ class SelectQueryBuilder:
     :param start: Set the start index
     :param cursor_mark: Set the cursor mark
     :param grouping: Set the grouping component
+    :param def_type: Set the query type
     """
-    def __init__(self, q: Optional[str] = None, fq: Optional[List[str]] = None, fl: Optional[List[str]] = None, sort: Optional[List[str]] = None, rows: Optional[int] = None, start: Optional[int] = None, cursor_mark: Optional[str] = None, grouping: Optional['GroupingComponent'] = None) -> None:
+    def __init__(self, q: Optional[str] = None, fq: Optional[List[str]] = None, fl: Optional[List[str]] = None, sort: Optional[List[str]] = None, rows: Optional[int] = None, start: Optional[int] = None, cursor_mark: Optional[str] = None, grouping: Optional['GroupingComponent'] = None, def_type: Optional['DefType'] = None) -> None:
         pass
 
     q: str
@@ -30,6 +32,7 @@ class SelectQueryBuilder:
     start: int
     cursor_mark: str
     grouping: Optional['GroupingComponent']
+    def_type: Optional['DefType']
 
 
     async def execute(self, context: 'SolrServerContext', collection: str) -> 'SolrResponse':

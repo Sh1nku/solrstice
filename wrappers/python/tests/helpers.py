@@ -64,6 +64,7 @@ class Population(DataClassJsonMixin):
     id: str
     age: int
     count: int
+    interests: List[str]
 
 
 @dataclass_json

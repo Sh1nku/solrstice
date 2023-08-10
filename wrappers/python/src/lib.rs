@@ -11,6 +11,7 @@ use crate::models::response::response as response_module;
 use crate::queries::alias::alias;
 use crate::queries::collection::collection;
 use crate::queries::config::config;
+use crate::queries::def_type::def_type as def_type_module;
 use crate::queries::index::{
     CommitTypeWrapper, DeleteQueryBuilderWrapper, UpdateQueryBuilderWrapper,
 };
@@ -61,5 +62,8 @@ fn solrstice(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_wrapped(wrap_pymodule!(group_module))?;
     sys_modules.set_item("solrstice.group", m.getattr("group")?)?;
+
+    m.add_wrapped(wrap_pymodule!(def_type_module))?;
+    sys_modules.set_item("solrstice.def_type", m.getattr("def_type")?)?;
     Ok(())
 }
