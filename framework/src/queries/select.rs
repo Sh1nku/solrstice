@@ -1,6 +1,7 @@
 use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
+use crate::queries::components::facet::FacetSetComponentBuilder;
 use crate::queries::components::grouping::GroupingComponentBuilder;
 use crate::queries::def_type::DefType;
 use serde::{Deserialize, Serialize};
@@ -36,6 +37,8 @@ pub struct SelectQueryBuilder {
     pub grouping: Option<GroupingComponentBuilder>,
     #[serde(flatten)]
     pub def_type: Option<DefType>,
+    #[serde(flatten)]
+    pub facets: Option<FacetSetComponentBuilder>,
 }
 
 impl SelectQueryBuilder {
@@ -58,6 +61,7 @@ impl SelectQueryBuilder {
             cursor_mark: None,
             grouping: None,
             def_type: None,
+            facets: None,
         }
     }
 
@@ -197,6 +201,11 @@ impl SelectQueryBuilder {
     /// ```
     pub fn def_type(mut self, def_type: &DefType) -> Self {
         self.def_type = Some(def_type.clone());
+        self
+    }
+
+    pub fn facets(mut self, facets: &FacetSetComponentBuilder) -> Self {
+        self.facets = Some(facets.clone());
         self
     }
 

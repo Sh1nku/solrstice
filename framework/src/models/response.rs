@@ -1,4 +1,5 @@
 use crate::models::error::SolrError;
+use crate::models::facet::FacetSet;
 use crate::models::group::SolrGroupResult;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -56,8 +57,6 @@ pub struct SolrResponse {
     #[serde(default)]
     #[serde(deserialize_with = "from_alias")]
     pub(crate) aliases: Option<HashMap<String, Vec<String>>>,
-    /// The facets given by Solr if `facet=true` is passed.
-    pub(crate) facets: Option<Box<RawValue>>,
     /// The response given by Solr on a select request
     pub(crate) response: Option<SolrDocsResponse>,
     /// The config sets that exist on the server.
@@ -74,6 +73,8 @@ pub struct SolrResponse {
     /// The next cursor mark returned by Solr if [SelectQueryBuilder::cursor_mark](crate::queries::select::SelectQueryBuilder::cursor_mark) is passed.
     #[serde(rename = "nextCursorMark")]
     pub next_cursor_mark: Option<String>,
+    #[serde(rename = "facet_counts")]
+    pub(crate) facets: Option<FacetSet>,
 }
 
 impl SolrResponse {
@@ -122,6 +123,10 @@ impl SolrResponse {
     /// ```
     pub fn get_groups(&self) -> Option<&HashMap<String, SolrGroupResult>> {
         self.grouped.as_ref()
+    }
+
+    pub fn get_facets(&self) -> Option<&FacetSet> {
+        self.facets.as_ref()
     }
 }
 

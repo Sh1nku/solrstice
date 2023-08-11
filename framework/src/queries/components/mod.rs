@@ -2,3 +2,6 @@
 
 /// Grouping component
 pub mod grouping;
+
+/// Facetset
+pub mod facet;
