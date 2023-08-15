@@ -1,8 +1,9 @@
 use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
-use crate::queries::components::facet::FacetSetComponentBuilder;
+use crate::queries::components::facetset::FacetSetComponentBuilder;
 use crate::queries::components::grouping::GroupingComponentBuilder;
+use crate::queries::components::json_facet::JsonFacetComponentBuilder;
 use crate::queries::def_type::DefType;
 use serde::{Deserialize, Serialize};
 
@@ -38,7 +39,9 @@ pub struct SelectQueryBuilder {
     #[serde(flatten)]
     pub def_type: Option<DefType>,
     #[serde(flatten)]
-    pub facets: Option<FacetSetComponentBuilder>,
+    pub facetset: Option<FacetSetComponentBuilder>,
+    #[serde(flatten)]
+    pub json_facet: Option<JsonFacetComponentBuilder>,
 }
 
 impl SelectQueryBuilder {
@@ -61,7 +64,8 @@ impl SelectQueryBuilder {
             cursor_mark: None,
             grouping: None,
             def_type: None,
-            facets: None,
+            facetset: None,
+            json_facet: None,
         }
     }
 
@@ -204,8 +208,13 @@ impl SelectQueryBuilder {
         self
     }
 
-    pub fn facets(mut self, facets: &FacetSetComponentBuilder) -> Self {
-        self.facets = Some(facets.clone());
+    pub fn facetset(mut self, facetset: &FacetSetComponentBuilder) -> Self {
+        self.facetset = Some(facetset.clone());
+        self
+    }
+
+    pub fn json_facet(mut self, json_facet: &JsonFacetComponentBuilder) -> Self {
+        self.json_facet = Some(json_facet.clone());
         self
     }
 

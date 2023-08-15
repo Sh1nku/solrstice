@@ -2,13 +2,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct FacetSetComponentBuilder {
-    #[serde(rename = "facet")]
     pub facet: bool,
     #[serde(rename = "facet.query")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub queries: Option<Vec<String>>,
     // #[serde(rename = "facet.field")]
     // pub fields: Option<Vec<String>>,
     #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pivots: Option<PivotFacetComponentBuilder>,
 }
 
@@ -23,6 +24,11 @@ impl FacetSetComponentBuilder {
 
     pub fn pivots(mut self, pivots: &PivotFacetComponentBuilder) -> Self {
         self.pivots = Some(pivots.clone());
+        self
+    }
+
+    pub fn queries(mut self, queries: &[&str]) -> Self {
+        self.queries = Some(queries.iter().map(|s| s.to_string()).collect());
         self
     }
 }

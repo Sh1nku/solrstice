@@ -5,25 +5,25 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct FacetSet {
-    #[serde(rename = "facet_queries")]
-    queries: Option<HashMap<String, usize>>,
-    #[serde(rename = "facet_pivot")]
-    pivots: Option<HashMap<String, Vec<PivotFacetResult>>>,
-    #[serde(rename = "facet_fields")]
-    fields: Option<HashMap<String, usize>>,
+    #[serde(rename = "facet_queries", default)]
+    queries: HashMap<String, usize>,
+    #[serde(rename = "facet_pivot", default)]
+    pivots: HashMap<String, Vec<PivotFacetResult>>,
+    #[serde(rename = "facet_fields", default)]
+    fields: HashMap<String, usize>,
 }
 
 impl FacetSet {
-    pub fn get_queries(&self) -> Option<&HashMap<String, usize>> {
-        self.queries.as_ref()
+    pub fn get_queries(&self) -> &HashMap<String, usize> {
+        &self.queries
     }
 
-    pub fn get_pivots(&self) -> Option<&HashMap<String, Vec<PivotFacetResult>>> {
-        self.pivots.as_ref()
+    pub fn get_pivots(&self) -> &HashMap<String, Vec<PivotFacetResult>> {
+        &self.pivots
     }
 
-    pub fn get_fields(&self) -> Option<&HashMap<String, usize>> {
-        self.fields.as_ref()
+    pub fn get_fields(&self) -> &HashMap<String, usize> {
+        &self.fields
     }
 }
 
