@@ -262,56 +262,6 @@ impl SelectQueryBuilder {
 pub mod tests {
     use crate::queries::components::grouping::GroupingComponentBuilder;
     use crate::queries::select::SelectQueryBuilder;
-    use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-    fn bool_to_string<S>(val: &bool, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match val {
-            true => serializer.serialize_str("true"),
-            false => serializer.serialize_str("false"),
-        }
-    }
-
-    fn string_to_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        match s.as_str() {
-            "true" => Ok(true),
-            "false" => Ok(false),
-            _ => Err(serde::de::Error::custom("Could not convert string to bool")),
-        }
-    }
-
-    fn is_false(b: &bool) -> bool {
-        !(*b)
-    }
-
-    #[derive(Serialize, Deserialize, Clone, Default, PartialEq, Debug)]
-    pub struct TestOuterStruct {
-        #[serde(flatten)]
-        pub grouping: Option<TestInnerStruct>,
-    }
-
-    #[derive(Deserialize, Serialize, Clone, Debug, Default, PartialEq)]
-    pub struct TestInnerStruct {
-        #[serde(rename = "group.field", skip_serializing_if = "Option::is_none")]
-        pub field: Option<Vec<String>>,
-        #[serde(rename = "group.query", skip_serializing_if = "Option::is_none")]
-        pub queries: Option<Vec<String>>,
-        #[serde(rename = "group.limit", skip_serializing_if = "Option::is_none")]
-        pub limit: Option<usize>,
-        #[serde(
-            rename = "group.main",
-            skip_serializing_if = "is_false",
-            serialize_with = "bool_to_string",
-            deserialize_with = "string_to_bool"
-        )]
-        pub main: bool,
-    }
 
     #[test]
     pub fn serialize_select_query_builder_works() {
