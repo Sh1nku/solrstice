@@ -31,12 +31,12 @@ pub struct SolrGroupFieldResultWrapper {
 impl SolrGroupResultWrapper {
     #[getter]
     pub fn get_matches(&self) -> usize {
-        self.0.matches
+        self.0.get_matches()
     }
 
     #[getter]
     pub fn get_n_groups(&self) -> Option<usize> {
-        self.0.n_groups
+        self.0.get_n_groups()
     }
 
     pub fn get_field_result(&self) -> PyResult<Option<Vec<SolrGroupFieldResultWrapper>>> {

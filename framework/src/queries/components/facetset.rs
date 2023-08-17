@@ -201,12 +201,12 @@ impl FieldFacetComponentBuilder {
         }
     }
 
-    pub fn set_prefix(mut self, prefix: &str) -> Self {
+    pub fn prefix(mut self, prefix: &str) -> Self {
         self.prefix = Some(prefix.to_string());
         self
     }
 
-    pub fn set_contains(mut self, contains: &str) -> Self {
+    pub fn contains(mut self, contains: &str) -> Self {
         self.contains = Some(contains.to_string());
         self
     }

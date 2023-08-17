@@ -7,12 +7,12 @@ use serde_json::value::RawValue;
 /// Struct representing a Solr Grouping response
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SolrGroupResult {
-    pub matches: usize,
+    matches: usize,
     #[serde(rename = "ngroups")]
-    pub n_groups: Option<usize>,
-    pub groups: Option<Vec<SolrGroupFieldResult>>,
+    n_groups: Option<usize>,
+    groups: Option<Vec<SolrGroupFieldResult>>,
     #[serde(rename = "doclist")]
-    pub doc_list: Option<SolrDocsResponse>,
+    doc_list: Option<SolrDocsResponse>,
 }
 
 impl SolrGroupResult {
@@ -99,6 +99,16 @@ impl SolrGroupResult {
     /// # }
     pub fn get_simple_result(&self) -> Option<&SolrDocsResponse> {
         self.doc_list.as_ref()
+    }
+
+    /// Returns the number of matches for the query
+    pub fn get_matches(&self) -> usize {
+        self.matches
+    }
+
+    /// Returns the number of groups for the query, if n_groups was given
+    pub fn get_n_groups(&self) -> Option<usize> {
+        self.n_groups
     }
 }
 

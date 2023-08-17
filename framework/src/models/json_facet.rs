@@ -4,17 +4,45 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub struct JsonFacetResponse {
-    pub count: usize,
-    pub buckets: Vec<JsonFacetBucket>,
+    count: usize,
+    buckets: Vec<JsonFacetBucket>,
     #[serde(flatten)]
-    pub flat_facets: HashMap<String, serde_json::Value>,
-    pub nested_facets: HashMap<String, JsonFacetResponse>,
+    flat_facets: HashMap<String, serde_json::Value>,
+    nested_facets: HashMap<String, JsonFacetResponse>,
+}
+
+impl JsonFacetResponse {
+    pub fn get_buckets(&self) -> impl Iterator<Item = &JsonFacetBucket> {
+        self.buckets.iter()
+    }
+
+    pub fn get_flat_facets(&self) -> &HashMap<String, serde_json::Value> {
+        &self.flat_facets
+    }
+
+    pub fn get_nested_facets(&self) -> &HashMap<String, JsonFacetResponse> {
+        &self.nested_facets
+    }
+
+    pub fn get_count(&self) -> usize {
+        self.count
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JsonFacetBucket {
-    pub val: serde_json::Value,
-    pub count: usize,
+    val: serde_json::Value,
+    count: usize,
+}
+
+impl JsonFacetBucket {
+    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, serde_json::Error> {
+        serde_json::from_value::<T>(self.val.clone())
+    }
+
+    pub fn get_count(&self) -> usize {
+        self.count
+    }
 }
 
 impl<'de> Deserialize<'de> for JsonFacetResponse {
@@ -54,33 +82,5 @@ impl<'de> Deserialize<'de> for JsonFacetResponse {
             flat_facets,
             nested_facets,
         })
-    }
-}
-
-impl JsonFacetResponse {
-    pub fn get_buckets(&self) -> &Vec<JsonFacetBucket> {
-        &self.buckets
-    }
-
-    pub fn get_flat_facets(&self) -> &HashMap<String, serde_json::Value> {
-        &self.flat_facets
-    }
-
-    pub fn get_nested_facets(&self) -> &HashMap<String, JsonFacetResponse> {
-        &self.nested_facets
-    }
-
-    pub fn get_count(&self) -> usize {
-        self.count
-    }
-}
-
-impl JsonFacetBucket {
-    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, serde_json::Error> {
-        serde_json::from_value::<T>(self.val.clone())
-    }
-
-    pub fn get_count(&self) -> usize {
-        self.count
     }
 }

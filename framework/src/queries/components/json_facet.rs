@@ -65,6 +65,14 @@ impl JsonFacetComponentBuilder {
         }
     }
 
+    pub fn facets(mut self, facets: &[(&str, &JsonFacetType)]) -> Self {
+        self.facet = facets
+            .iter()
+            .map(|(name, facet)| (name.to_string(), facet.to_owned().clone()))
+            .collect();
+        self
+    }
+
     pub fn add_facet(mut self, name: &str, facet: JsonFacetType) -> Self {
         self.facet.insert(name.to_string(), facet);
         self
@@ -95,23 +103,29 @@ impl JsonTermsFacet {
         }
     }
 
-    pub fn set_offset(mut self, offset: usize) -> Self {
+    pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(offset);
         self
     }
 
-    pub fn set_limit(mut self, limit: usize) -> Self {
+    pub fn limit(mut self, limit: usize) -> Self {
         self.limit = Some(limit);
         self
     }
 
-    pub fn set_sort(mut self, sort: &str) -> Self {
+    pub fn sort(mut self, sort: &str) -> Self {
         self.sort = Some(sort.to_string());
         self
     }
 
-    pub fn set_facets(mut self, facets: HashMap<String, JsonFacetType>) -> Self {
+    pub fn facets(mut self, facets: HashMap<String, JsonFacetType>) -> Self {
         self.facet = Some(facets);
+        self
+    }
+
+    pub fn add_facet(mut self, name: &str, facet: JsonFacetType) -> Self {
+        let facets = self.facet.get_or_insert_with(HashMap::new);
+        facets.insert(name.to_string(), facet);
         self
     }
 }
@@ -129,39 +143,34 @@ impl JsonQueryFacet {
         }
     }
 
-    pub fn set_limit(mut self, limit: usize) -> Self {
+    pub fn limit(mut self, limit: usize) -> Self {
         self.limit = Some(limit);
         self
     }
 
-    pub fn set_offset(mut self, offset: usize) -> Self {
+    pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(offset);
         self
     }
 
-    pub fn set_sort(mut self, sort: &str) -> Self {
+    pub fn sort(mut self, sort: &str) -> Self {
         self.sort = Some(sort.to_string());
         self
     }
 
-    pub fn set_fq(mut self, fq: Vec<String>) -> Self {
-        self.fq = Some(fq);
+    pub fn fq(mut self, fq: &[&str]) -> Self {
+        self.fq = Some(fq.iter().map(|s| s.to_string()).collect());
         self
     }
 
-    pub fn set_facets(mut self, facets: HashMap<String, JsonFacetType>) -> Self {
+    pub fn facets(mut self, facets: HashMap<String, JsonFacetType>) -> Self {
         self.facet = Some(facets);
         self
     }
 
     pub fn add_facet(mut self, name: &str, facet: JsonFacetType) -> Self {
-        if let Some(facets) = self.facet.as_mut() {
-            facets.insert(name.to_string(), facet);
-        } else {
-            let mut facets = HashMap::new();
-            facets.insert(name.to_string(), facet);
-            self.facet = Some(facets);
-        }
+        let facets = self.facet.get_or_insert_with(HashMap::new);
+        facets.insert(name.to_string(), facet);
         self
     }
 }

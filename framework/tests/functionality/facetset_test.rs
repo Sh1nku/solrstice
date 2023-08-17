@@ -35,11 +35,10 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
             Err(_) => false,
         })
         .ok_or("No cars pivot")?;
-    assert_eq!(cars_pivot.count, 1);
+    assert_eq!(cars_pivot.get_count(), 1);
     let age_pivot = cars_pivot
         .get_pivots()
-        .ok_or("No pivots for cars")?
-        .first()
+        .next()
         .ok_or("No age pivot in cars")?;
     assert_eq!(age_pivot.get_value::<usize>()?, 20);
 

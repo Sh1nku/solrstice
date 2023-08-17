@@ -98,7 +98,10 @@ async fn group_n_groups() -> Result<(), SolrError> {
         .get_groups()
         .ok_or(SolrError::Unknown("Could not get groups".to_string()))?;
     let age_group = groups.get("age").unwrap();
-    assert_eq!(age_group.n_groups, Some(3));
+    let n_groups = age_group
+        .get_n_groups()
+        .ok_or(SolrError::Unknown("No n_groups".to_string()))?;
+    assert_eq!(n_groups, 3);
     let _ = config.tear_down().await;
     Ok(())
 }

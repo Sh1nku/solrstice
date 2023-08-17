@@ -84,12 +84,13 @@ impl FacetSet {
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct PivotFacetResult {
-    pub field: String,
+    field: String,
     value: serde_json::Value,
-    pub count: usize,
-    #[serde(rename = "pivot")]
-    pivots: Option<Vec<PivotFacetResult>>,
-    queries: Option<HashMap<String, usize>>,
+    count: usize,
+    #[serde(rename = "pivot", default)]
+    pivots: Vec<PivotFacetResult>,
+    #[serde(default)]
+    queries: HashMap<String, usize>,
 }
 
 impl PivotFacetResult {
@@ -97,19 +98,27 @@ impl PivotFacetResult {
         Ok(serde_json::from_value::<T>(self.value.clone())?)
     }
 
-    pub fn get_pivots(&self) -> Option<&Vec<PivotFacetResult>> {
-        self.pivots.as_ref()
+    pub fn get_pivots(&self) -> impl Iterator<Item = &PivotFacetResult> {
+        self.pivots.iter()
     }
 
-    pub fn get_queries(&self) -> Option<&HashMap<String, usize>> {
-        self.queries.as_ref()
+    pub fn get_queries(&self) -> &HashMap<String, usize> {
+        &self.queries
+    }
+    
+    pub fn get_count(&self) -> usize {
+        self.count
+    }
+    
+    pub fn get_field(&self) -> &str {
+        &self.field
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct FieldFacetResult {
-    pub key: serde_json::Value,
-    pub count: usize,
+    key: serde_json::Value,
+    count: usize,
 }
 
 impl FieldFacetResult {
