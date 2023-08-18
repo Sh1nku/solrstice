@@ -36,14 +36,50 @@ pub struct SolrResponseError {
 pub struct SolrDocsResponse {
     /// The number of documents found.
     #[serde(rename = "numFound")]
-    pub num_found: usize,
+    pub(crate) num_found: usize,
     /// The start index of the documents.
-    pub start: usize,
+    pub(crate) start: usize,
     #[serde(rename = "numFoundExact")]
     /// Whether or not the number of documents found is exact.
-    pub num_found_exact: bool,
+    pub(crate) num_found_exact: bool,
     /// The documents returned by the query. Use [`SolrDocsResponse::get_docs`] to deserialize.
     docs: Box<RawValue>,
+}
+
+impl SolrDocsResponse {
+    pub fn get_num_found(&self) -> usize {
+        self.num_found
+    }
+
+    pub fn get_start(&self) -> usize {
+        self.start
+    }
+
+    pub fn get_num_found_exact(&self) -> bool {
+        self.num_found_exact
+    }
+
+    /// Deserialize the docs returned by a select request.
+    ///
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::grouping::GroupingComponent;
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let response = client.select(&SelectQuery::new(), "collection").await?;
+    /// let docs = response.get_docs_response().unwrap().get_docs::<serde_json::Value>()?;
+    /// Ok(())
+    /// # }
+    /// ```
+    pub fn get_docs<V: DeserializeOwned>(&self) -> Result<Vec<V>, SolrError> {
+        serde_json::from_str::<Vec<V>>(self.docs.get()).map_err(|e| e.into())
+    }
 }
 
 /// Represents any response Solr can give. This is the top level response.
@@ -71,7 +107,7 @@ pub struct SolrResponse {
     pub(crate) collections: Option<Vec<String>>,
     /// Grouping results returned by Solr if `group=true` is passed.
     pub(crate) grouped: Option<HashMap<String, SolrGroupResult>>,
-    /// The next cursor mark returned by Solr if [SelectQueryBuilder::cursor_mark](crate::queries::select::SelectQueryBuilder::cursor_mark) is passed.
+    /// The next cursor mark returned by Solr if [SelectQuery::cursor_mark](crate::queries::select::SelectQuery::cursor_mark) is passed.
     #[serde(rename = "nextCursorMark")]
     pub next_cursor_mark: Option<String>,
     #[serde(rename = "facet_counts")]
@@ -88,20 +124,20 @@ impl SolrResponse {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::components::grouping::GroupingComponent;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new(), "collection").await?;
+    /// let response = client.select(&SelectQuery::new(), "collection").await?;
     /// Ok(())
     /// # }
     /// ```
-    pub fn get_response(&self) -> Option<&SolrDocsResponse> {
+    pub fn get_docs_response(&self) -> Option<&SolrDocsResponse> {
         self.response.as_ref()
     }
 
-    /// Get the groups returned by a select request using the [GroupingComponentBuilder](crate::queries::components::grouping::GroupingComponentBuilder).
+    /// Get the groups returned by a select request using the [GroupingComponentBuilder](crate::queries::components::grouping::GroupingComponent).
     ///
     /// # Examples
     /// ```no_run
@@ -109,14 +145,14 @@ impl SolrResponse {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::components::grouping::GroupingComponent;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let groups = client.select(&SelectQueryBuilder::new()
+    /// let groups = client.select(&SelectQuery::new()
     ///     .grouping(
-    ///         &GroupingComponentBuilder::new()
+    ///         &GroupingComponent::new()
     ///             .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
     ///             .limit(10),
     ///     ), "collection").await?
@@ -134,30 +170,6 @@ impl SolrResponse {
 
     pub fn get_json_facets(&self) -> Option<&JsonFacetResponse> {
         self.json_facet.as_ref()
-    }
-}
-
-impl SolrDocsResponse {
-    /// Deserialize the docs returned by a select request.
-    ///
-    /// # Examples
-    /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
-    /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new(), "collection").await?;
-    /// let docs = response.get_response().unwrap().get_docs::<serde_json::Value>()?;
-    /// Ok(())
-    /// # }
-    /// ```
-    pub fn get_docs<V: DeserializeOwned>(&self) -> Result<Vec<V>, SolrError> {
-        serde_json::from_str::<Vec<V>>(self.docs.get()).map_err(|e| e.into())
     }
 }
 

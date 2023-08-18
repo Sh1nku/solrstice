@@ -3,10 +3,9 @@ use serde::de::Error;
 use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
-use std::ops::Deref;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct FacetSetComponentBuilder {
+pub struct FacetSetComponent {
     pub facet: bool,
     #[serde(rename = "facet.query")]
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
@@ -17,16 +16,13 @@ pub struct FacetSetComponentBuilder {
         flatten
     )]
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub fields: Vec<FieldFacetComponentBuilder>,
+    pub fields: Vec<FieldFacetComponent>,
     #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pivots: Option<PivotFacetComponentBuilder>,
+    pub pivots: Option<PivotFacetComponent>,
 }
 
-fn serialize_fields<S>(
-    fields: &Vec<FieldFacetComponentBuilder>,
-    serializer: S,
-) -> Result<S::Ok, S::Error>
+fn serialize_fields<S>(fields: &Vec<FieldFacetComponent>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
@@ -49,7 +45,7 @@ where
     map.end()
 }
 
-fn deserialize_fields<'de, D>(deserializer: D) -> Result<Vec<FieldFacetComponentBuilder>, D::Error>
+fn deserialize_fields<'de, D>(deserializer: D) -> Result<Vec<FieldFacetComponent>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -57,7 +53,7 @@ where
         static ref RE: Regex = Regex::new(r"^f\.(.+).facet\.(.+)$").unwrap();
     };
     let map = serde_json::Value::deserialize(deserializer)?;
-    let mut fields: HashMap<String, FieldFacetComponentBuilder> = HashMap::new();
+    let mut fields: HashMap<String, FieldFacetComponent> = HashMap::new();
     for (key, value) in map.as_object().unwrap().iter() {
         if let Some(caps) = RE.captures(key) {
             let field_name = caps.get(1).ok_or(Error::custom(format!(
@@ -75,7 +71,7 @@ where
                     })?;
                     let entry = fields
                         .entry(field_name.as_str().to_string())
-                        .or_insert_with(|| FieldFacetComponentBuilder::new(field_name.as_str()));
+                        .or_insert_with(|| FieldFacetComponent::new(field_name.as_str()));
                     entry.prefix = Some(prefix);
                 }
                 "contains" => {
@@ -85,7 +81,7 @@ where
                         })?;
                     let entry = fields
                         .entry(field_name.as_str().to_string())
-                        .or_insert_with(|| FieldFacetComponentBuilder::new(field_name.as_str()));
+                        .or_insert_with(|| FieldFacetComponent::new(field_name.as_str()));
                     entry.contains = Some(contains);
                 }
                 _ => {
@@ -102,7 +98,7 @@ where
                 if !fields.contains_key(&field_name) {
                     fields.insert(
                         field_name.clone(),
-                        FieldFacetComponentBuilder::new(field_name.as_str()),
+                        FieldFacetComponent::new(field_name.as_str()),
                     );
                 }
             }
@@ -113,12 +109,12 @@ where
     Ok(fields
         .into_iter()
         .map(|(_, v)| v)
-        .collect::<Vec<FieldFacetComponentBuilder>>())
+        .collect::<Vec<FieldFacetComponent>>())
 }
 
-impl FacetSetComponentBuilder {
+impl FacetSetComponent {
     pub fn new() -> Self {
-        FacetSetComponentBuilder {
+        FacetSetComponent {
             facet: true,
             queries: Vec::new(),
             pivots: None,
@@ -126,43 +122,36 @@ impl FacetSetComponentBuilder {
         }
     }
 
-    pub fn set_pivots(mut self, pivots: &PivotFacetComponentBuilder) -> Self {
-        self.pivots = Some(pivots.clone());
+    pub fn pivots<T: AsRef<PivotFacetComponent>>(mut self, pivots: T) -> Self {
+        self.pivots = Some(pivots.as_ref().clone());
         self
     }
 
-    pub fn set_queries(mut self, queries: &[&str]) -> Self {
-        self.queries = queries.iter().map(|s| s.to_string()).collect();
+    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
+        self.queries = queries.iter().map(|q| q.as_ref().to_string()).collect();
         self
     }
 
-    pub fn add_query(mut self, query: &str) -> Self {
-        self.queries.push(query.to_string());
-        self
-    }
-
-    pub fn add_field(mut self, field: &FieldFacetComponentBuilder) -> Self {
-        self.fields.push(field.clone());
-        self
-    }
-
-    pub fn set_fields(mut self, fields: &[&FieldFacetComponentBuilder]) -> Self {
-        self.fields = fields
-            .iter()
-            .map(|f| f.deref().clone())
-            .collect::<Vec<FieldFacetComponentBuilder>>();
+    pub fn fields<T: AsRef<FieldFacetComponent>>(mut self, fields: &[T]) -> Self {
+        self.fields = fields.iter().map(|f| f.as_ref().clone()).collect();
         self
     }
 }
 
-impl Default for FacetSetComponentBuilder {
+impl Default for FacetSetComponent {
     fn default() -> Self {
-        FacetSetComponentBuilder::new()
+        FacetSetComponent::new()
+    }
+}
+
+impl AsRef<FacetSetComponent> for FacetSetComponent {
+    fn as_ref(&self) -> &FacetSetComponent {
+        self
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct PivotFacetComponentBuilder {
+pub struct PivotFacetComponent {
     /// The field to facet on.
     #[serde(rename = "facet.pivot")]
     pub pivots: Vec<String>,
@@ -171,10 +160,10 @@ pub struct PivotFacetComponentBuilder {
     pub min_count: Option<usize>,
 }
 
-impl PivotFacetComponentBuilder {
-    pub fn new(pivots: &[&str]) -> Self {
-        PivotFacetComponentBuilder {
-            pivots: pivots.iter().map(|s| s.to_string()).collect(),
+impl PivotFacetComponent {
+    pub fn new<T: AsRef<str>>(pivots: &[T]) -> Self {
+        PivotFacetComponent {
+            pivots: pivots.iter().map(|p| p.as_ref().to_string()).collect(),
             min_count: None,
         }
     }
@@ -185,50 +174,62 @@ impl PivotFacetComponentBuilder {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct FieldFacetComponentBuilder {
+impl AsRef<PivotFacetComponent> for PivotFacetComponent {
+    fn as_ref(&self) -> &PivotFacetComponent {
+        self
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FieldFacetComponent {
     pub field: String,
     pub prefix: Option<String>,
     pub contains: Option<String>,
 }
 
-impl FieldFacetComponentBuilder {
+impl FieldFacetComponent {
     pub fn new(field: &str) -> Self {
-        FieldFacetComponentBuilder {
+        FieldFacetComponent {
             field: field.to_string(),
             prefix: None,
             contains: None,
         }
     }
 
-    pub fn prefix(mut self, prefix: &str) -> Self {
-        self.prefix = Some(prefix.to_string());
+    pub fn prefix<T: AsRef<str>>(mut self, prefix: T) -> Self {
+        self.prefix = Some(prefix.as_ref().to_string());
         self
     }
 
-    pub fn contains(mut self, contains: &str) -> Self {
-        self.contains = Some(contains.to_string());
+    pub fn contains<T: AsRef<str>>(mut self, contains: T) -> Self {
+        self.contains = Some(contains.as_ref().to_string());
+        self
+    }
+}
+
+impl AsRef<FieldFacetComponent> for FieldFacetComponent {
+    fn as_ref(&self) -> &FieldFacetComponent {
         self
     }
 }
 
 #[cfg(test)]
 pub mod tests {
-    use crate::queries::components::facetset::FacetSetComponentBuilder;
+    use crate::queries::components::facetset::FacetSetComponent;
 
     #[test]
     fn serialize_fields_works() {
-        let builder = FacetSetComponentBuilder::new()
-            .add_query("age:[* TO *]")
-            .add_field(
-                &crate::queries::components::facetset::FieldFacetComponentBuilder {
+        let builder = FacetSetComponent::new()
+            .queries(&["age:[* TO *]"])
+            .fields(
+                &[&crate::queries::components::facetset::FieldFacetComponent {
                     field: "field".to_string(),
                     prefix: Some("prefix".to_string()),
                     contains: Some("contains".to_string()),
-                },
+                }],
             );
         let serialized = serde_json::to_string_pretty(&builder).unwrap();
-        let deserialized = serde_json::from_str::<FacetSetComponentBuilder>(&serialized).unwrap();
+        let deserialized = serde_json::from_str::<FacetSetComponent>(&serialized).unwrap();
         assert_eq!(builder, deserialized);
     }
 }

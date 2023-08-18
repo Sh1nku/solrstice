@@ -22,13 +22,13 @@ impl fmt::Display for GroupFormatting {
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// use solrstice::models::auth::SolrBasicAuth;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-/// use solrstice::queries::select::SelectQueryBuilder;
+/// use solrstice::queries::components::grouping::GroupingComponent;
+/// use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-/// let response = SelectQueryBuilder::new()
+/// let response = SelectQuery::new()
 ///     .fq(&["age:[* TO *]"])
-///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10))
+///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
 ///     .execute(&context, "collection_name")
 ///     .await?;
 /// let groups = response.get_groups().ok_or("No groups")?;
@@ -42,7 +42,7 @@ impl fmt::Display for GroupFormatting {
 /// # }
 /// ```
 #[derive(Deserialize, Serialize, Clone, Debug, Default, PartialEq)]
-pub struct GroupingComponentBuilder {
+pub struct GroupingComponent {
     #[serde(skip_serializing_if = "Option::is_none")]
     group: Option<bool>,
     #[serde(rename = "group.field", skip_serializing_if = "Option::is_none")]
@@ -67,20 +67,20 @@ pub struct GroupingComponentBuilder {
     pub facet: Option<bool>,
 }
 
-impl GroupingComponentBuilder {
+impl GroupingComponent {
     /// Create a new GroupingComponentBuilder.
     /// # Examples
     /// ```no_run
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// use solrstice::queries::select::SelectQueryBuilder;
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-    /// let response = SelectQueryBuilder::new()
+    /// let response = SelectQuery::new()
     ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10))
+    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -112,30 +112,35 @@ impl GroupingComponentBuilder {
     /// Fields to group by.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().fields(&["age"]);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().fields(&["age"]);
     /// ```
-    pub fn fields(mut self, fields: &[&str]) -> Self {
-        self.field = Some(fields.into_iter().map(|x| x.to_string()).collect());
+    pub fn fields<T: AsRef<str>>(mut self, fields: &[T]) -> Self {
+        self.field = Some(fields.into_iter().map(|x| x.as_ref().to_string()).collect());
         self
     }
 
     /// Queries to group by.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().queries(&["age:[0 TO 59]", "age:[60 TO *]"]);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().queries(&["age:[0 TO 59]", "age:[60 TO *]"]);
     /// ```
-    pub fn queries(mut self, queries: &[&str]) -> Self {
-        self.queries = Some(queries.into_iter().map(|x| x.to_string()).collect());
+    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
+        self.queries = Some(
+            queries
+                .into_iter()
+                .map(|x| x.as_ref().to_string())
+                .collect(),
+        );
         self
     }
 
     /// Maximum number of documents per group.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().limit(10);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().limit(10);
     /// ```
     pub fn limit(mut self, limit: usize) -> Self {
         self.limit = Some(limit);
@@ -145,8 +150,8 @@ impl GroupingComponentBuilder {
     /// Initial offset
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().limit(10).offset(10);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().limit(10).offset(10);
     /// ```
     pub fn offset(mut self, offset: usize) -> Self {
         self.offset = Some(offset);
@@ -156,19 +161,19 @@ impl GroupingComponentBuilder {
     /// How to sort the documents in the groups.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().sort(&["age asc"]);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().sort(&["age asc"]);
     /// ```
-    pub fn sort(mut self, sort: &[&str]) -> Self {
-        self.sort = Some(sort.into_iter().map(|x| x.to_string()).collect());
+    pub fn sort<T: AsRef<str>>(mut self, sort: &[T]) -> Self {
+        self.sort = Some(sort.into_iter().map(|x| x.as_ref().to_string()).collect());
         self
     }
 
     /// How to format the groups.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::{GroupingComponentBuilder, GroupFormatting};
-    /// GroupingComponentBuilder::new().format(GroupFormatting::Simple);
+    /// use solrstice::queries::components::grouping::{GroupingComponent, GroupFormatting};
+    /// GroupingComponent::new().format(GroupFormatting::Simple);
     /// ```
     pub fn format(mut self, format: GroupFormatting) -> Self {
         self.format = Some(format);
@@ -178,8 +183,8 @@ impl GroupingComponentBuilder {
     /// Put the results in the main result set.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().main(true);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().main(true);
     /// ```
     pub fn main(mut self, main: bool) -> Self {
         self.main = Some(main);
@@ -189,8 +194,8 @@ impl GroupingComponentBuilder {
     /// Include the number of groups that have matched the query.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// GroupingComponentBuilder::new().n_groups(true);
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// GroupingComponent::new().n_groups(true);
     /// ```
     pub fn n_groups(mut self, n_groups: bool) -> Self {
         self.n_groups = Some(n_groups);
@@ -206,6 +211,12 @@ impl GroupingComponentBuilder {
     /// Not really sure what this does.
     pub fn facet(mut self, facet: bool) -> Self {
         self.facet = Some(facet);
+        self
+    }
+}
+
+impl AsRef<GroupingComponent> for GroupingComponent {
+    fn as_ref(&self) -> &Self {
         self
     }
 }

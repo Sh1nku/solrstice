@@ -1,24 +1,23 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use solrstice::models::error::SolrError;
 use solrstice::queries::components::json_facet::{
-    JsonFacetComponentBuilder, JsonFacetType, JsonQueryFacet,
+    JsonFacetComponent, JsonFacetType, JsonQueryFacet,
 };
-use solrstice::queries::index::UpdateQueryBuilder;
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::UpdateQuery;
+use solrstice::queries::select::SelectQuery;
 
 #[tokio::test]
 pub async fn test_json_facet_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetBasic")
         .await
         .unwrap();
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQueryBuilder::new().json_facet(
-        &JsonFacetComponentBuilder::new()
-            .add_facet("below_60", JsonQueryFacet::new("age:[0 TO 59]").into()),
+    let query = SelectQuery::new().json_facet(
+        &JsonFacetComponent::new().facets(&[("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
     );
     let response = config
         .async_client
@@ -40,22 +39,18 @@ pub async fn test_json_facet_sub_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetSub")
         .await
         .unwrap();
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQueryBuilder::new().json_facet(
-        &JsonFacetComponentBuilder::new().add_facet(
-            "below_60",
-            JsonQueryFacet::new("age:[0 TO 59]")
-                .add_facet(
-                    "total_people",
-                    JsonFacetType::StringQuery("sum(count)".to_string()),
-                )
-                .into(),
-        ),
-    );
+    let query = SelectQuery::new().json_facet(&JsonFacetComponent::new().facets(&[(
+        "below_60",
+        JsonQueryFacet::new("age:[0 TO 59]").facets(&[(
+            "total_people",
+            JsonFacetType::StringQuery("sum(count)".to_string()),
+        )]),
+    )]));
     let response = config
         .async_client
         .select(&query, &config.collection_name)

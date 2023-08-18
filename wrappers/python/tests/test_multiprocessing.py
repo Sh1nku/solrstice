@@ -9,7 +9,7 @@ from helpers import Config, create_config
 from solrstice.auth import SolrBasicAuth
 from solrstice.clients import BlockingSolrCloudClient
 from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import UpdateQueryBuilder
+from solrstice.queries import UpdateQuery
 
 
 @pytest.fixture()
@@ -38,7 +38,7 @@ def create_client(config: PickableConfig):
 def index_independent(config: PickableConfig, collection_name):
     client = create_client(config)
     client.index(
-        UpdateQueryBuilder(),
+        UpdateQuery(),
         collection_name,
         [{"id": str(random.randint(0, 10000000000))}],
     )

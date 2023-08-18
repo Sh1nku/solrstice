@@ -98,18 +98,18 @@ impl PivotFacetResult {
         Ok(serde_json::from_value::<T>(self.value.clone())?)
     }
 
-    pub fn get_pivots(&self) -> impl Iterator<Item = &PivotFacetResult> {
-        self.pivots.iter()
+    pub fn get_pivots(&self) -> &[PivotFacetResult] {
+        self.pivots.as_slice()
     }
 
     pub fn get_queries(&self) -> &HashMap<String, usize> {
         &self.queries
     }
-    
+
     pub fn get_count(&self) -> usize {
         self.count
     }
-    
+
     pub fn get_field(&self) -> &str {
         &self.field
     }

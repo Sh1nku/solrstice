@@ -11,8 +11,8 @@ use crate::queries::collection::{
 use crate::queries::config::{
     config_exists_blocking, delete_config_blocking, get_configs_blocking, upload_config_blocking,
 };
-use crate::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use crate::queries::select::SelectQueryBuilder;
+use crate::queries::index::{DeleteQuery, UpdateQuery};
+use crate::queries::select::SelectQuery;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::Path;
@@ -269,7 +269,7 @@ impl BlockingSolrCloudClient {
     /// ```no_run
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQueryBuilder;
+    /// # use solrstice::queries::index::UpdateQuery;
     /// # use serde::Serialize;
     /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -278,13 +278,13 @@ impl BlockingSolrCloudClient {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
-    /// let response = client.index(&UpdateQueryBuilder::new(), "collection_name", &[Data {id: "test".to_string()}])?;
+    /// let response = client.index(&UpdateQuery::new(), "collection_name", &[Data {id: "test".to_string()}])?;
     /// # Ok(())
     /// # }
     /// ```
     pub fn index<T: Serialize>(
         &self,
-        builder: &UpdateQueryBuilder,
+        builder: &UpdateQuery,
         collection: &str,
         data: &[T],
     ) -> Result<SolrResponse, SolrError> {
@@ -297,17 +297,17 @@ impl BlockingSolrCloudClient {
     /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new().fq(&["age:[* TO *]"]), "collection_name")?;
+    /// let response = client.select(&SelectQuery::new().fq(&["age:[* TO *]"]), "collection_name")?;
     /// # Ok(())
     /// # }
     /// ```
     pub fn select(
         &self,
-        builder: &SelectQueryBuilder,
+        builder: &SelectQuery,
         collection: &str,
     ) -> Result<SolrResponse, SolrError> {
         builder.execute_blocking(&self.context, collection)
@@ -319,18 +319,18 @@ impl BlockingSolrCloudClient {
     /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQueryBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::index::DeleteQuery;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQueryBuilder::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name")?;
+    /// let response = client.delete(&DeleteQuery::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name")?;
     /// # Ok(())
     /// # }
     /// ```
     pub fn delete(
         &self,
-        builder: &DeleteQueryBuilder,
+        builder: &DeleteQuery,
         collection: &str,
     ) -> Result<SolrResponse, SolrError> {
         builder.execute_blocking(&self.context, collection)

@@ -22,13 +22,13 @@ impl SolrGroupResult {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// use solrstice::queries::select::SelectQueryBuilder;
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-    /// let response = SelectQueryBuilder::new()
+    /// let response = SelectQuery::new()
     ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10))
+    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -41,8 +41,8 @@ impl SolrGroupResult {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn get_field_result(&self) -> Option<&Vec<SolrGroupFieldResult>> {
-        self.groups.as_ref()
+    pub fn get_field_result(&self) -> Option<&[SolrGroupFieldResult]> {
+        self.groups.as_deref()
     }
 
     /// Returns a grouping query result
@@ -51,13 +51,13 @@ impl SolrGroupResult {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// use solrstice::queries::select::SelectQueryBuilder;
+    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-    /// let response = SelectQueryBuilder::new()
+    /// let response = SelectQuery::new()
     ///     .grouping(
-    ///         &GroupingComponentBuilder::new()
+    ///         &GroupingComponent::new()
     ///             .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
     ///             .limit(10),
     ///     )
@@ -82,13 +82,13 @@ impl SolrGroupResult {
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// use solrstice::models::auth::SolrBasicAuth;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponentBuilder};
-    /// use solrstice::queries::select::SelectQueryBuilder;
+    /// use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponent};
+    /// use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-    /// let response = SelectQueryBuilder::new()
+    /// let response = SelectQuery::new()
     ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10).format(GroupFormatting::Simple))
+    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10).format(GroupFormatting::Simple))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -120,14 +120,14 @@ impl SolrGroupResult {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-/// # use solrstice::queries::select::SelectQueryBuilder;
+/// # use solrstice::queries::components::grouping::GroupingComponent;
+/// # use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
-/// let response = client.select(&SelectQueryBuilder::new()
+/// let response = client.select(&SelectQuery::new()
 ///     .fq(&["age:[* TO *]"])
-///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10)), "collection_name").await?;
+///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
 /// let groups = response
 ///     .get_groups()
 ///     .ok_or("No groups found")?;
@@ -156,14 +156,14 @@ impl SolrGroupFieldResult {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::components::grouping::GroupingComponent;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10)), "collection_name").await?;
+    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
     /// let groups = response
     ///     .get_groups()
     ///     .ok_or("No groups found")?;
@@ -184,14 +184,14 @@ impl SolrGroupFieldResult {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponentBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::components::grouping::GroupingComponent;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponentBuilder::new().fields(&["age"]).limit(10)), "collection_name").await?;
+    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
     /// let groups = response
     ///     .get_groups()
     ///     .ok_or("No groups found")?;

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::index::UpdateQueryBuilder;
+/// # use solrstice::queries::index::UpdateQuery;
 /// # use serde::Serialize;
 /// # use solrstice::models::commit_type::CommitType;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -19,24 +19,24 @@ use serde::{Deserialize, Serialize};
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
-/// let response = client.index(&UpdateQueryBuilder::new().commit_type(CommitType::Soft), "collection_name", &[Data {id: "test".to_string()}]).await?;
+/// let response = client.index(&UpdateQuery::new().commit_type(CommitType::Soft), "collection_name", &[Data {id: "test".to_string()}]).await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Debug)]
-pub struct UpdateQueryBuilder {
+pub struct UpdateQuery {
     pub handler: String,
     pub commit_type: CommitType,
 }
 
-impl UpdateQueryBuilder {
-    /// Create a new instance of UpdateQueryBuilder.
+impl UpdateQuery {
+    /// Create a new instance of UpdateQuery.
     /// # Examples
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQueryBuilder;
+    /// # use solrstice::queries::index::UpdateQuery;
     /// # use serde::Serialize;
     /// # use solrstice::models::commit_type::CommitType;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -45,12 +45,12 @@ impl UpdateQueryBuilder {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.index(&UpdateQueryBuilder::new().commit_type(CommitType::Soft), "collection_name", &[Data {id: "test".to_string()}]).await?;
+    /// let response = client.index(&UpdateQuery::new().commit_type(CommitType::Soft), "collection_name", &[Data {id: "test".to_string()}]).await?;
     /// # Ok(())
     /// # }
     /// ```
     pub fn new() -> Self {
-        UpdateQueryBuilder {
+        UpdateQuery {
             handler: "update".to_string(),
             commit_type: CommitType::Hard,
         }
@@ -59,11 +59,11 @@ impl UpdateQueryBuilder {
     /// Set the handler for the query. Default is "update".
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::UpdateQueryBuilder;
-    /// let builder = UpdateQueryBuilder::new().handler("custom_handler");
+    /// use solrstice::queries::index::UpdateQuery;
+    /// let builder = UpdateQuery::new().handler("custom_handler");
     /// ```
-    pub fn handler(mut self, handler: &str) -> Self {
-        self.handler = handler.to_string();
+    pub fn handler<T: AsRef<str>>(mut self, handler: T) -> Self {
+        self.handler = handler.as_ref().to_string();
         self
     }
 
@@ -71,8 +71,8 @@ impl UpdateQueryBuilder {
     /// # Examples
     /// ```no_run
     /// use solrstice::models::commit_type::CommitType;
-    /// use solrstice::queries::index::UpdateQueryBuilder;
-    /// let builder = UpdateQueryBuilder::new().commit_type(CommitType::Soft);
+    /// use solrstice::queries::index::UpdateQuery;
+    /// let builder = UpdateQuery::new().commit_type(CommitType::Soft);
     /// ```
     pub fn commit_type(mut self, commit_type: CommitType) -> Self {
         self.commit_type = commit_type;
@@ -122,7 +122,7 @@ impl UpdateQueryBuilder {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::index::DeleteQueryBuilder;
+/// # use solrstice::queries::index::DeleteQuery;
 /// # use serde::Serialize;
 /// # use solrstice::models::commit_type::CommitType;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -131,12 +131,12 @@ impl UpdateQueryBuilder {
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
-/// let response = client.delete(&DeleteQueryBuilder::new().ids(&["document1", "document2"]), "collection_name").await?;
+/// let response = client.delete(&DeleteQuery::new().ids(&["document1", "document2"]), "collection_name").await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Debug)]
-pub struct DeleteQueryBuilder {
+pub struct DeleteQuery {
     /// The handler for the query. Default is "update".
     pub handler: String,
     /// The commit type for the query. Default is CommitType::Hard.
@@ -147,14 +147,14 @@ pub struct DeleteQueryBuilder {
     pub queries: Option<Vec<String>>,
 }
 
-impl DeleteQueryBuilder {
-    /// Create a new instance of DeleteQueryBuilder.
+impl DeleteQuery {
+    /// Create a new instance of DeleteQuery.
     /// # Examples
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQueryBuilder;
+    /// # use solrstice::queries::index::DeleteQuery;
     /// # use serde::Serialize;
     /// # use solrstice::models::commit_type::CommitType;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -163,12 +163,12 @@ impl DeleteQueryBuilder {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQueryBuilder::new().ids(&["document1", "document2"]), "collection_name").await?;
+    /// let response = client.delete(&DeleteQuery::new().ids(&["document1", "document2"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
     pub fn new() -> Self {
-        DeleteQueryBuilder {
+        DeleteQuery {
             handler: "update".to_string(),
             commit_type: CommitType::Hard,
             ids: None,
@@ -179,11 +179,11 @@ impl DeleteQueryBuilder {
     /// Set the handler for the query. Default is "update".
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQueryBuilder;
-    /// let builder = DeleteQueryBuilder::new().handler("custom_handler");
+    /// use solrstice::queries::index::DeleteQuery;
+    /// let builder = DeleteQuery::new().handler("custom_handler");
     /// ```
-    pub fn handler(mut self, handler: &str) -> Self {
-        self.handler = handler.to_string();
+    pub fn handler<T: AsRef<str>>(mut self, handler: T) -> Self {
+        self.handler = handler.as_ref().to_string();
         self
     }
 
@@ -191,8 +191,8 @@ impl DeleteQueryBuilder {
     /// # Examples
     /// ```no_run
     /// use solrstice::models::commit_type::CommitType;
-    /// use solrstice::queries::index::DeleteQueryBuilder;
-    /// let builder = DeleteQueryBuilder::new().commit_type(CommitType::Soft);
+    /// use solrstice::queries::index::DeleteQuery;
+    /// let builder = DeleteQuery::new().commit_type(CommitType::Soft);
     /// ```
     pub fn commit_type(mut self, commit_type: CommitType) -> Self {
         self.commit_type = commit_type;
@@ -202,22 +202,22 @@ impl DeleteQueryBuilder {
     /// Set the ids to delete
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQueryBuilder;
-    /// let builder = DeleteQueryBuilder::new().ids(&["document1", "document2"]);
+    /// use solrstice::queries::index::DeleteQuery;
+    /// let builder = DeleteQuery::new().ids(&["document1", "document2"]);
     /// ```
-    pub fn ids(mut self, ids: &[&str]) -> Self {
-        self.ids = Some(ids.iter().map(|s| s.to_string()).collect());
+    pub fn ids<T: AsRef<str>>(mut self, ids: &[T]) -> Self {
+        self.ids = Some(ids.iter().map(|s| s.as_ref().to_string()).collect());
         self
     }
 
     /// Set the queries to delete
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQueryBuilder;
-    /// let builder = DeleteQueryBuilder::new().queries(&["age:[* TO *]"]);
+    /// use solrstice::queries::index::DeleteQuery;
+    /// let builder = DeleteQuery::new().queries(&["age:[* TO *]"]);
     /// ```
-    pub fn queries(mut self, queries: &[&str]) -> Self {
-        self.queries = Some(queries.iter().map(|s| s.to_string()).collect());
+    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
+        self.queries = Some(queries.iter().map(|s| s.as_ref().to_string()).collect());
         self
     }
 
@@ -276,7 +276,7 @@ impl DeleteQueryBuilder {
 #[cfg(feature = "blocking")]
 use crate::runtime::RUNTIME;
 #[cfg(feature = "blocking")]
-impl UpdateQueryBuilder {
+impl UpdateQuery {
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [BlockingSolrCloudClient::index](crate::clients::blocking_cloud_client::BlockingSolrCloudClient::index) instead.
@@ -292,7 +292,7 @@ impl UpdateQueryBuilder {
     }
 }
 #[cfg(feature = "blocking")]
-impl DeleteQueryBuilder {
+impl DeleteQuery {
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [BlockingSolrCloudClient::delete](crate::clients::blocking_cloud_client::BlockingSolrCloudClient::delete) instead.

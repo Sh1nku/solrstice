@@ -12,7 +12,7 @@ from solrstice.auth import SolrBasicAuth
 from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
 from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import UpdateQueryBuilder
+from solrstice.queries import UpdateQuery
 
 
 @dataclass
@@ -89,7 +89,7 @@ def load_test_data() -> List[City]:
 
 async def index_test_data(context: SolrServerContext, name: str) -> None:
     data = load_test_data()
-    update_builder = UpdateQueryBuilder()
+    update_builder = UpdateQuery()
     await update_builder.execute(context, name, [City.to_dict(x) for x in data])
 
 

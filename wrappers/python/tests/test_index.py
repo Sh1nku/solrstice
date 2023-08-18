@@ -7,7 +7,7 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.queries import CommitType, UpdateQueryBuilder
+from solrstice.queries import CommitType, UpdateQuery
 
 
 @pytest.fixture()
@@ -23,7 +23,7 @@ async def test_index_indexes_documents(config: Config):
     try:
         await setup_collection(config.context, name, config.config_path)
 
-        await UpdateQueryBuilder(handler="update", commit_type=CommitType.Soft).execute(
+        await UpdateQuery(handler="update", commit_type=CommitType.Soft).execute(
             config.context, name, [{"id": "test"}]
         )
     finally:

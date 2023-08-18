@@ -13,9 +13,9 @@ use crate::queries::collection::collection;
 use crate::queries::config::config;
 use crate::queries::def_type::def_type as def_type_module;
 use crate::queries::index::{
-    CommitTypeWrapper, DeleteQueryBuilderWrapper, UpdateQueryBuilderWrapper,
+    CommitTypeWrapper, DeleteQueryWrapper, UpdateQueryWrapper,
 };
-use crate::queries::select::SelectQueryBuilderWrapper;
+use crate::queries::select::SelectQueryWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::wrap_pymodule;
@@ -23,9 +23,9 @@ use pyo3::wrap_pymodule;
 #[pymodule]
 #[pyo3(name = "queries")]
 fn queries_module(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_class::<SelectQueryBuilderWrapper>()?;
-    m.add_class::<UpdateQueryBuilderWrapper>()?;
-    m.add_class::<DeleteQueryBuilderWrapper>()?;
+    m.add_class::<SelectQueryWrapper>()?;
+    m.add_class::<UpdateQueryWrapper>()?;
+    m.add_class::<DeleteQueryWrapper>()?;
     m.add_class::<CommitTypeWrapper>()?;
     Ok(())
 }

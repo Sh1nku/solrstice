@@ -1,7 +1,7 @@
 use crate::structures::{get_test_data, City, FunctionalityTestsBuildup};
 use solrstice::models::error::SolrError;
-use solrstice::queries::index::UpdateQueryBuilder;
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::UpdateQuery;
+use solrstice::queries::select::SelectQuery;
 
 #[tokio::test]
 async fn select_works_when_no_result() -> Result<(), SolrError> {
@@ -9,13 +9,13 @@ async fn select_works_when_no_result() -> Result<(), SolrError> {
         .await
         .unwrap();
 
-    let result = SelectQueryBuilder::new()
+    let result = SelectQuery::new()
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap();
     assert_eq!(
         result
-            .get_response()
+            .get_docs_response()
             .unwrap()
             .get_docs::<City>()
             .unwrap()
@@ -32,13 +32,13 @@ async fn select_works_when_no_result_serde_value() -> Result<(), SolrError> {
         .await
         .unwrap();
 
-    let result = SelectQueryBuilder::new()
+    let result = SelectQuery::new()
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap();
     assert_eq!(
         result
-            .get_response()
+            .get_docs_response()
             .unwrap()
             .get_docs::<serde_json::Value>()
             .unwrap()
@@ -55,7 +55,7 @@ async fn select_works_using_cursor_mark() -> Result<(), SolrError> {
         .await
         .unwrap();
 
-    UpdateQueryBuilder::new()
+    UpdateQuery::new()
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await
         .unwrap();
@@ -66,7 +66,7 @@ async fn select_works_using_cursor_mark() -> Result<(), SolrError> {
         if current_iteration > 100 {
             panic!("Cursor mark test failed. Too many iterations");
         }
-        let result = SelectQueryBuilder::new()
+        let result = SelectQuery::new()
             .fq(&["age:[* TO *]"])
             .rows(1)
             .cursor_mark(cursor_mark.as_str())

@@ -3,9 +3,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum DefType {
-    Lucene(LuceneQueryBuilder),
-    Dismax(DismaxQueryBuilder),
-    Edismax(EdismaxQueryBuilder),
+    Lucene(LuceneQuery),
+    Dismax(DismaxQuery),
+    Edismax(EdismaxQuery),
+}
+
+impl From<&DefType> for DefType {
+    fn from(def_type: &DefType) -> Self {
+        def_type.clone()
+    }
 }
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
@@ -22,22 +28,22 @@ pub enum QueryOperator {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, LuceneQueryBuilder};
-/// # use solrstice::queries::select::SelectQueryBuilder;
+/// # use solrstice::queries::def_type::{DefType, LuceneQuery};
+/// # use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
-/// let response = client.select(&SelectQueryBuilder::new()
+/// let response = client.select(&SelectQuery::new()
 ///     .q("outdoors")
 ///     .def_type(&DefType::Lucene(
-///         LuceneQueryBuilder::new().df("interests")
+///         LuceneQuery::new().df("interests")
 ///     )), "collection_name")
 ///     .await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct LuceneQueryBuilder {
+pub struct LuceneQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.op", skip_serializing_if = "Option::is_none")]
@@ -48,7 +54,7 @@ pub struct LuceneQueryBuilder {
     pub sow: Option<bool>,
 }
 
-impl Default for LuceneQueryBuilder {
+impl Default for LuceneQuery {
     fn default() -> Self {
         Self {
             def_type: "lucene".to_string(),
@@ -59,22 +65,28 @@ impl Default for LuceneQueryBuilder {
     }
 }
 
-impl LuceneQueryBuilder {
+impl From<LuceneQuery> for DefType {
+    fn from(lucene_query: LuceneQuery) -> Self {
+        DefType::Lucene(lucene_query)
+    }
+}
+
+impl LuceneQuery {
     /// Create a new lucene query
     /// # Examples
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, LuceneQueryBuilder};
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::def_type::{DefType, LuceneQuery};
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .q("outdoors")
     ///     .def_type(&DefType::Lucene(
-    ///         LuceneQueryBuilder::new().df("interests")
+    ///         LuceneQuery::new().df("interests")
     ///     )), "collection_name")
     ///     .await?;
     /// # Ok(())
@@ -111,22 +123,22 @@ impl LuceneQueryBuilder {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, DismaxQueryBuilder};
-/// # use solrstice::queries::select::SelectQueryBuilder;
+/// # use solrstice::queries::def_type::{DefType, DismaxQuery};
+/// # use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
-/// let response = client.select(&SelectQueryBuilder::new()
+/// let response = client.select(&SelectQuery::new()
 ///     .q("outdoors")
 ///     .def_type(&DefType::Dismax(
-///         DismaxQueryBuilder::new().qf("interests^20").bq(&["interests:cars^20"]),
+///         DismaxQuery::new().qf("interests^20").bq(&["interests:cars^20"]),
 ///     )), "collection_name")
 ///     .await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct DismaxQueryBuilder {
+pub struct DismaxQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.alt", skip_serializing_if = "Option::is_none")]
@@ -149,7 +161,7 @@ pub struct DismaxQueryBuilder {
     pub bf: Option<Vec<String>>,
 }
 
-impl Default for DismaxQueryBuilder {
+impl Default for DismaxQuery {
     fn default() -> Self {
         Self {
             def_type: "dismax".to_string(),
@@ -166,22 +178,28 @@ impl Default for DismaxQueryBuilder {
     }
 }
 
-impl DismaxQueryBuilder {
+impl From<DismaxQuery> for DefType {
+    fn from(dismax_query: DismaxQuery) -> Self {
+        DefType::Dismax(dismax_query)
+    }
+}
+
+impl DismaxQuery {
     /// Create a new dismax query
     ///
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, DismaxQueryBuilder};
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::def_type::{DefType, DismaxQuery};
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .q("outdoors")
     ///     .def_type(&DefType::Dismax(
-    ///         DismaxQueryBuilder::new().qf("interests^20").bq(&["interests:cars^20"]),
+    ///         DismaxQuery::new().qf("interests^20").bq(&["interests:cars^20"]),
     ///     )), "collection_name")
     ///     .await?;
     /// # Ok(())
@@ -250,7 +268,7 @@ impl DismaxQueryBuilder {
 ///
 /// Documentation can be found at [SolrDocs](https://solr.apache.org/guide/8_11/the-extended-dismax-query-parser.html)
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct EdismaxQueryBuilder {
+pub struct EdismaxQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.alt", skip_serializing_if = "Option::is_none")]
@@ -293,7 +311,7 @@ pub struct EdismaxQueryBuilder {
     pub uf: Option<String>,
 }
 
-impl Default for EdismaxQueryBuilder {
+impl Default for EdismaxQuery {
     fn default() -> Self {
         Self {
             def_type: "edismax".to_string(),
@@ -320,7 +338,13 @@ impl Default for EdismaxQueryBuilder {
     }
 }
 
-impl EdismaxQueryBuilder {
+impl From<EdismaxQuery> for DefType {
+    fn from(edismax_query: EdismaxQuery) -> Self {
+        DefType::Edismax(edismax_query)
+    }
+}
+
+impl EdismaxQuery {
     pub fn new() -> Self {
         Self::default()
     }

@@ -6,8 +6,8 @@ use crate::queries::collection::{
     collection_exists, create_collection, delete_collection, get_collections,
 };
 use crate::queries::config::{config_exists, delete_config, get_configs, upload_config};
-use crate::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use crate::queries::select::SelectQueryBuilder;
+use crate::queries::index::{DeleteQuery, UpdateQuery};
+use crate::queries::select::SelectQuery;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::Path;
@@ -264,7 +264,7 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQueryBuilder;
+    /// # use solrstice::queries::index::UpdateQuery;
     /// # use serde::Serialize;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
@@ -272,13 +272,13 @@ impl AsyncSolrCloudClient {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.index(&UpdateQueryBuilder::new(), "collection_name", &[Data {id: "test".to_string()}]).await?;
+    /// let response = client.index(&UpdateQuery::new(), "collection_name", &[Data {id: "test".to_string()}]).await?;
     /// # Ok(())
     /// # }
     /// ```
     pub async fn index<T: Serialize>(
         &self,
-        builder: &UpdateQueryBuilder,
+        builder: &UpdateQuery,
         collection: &str,
         data: &[T],
     ) -> Result<SolrResponse, SolrError> {
@@ -291,17 +291,17 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new().fq(&["age:[* TO *]"]), "collection_name").await?;
+    /// let response = client.select(&SelectQuery::new().fq(&["age:[* TO *]"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
     pub async fn select(
         &self,
-        builder: &SelectQueryBuilder,
+        builder: &SelectQuery,
         collection: &str,
     ) -> Result<SolrResponse, SolrError> {
         builder.execute(&self.context, collection).await
@@ -313,18 +313,18 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQueryBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::index::DeleteQuery;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQueryBuilder::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name").await?;
+    /// let response = client.delete(&DeleteQuery::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
     pub async fn delete(
         &self,
-        builder: &DeleteQueryBuilder,
+        builder: &DeleteQuery,
         collection: &str,
     ) -> Result<SolrResponse, SolrError> {
         builder.execute(&self.context, collection).await

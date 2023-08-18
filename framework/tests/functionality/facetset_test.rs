@@ -1,25 +1,21 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use solrstice::models::error::SolrError;
-use solrstice::queries::components::facetset::{
-    FacetSetComponentBuilder, PivotFacetComponentBuilder,
-};
-use solrstice::queries::index::UpdateQueryBuilder;
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::components::facetset::{FacetSetComponent, PivotFacetComponent};
+use solrstice::queries::index::UpdateQuery;
+use solrstice::queries::select::SelectQuery;
 
 #[tokio::test]
 pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetPivot")
         .await
         .unwrap();
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQueryBuilder::new().facetset(
-        &FacetSetComponentBuilder::new()
-            .set_pivots(&PivotFacetComponentBuilder::new(&["interests,age"])),
-    );
+    let query = SelectQuery::new()
+        .facetset(&FacetSetComponent::new().pivots(&PivotFacetComponent::new(&["interests,age"])));
     let response = config
         .async_client
         .select(&query, &config.collection_name)
@@ -38,7 +34,7 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
     assert_eq!(cars_pivot.get_count(), 1);
     let age_pivot = cars_pivot
         .get_pivots()
-        .next()
+        .first()
         .ok_or("No age pivot in cars")?;
     assert_eq!(age_pivot.get_value::<usize>()?, 20);
 
@@ -51,13 +47,12 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetQuery")
         .await
         .unwrap();
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQueryBuilder::new()
-        .facetset(&FacetSetComponentBuilder::new().set_queries(&["age:[0 TO 59]"]));
+    let query = SelectQuery::new().facetset(&FacetSetComponent::new().queries(&["age:[0 TO 59]"]));
     let response = config
         .async_client
         .select(&query, &config.collection_name)

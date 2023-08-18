@@ -9,7 +9,7 @@ class GroupFormatting(Enum):
 
 class GroupingComponent:
     """
-    Grouping component, used in conjunction with SelectQueryBuilder
+    Grouping component, used in conjunction with SelectQuery
 
     :param fields: Fields to group results by
     :param queries: Queries to group by
@@ -37,51 +37,50 @@ class GroupingComponent:
         facet: Optional[bool] = None,
     ):
         pass
-    fields: Optional[List[str]]
-    queries: Optional[List[str]]
-    limit: Optional[int]
-    offset: Optional[int]
-    sort: Optional[List[str]]
-    format: Optional[GroupFormatting]
-    main: Optional[bool]
-    n_groups: Optional[bool]
-    truncate: Optional[bool]
-    facet: Optional[bool]
 
 class SolrGroupFieldResult:
     """
     Represents a group field result
     """
 
-    group_value: Any
-    doc_list: SolrDocsResponse
+    def get_group_value(self) -> Any:
+        """
+        Gets the group value
+        :return: Group value
+        """
+    def get_doc_list(self) -> SolrDocsResponse:
+        """
+        Gets the document response from solr
+        :return: Document response
+        """
 
 class SolrGroupResult:
     """
     Represents a group result
     """
 
-    matches: int
-    n_groups: Optional[int]
-
-    def get_field_result(self) -> List[SolrGroupFieldResult]:
+    def get_field_result(self) -> Optional[List[SolrGroupFieldResult]]:
         """
         Gets the field results form a group query
         :return: List of group field results
-
-        :raises: RuntimeError if conversion failed, or no field result existed
         """
-    def get_query_result(self) -> SolrDocsResponse:
+    def get_query_result(self) -> Optional[SolrDocsResponse]:
         """
         Gets the query result from a group query
         :return: Query result
-
-        :raises: RuntimeError if conversion failed, or no query result existed
         """
-    def get_simple_result(self) -> SolrDocsResponse:
+    def get_simple_result(self) -> Optional[SolrDocsResponse]:
         """
         Gets the result from a group query where `GroupFormatting.Simple` was used
         :return: Simple result
-
-        :raises: RuntimeError if conversion failed, or no simple result existed
+        """
+    def get_matches(self) -> int:
+        """
+        Gets the number of matches for a group query
+        :return: Number of matches
+        """
+    def get_n_groups(self) -> int:
+        """
+        Gets the number of groups for a group query
+        :return: Number of groups
         """

@@ -7,7 +7,7 @@ use pythonize::depythonize;
 use serde::{Deserialize, Serialize};
 use solrstice::models::commit_type::CommitType;
 use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
+use solrstice::queries::index::{DeleteQuery, UpdateQuery};
 
 #[pyclass(name = "CommitType")]
 #[derive(Clone, Copy, Serialize, Deserialize)]
@@ -17,41 +17,21 @@ pub enum CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "UpdateQueryBuilder", module = "solrstice.queries")]
-pub struct UpdateQueryBuilderWrapper(UpdateQueryBuilder);
+#[pyclass(name = "UpdateQuery", module = "solrstice.queries")]
+pub struct UpdateQueryWrapper(UpdateQuery);
 
 #[pymethods]
-impl UpdateQueryBuilderWrapper {
+impl UpdateQueryWrapper {
     #[new]
     pub fn new(handler: Option<String>, commit_type: Option<CommitTypeWrapper>) -> Self {
-        let mut s = Self(UpdateQueryBuilder::new());
+        let mut builder = UpdateQuery::new();
         if let Some(handler) = handler {
-            s.set_handler(handler);
+            builder = builder.handler(handler);
         }
         if let Some(commit_type) = commit_type {
-            s.set_commit_type(commit_type);
+            builder = builder.commit_type(commit_type.into());
         }
-        s
-    }
-
-    #[getter]
-    pub fn get_handler(&self) -> &str {
-        self.0.handler.as_str()
-    }
-
-    #[setter]
-    pub fn set_handler(&mut self, handler: String) {
-        self.0.handler = handler;
-    }
-
-    #[getter]
-    pub fn get_commit_type(&self) -> CommitTypeWrapper {
-        self.0.commit_type.into()
-    }
-
-    #[setter]
-    pub fn set_commit_type(&mut self, commit_type: CommitTypeWrapper) {
-        self.0.commit_type = commit_type.into();
+        Self(builder)
     }
 
     pub fn execute<'a>(
@@ -146,11 +126,11 @@ impl From<CommitType> for CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "DeleteQueryBuilder", module = "solrstice.queries")]
-pub struct DeleteQueryBuilderWrapper(DeleteQueryBuilder);
+#[pyclass(name = "DeleteQuery", module = "solrstice.queries")]
+pub struct DeleteQueryWrapper(DeleteQuery);
 
 #[pymethods]
-impl DeleteQueryBuilderWrapper {
+impl DeleteQueryWrapper {
     #[new]
     pub fn new(
         handler: Option<String>,
@@ -158,66 +138,20 @@ impl DeleteQueryBuilderWrapper {
         ids: Option<Vec<&str>>,
         queries: Option<Vec<&str>>,
     ) -> Self {
-        let mut s = Self(DeleteQueryBuilder::new());
+        let mut builder = DeleteQuery::new();
         if let Some(handler) = handler {
-            s.set_handler(handler);
+            builder = builder.handler(handler);
         }
         if let Some(commit_type) = commit_type {
-            s.set_commit_type(commit_type);
+            builder = builder.commit_type(commit_type.into());
         }
         if let Some(ids) = ids {
-            s.set_ids(Some(ids));
+            builder = builder.ids(&ids);
         }
         if let Some(queries) = queries {
-            s.set_queries(Some(queries));
+            builder = builder.queries(&queries);
         }
-        s
-    }
-
-    #[getter]
-    pub fn get_handler(&self) -> &str {
-        self.0.handler.as_str()
-    }
-
-    #[setter]
-    pub fn set_handler(&mut self, handler: String) {
-        self.0.handler = handler;
-    }
-
-    #[getter]
-    pub fn get_commit_type(&self) -> CommitTypeWrapper {
-        self.0.commit_type.into()
-    }
-
-    #[setter]
-    pub fn set_commit_type(&mut self, commit_type: CommitTypeWrapper) {
-        self.0.commit_type = commit_type.into();
-    }
-
-    #[getter]
-    pub fn get_ids(&self) -> Option<Vec<&str>> {
-        self.0
-            .ids
-            .as_ref()
-            .map(|f| f.iter().map(|x| x.as_str()).collect())
-    }
-
-    #[setter]
-    pub fn set_ids(&mut self, ids: Option<Vec<&str>>) {
-        self.0.ids = ids.map(|f| f.into_iter().map(|x| x.to_string()).collect())
-    }
-
-    #[getter]
-    pub fn get_queries(&self) -> Option<Vec<&str>> {
-        self.0
-            .queries
-            .as_ref()
-            .map(|f| f.iter().map(|x| x.as_str()).collect())
-    }
-
-    #[setter]
-    pub fn set_queries(&mut self, queries: Option<Vec<&str>>) {
-        self.0.queries = queries.map(|f| f.into_iter().map(|x| x.to_string()).collect())
+        Self(builder)
     }
 
     pub fn execute<'a>(

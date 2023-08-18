@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 if TYPE_CHECKING:
     from solrstice.hosts import SolrServerContext
     from solrstice.queries import (
-        DeleteQueryBuilder,
-        SelectQueryBuilder,
-        UpdateQueryBuilder,
+        DeleteQuery,
+        SelectQuery,
+        UpdateQuery,
     )
     from solrstice.response import SolrResponse
 Somepath = Union[PathLike, str]
@@ -110,7 +110,7 @@ class AsyncSolrCloudClient:
         :param name: The name of the alias to delete
         """
     async def select(
-        self, builder: "SelectQueryBuilder", collection: str
+        self, builder: "SelectQuery", collection: str
     ) -> "SolrResponse":
         """Execute a select query
 
@@ -118,7 +118,7 @@ class AsyncSolrCloudClient:
         :param collection: The collection to query
         """
     async def index(
-        self, builder: "UpdateQueryBuilder", collection: str, data: List[Dict[str, Any]]
+        self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute an index query
 
@@ -127,7 +127,7 @@ class AsyncSolrCloudClient:
         :param data: The data to index
         """
     async def delete(
-        self, builder: "DeleteQueryBuilder", collection: str
+        self, builder: "DeleteQuery", collection: str
     ) -> "SolrResponse":
         """Execute a delete query
 
@@ -233,14 +233,14 @@ class BlockingSolrCloudClient:
 
         :param name: The name of the alias to delete
         """
-    def select(self, builder: "SelectQueryBuilder", collection: str) -> "SolrResponse":
+    def select(self, builder: "SelectQuery", collection: str) -> "SolrResponse":
         """Execute a select query
 
         :param builder: The query builder
         :param collection: The collection to query
         """
     def index(
-        self, builder: "UpdateQueryBuilder", collection: str, data: List[Dict[str, Any]]
+        self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute an index query
 
@@ -248,7 +248,7 @@ class BlockingSolrCloudClient:
         :param collection: The collection to index
         :param data: The data to index
         """
-    def delete(self, builder: "DeleteQueryBuilder", collection: str) -> "SolrResponse":
+    def delete(self, builder: "DeleteQuery", collection: str) -> "SolrResponse":
         """Execute a delete query
 
         :param builder: The query builder

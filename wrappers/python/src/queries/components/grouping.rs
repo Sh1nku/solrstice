@@ -1,18 +1,18 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponentBuilder};
+use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponent};
 
 #[pyclass(name = "GroupingComponent", module = "solrstice.group")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct GroupingComponentWrapper(GroupingComponentBuilder);
+pub struct GroupingComponentWrapper(GroupingComponent);
 
-impl From<GroupingComponentWrapper> for GroupingComponentBuilder {
+impl From<GroupingComponentWrapper> for GroupingComponent {
     fn from(wrapper: GroupingComponentWrapper) -> Self {
         wrapper.0
     }
 }
 
-impl<'a> From<&'a GroupingComponentWrapper> for &'a GroupingComponentBuilder {
+impl<'a> From<&'a GroupingComponentWrapper> for &'a GroupingComponent {
     fn from(wrapper: &'a GroupingComponentWrapper) -> Self {
         &wrapper.0
     }
@@ -58,7 +58,7 @@ impl GroupingComponentWrapper {
         truncate: Option<bool>,
         facet: Option<bool>,
     ) -> Self {
-        let builder = GroupingComponentBuilder::new();
+        let builder = GroupingComponent::new();
         let mut s = Self(builder);
         s.set_fields(fields);
         s.set_queries(queries);
@@ -180,8 +180,8 @@ impl GroupingComponentWrapper {
     }
 }
 
-impl From<GroupingComponentBuilder> for GroupingComponentWrapper {
-    fn from(builder: GroupingComponentBuilder) -> Self {
+impl From<GroupingComponent> for GroupingComponentWrapper {
+    fn from(builder: GroupingComponent) -> Self {
         Self(builder)
     }
 }

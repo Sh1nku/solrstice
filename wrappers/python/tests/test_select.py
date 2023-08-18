@@ -8,7 +8,7 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.queries import SelectQueryBuilder
+from solrstice.queries import SelectQuery
 
 
 @pytest.fixture()
@@ -26,12 +26,12 @@ async def test_get_response_gets_response(config: Config):
 
         await index_test_data(config.context, name)
 
-        builder = SelectQueryBuilder()
+        builder = SelectQuery()
         solr_response = await builder.execute(config.context, name)
-        docs_response = solr_response.get_response()
-        assert docs_response.num_found > 0
-        assert docs_response.start == 0
-        assert len(docs_response.docs) > 4
+        docs_response = solr_response.get_docs_response()
+        assert docs_response.get_num_found() > 0
+        assert docs_response.get_start() == 0
+        assert len(docs_response.get_docs()) > 4
     finally:
         await teardown_collection(config.context, name)
 
@@ -46,12 +46,12 @@ async def test_select_works_when_no_result(config: Config):
 
         await index_test_data(config.context, name)
 
-        builder = SelectQueryBuilder(fq=["id:non_existent_id"])
+        builder = SelectQuery(fq=["id:non_existent_id"])
         solr_response = await builder.execute(config.context, name)
-        docs_response = solr_response.get_response()
-        assert docs_response.num_found == 0
-        assert docs_response.start == 0
-        assert len(docs_response.docs) == 0
+        docs_response = solr_response.get_docs_response()
+        assert docs_response.get_num_found() == 0
+        assert docs_response.get_start() == 0
+        assert len(docs_response.get_docs()) == 0
     finally:
         await teardown_collection(config.context, name)
 
@@ -69,14 +69,14 @@ async def test_select_works_with_cursor_mark(config: Config):
         while True:
             if current_iteration > 100:
                 raise Exception("Cursor mark test failed. Too many iterations")
-            builder = SelectQueryBuilder(
+            builder = SelectQuery(
                 fq=["age:[* TO *]"], rows=1, sort=["id desc"], cursor_mark=cursor_mark
             )
             result = await builder.execute(config.context, name)
-            if result.next_cursor_mark is not None:
+            if result.get_next_cursor_mark() is not None:
                 if cursor_mark == "*":
                     break
-                cursor_mark = result.next_cursor_mark
+                cursor_mark = result.get_next_cursor_mark()
             else:
                 raise Exception("Cursor mark test failed. No next cursor mark")
             current_iteration += 1

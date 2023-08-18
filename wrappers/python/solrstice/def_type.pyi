@@ -9,11 +9,7 @@ class QueryOperator(Enum):
 class DefType(abc.ABC):
     pass
 
-class LuceneQueryBuilder(DefType):
-    q_op: Optional[QueryOperator]
-    df: Optional[str]
-    sow: Optional[bool]
-
+class LuceneQuery(DefType):
     """
     Create a Lucene query builder.
     
@@ -29,17 +25,7 @@ class LuceneQueryBuilder(DefType):
     ):
         pass
 
-class DismaxQueryBuilder(DefType):
-    q_alt: Optional[str]
-    qf: Optional[str]
-    mm: Optional[str]
-    pf: Optional[str]
-    ps: Optional[str]
-    qs: Optional[str]
-    tie: Optional[str]
-    bq: Optional[List[str]]
-    bf: Optional[List[str]]
-
+class DismaxQuery(DefType):
     """
     Create a DisMax query builder.
     
@@ -67,27 +53,7 @@ class DismaxQueryBuilder(DefType):
     ):
         pass
 
-class EdismaxQueryBuilder(DefType):
-    q_alt: Optional[str]
-    qf: Optional[str]
-    mm: Optional[str]
-    mm_auto_relax: Optional[bool]
-    pf: Optional[str]
-    pf2: Optional[str]
-    pf3: Optional[str]
-    ps: Optional[str]
-    ps2: Optional[str]
-    ps3: Optional[str]
-    qs: Optional[str]
-    tie: Optional[str]
-    bq: Optional[List[str]]
-    bf: Optional[List[str]]
-    sow: Optional[bool]
-    boost: Optional[List[str]]
-    lowercase_operators: Optional[bool]
-    stopwords: Optional[bool]
-    uf: Optional[str]
-
+class EdismaxQuery(DefType):
     """
     Create an Edismax query builder.
     
