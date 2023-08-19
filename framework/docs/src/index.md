@@ -45,7 +45,7 @@ client
 ```rust
 let docs = client
     .select(
-        &SelectQuery::new().fq(&["id:example_document"]),
+        &SelectQuery::new().fq(["id:example_document"]),
         "example_collection",
     )
     .await?
@@ -57,7 +57,7 @@ let docs = client
 ```rust
 client
     .delete(
-        &DeleteQuery::new().ids(&["example_document"]),
+        &DeleteQuery::new().ids(["example_document"]),
         "example_collection",
     )
     .await?;

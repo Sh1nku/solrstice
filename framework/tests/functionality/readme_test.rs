@@ -49,7 +49,7 @@ pub async fn example() -> Result<(), SolrError> {
     // Search and retrieve the document
     let docs = client
         .select(
-            &SelectQuery::new().fq(&["id:example_document"]),
+            &SelectQuery::new().fq(["id:example_document"]),
             "example_collection",
         )
         .await?
@@ -61,7 +61,7 @@ pub async fn example() -> Result<(), SolrError> {
     // Delete the document
     client
         .delete(
-            &DeleteQuery::new().ids(&["example_document"]),
+            &DeleteQuery::new().ids(["example_document"]),
             "example_collection",
         )
         .await?;

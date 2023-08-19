@@ -6,6 +6,7 @@ use pyo3::types::PyBytes;
 use pythonize::depythonize;
 use serde::{Deserialize, Serialize};
 use solrstice::models::commit_type::CommitType;
+use solrstice::models::context::SolrServerContext;
 use solrstice::models::error::SolrError;
 use solrstice::queries::index::{DeleteQuery, UpdateQuery};
 
@@ -51,8 +52,9 @@ impl UpdateQueryWrapper {
             .collect();
         let data = data?;
         pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+            let context: SolrServerContext = context.into();
             let result = builder
-                .execute(&context.into(), collection.as_str(), data.as_slice())
+                .execute(&context, collection.as_str(), data.as_slice())
                 .await
                 .map_err(PyErrWrapper::from)?;
             Ok(Python::with_gil(|_| result.into()))
@@ -76,8 +78,9 @@ impl UpdateQueryWrapper {
         let data = data?;
         let builder = self.0.clone();
         py.allow_threads(move || {
+            let context: SolrServerContext = context.into();
             let result = builder
-                .execute_blocking(&context.into(), collection.as_str(), data.as_slice())
+                .execute_blocking(&context, collection.as_str(), data.as_slice())
                 .map_err(PyErrWrapper::from)?;
             Ok(result.into())
         })
@@ -135,15 +138,16 @@ impl DeleteQueryWrapper {
     pub fn new(
         handler: Option<String>,
         commit_type: Option<CommitTypeWrapper>,
-        ids: Option<Vec<&str>>,
-        queries: Option<Vec<&str>>,
+        ids: Option<Vec<String>>,
+        queries: Option<Vec<String>>,
     ) -> Self {
         let mut builder = DeleteQuery::new();
         if let Some(handler) = handler {
             builder = builder.handler(handler);
         }
         if let Some(commit_type) = commit_type {
-            builder = builder.commit_type(commit_type.into());
+            let commit_type: CommitType = commit_type.into();
+            builder = builder.commit_type(commit_type);
         }
         if let Some(ids) = ids {
             builder = builder.ids(&ids);
@@ -162,8 +166,9 @@ impl DeleteQueryWrapper {
     ) -> PyResult<&'a PyAny> {
         let builder = self.0.clone();
         pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+            let context: SolrServerContext = context.into();
             let result = builder
-                .execute(&context.into(), collection.as_str())
+                .execute(&context, collection.as_str())
                 .await
                 .map_err(PyErrWrapper::from)?;
             Ok(Python::with_gil(|_| result.into()))
@@ -178,8 +183,9 @@ impl DeleteQueryWrapper {
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
         py.allow_threads(move || {
+            let context: SolrServerContext = context.into();
             let result = builder
-                .execute_blocking(&context.into(), collection.as_str())
+                .execute_blocking(&context, collection.as_str())
                 .map_err(PyErrWrapper::from)?;
             Ok(result.into())
         })

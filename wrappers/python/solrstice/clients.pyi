@@ -3,11 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 if TYPE_CHECKING:
     from solrstice.hosts import SolrServerContext
-    from solrstice.queries import (
-        DeleteQuery,
-        SelectQuery,
-        UpdateQuery,
-    )
+    from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
     from solrstice.response import SolrResponse
 Somepath = Union[PathLike, str]
 
@@ -109,9 +105,7 @@ class AsyncSolrCloudClient:
 
         :param name: The name of the alias to delete
         """
-    async def select(
-        self, builder: "SelectQuery", collection: str
-    ) -> "SolrResponse":
+    async def select(self, builder: "SelectQuery", collection: str) -> "SolrResponse":
         """Execute a select query
 
         :param builder: The query builder
@@ -126,9 +120,7 @@ class AsyncSolrCloudClient:
         :param collection: The collection to index
         :param data: The data to index
         """
-    async def delete(
-        self, builder: "DeleteQuery", collection: str
-    ) -> "SolrResponse":
+    async def delete(self, builder: "DeleteQuery", collection: str) -> "SolrResponse":
         """Execute a delete query
 
         :param builder: The query builder

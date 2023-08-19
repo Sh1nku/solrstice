@@ -17,7 +17,7 @@ struct PostQueryWrapper {
 /// Also take a look at [AsyncSolrCloudClient::select](crate::clients::async_cloud_client::AsyncSolrCloudClient::select)
 /// ```rust
 ///     use solrstice::queries::select::SelectQuery;
-///     SelectQuery::new().fq(&["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
+///     SelectQuery::new().fq(["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
 /// ```
 #[derive(Serialize, Deserialize, Clone, Default, PartialEq, Debug)]
 pub struct SelectQuery {
@@ -44,13 +44,25 @@ pub struct SelectQuery {
     json_facet: Option<JsonFacetComponent>,
 }
 
+impl From<&SelectQuery> for SelectQuery {
+    fn from(query: &SelectQuery) -> Self {
+        query.clone()
+    }
+}
+
+impl AsRef<SelectQuery> for SelectQuery {
+    fn as_ref(&self) -> &SelectQuery {
+        self
+    }
+}
+
 impl SelectQuery {
     /// Builder for a select query.
     ///
     /// Also take a look at [AsyncSolrCloudClient::select](crate::clients::async_cloud_client::AsyncSolrCloudClient::select)
     /// ```rust
     ///     use solrstice::queries::select::SelectQuery;
-    ///     SelectQuery::new().fq(&["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
+    ///     SelectQuery::new().fq(["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
     /// ```
     pub fn new() -> Self {
         SelectQuery {
@@ -70,38 +82,53 @@ impl SelectQuery {
     }
 
     /// Set the q parameter. Default is "*:*"
-    pub fn q<T: AsRef<str>>(mut self, q: T) -> Self {
-        self.q = q.as_ref().to_string();
+    pub fn q<S: Into<String>>(mut self, q: S) -> Self {
+        self.q = q.into();
         self
     }
 
     /// A list of filter queries
     /// ```rust
     /// use solrstice::queries::select::SelectQuery;
-    /// SelectQuery::new().fq(&["id:1"]);
+    /// SelectQuery::new().fq(["id:1"]);
     /// ```
-    pub fn fq<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
-        self.fq = Some(queries.iter().map(|x| x.as_ref().to_string()).collect());
+    pub fn fq<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        queries: O,
+    ) -> Self {
+        self.fq = queries
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     /// Set the fields to return
     /// ```rust
     /// use solrstice::queries::select::SelectQuery;
-    /// SelectQuery::new().fl(&["field1", "field2"]);
+    /// SelectQuery::new().fl(["field1", "field2"]);
     /// ```
-    pub fn fl<T: AsRef<str>>(mut self, fields: &[T]) -> Self {
-        self.fl = Some(fields.iter().map(|x| x.as_ref().to_string()).collect());
+    pub fn fl<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        fields: O,
+    ) -> Self {
+        self.fl = fields
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     ///Set the sort order
     ///```rust
     /// use solrstice::queries::select::SelectQuery;
-    /// SelectQuery::new().sort(&["id asc", "field1 desc"]);
+    /// SelectQuery::new().sort(["id asc", "field1 desc"]);
     /// ```
-    pub fn sort<T: AsRef<str>>(mut self, sort: &[T]) -> Self {
-        self.sort = Some(sort.iter().map(|x| x.as_ref().to_string()).collect());
+    pub fn sort<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        sort: O,
+    ) -> Self {
+        self.sort = sort
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
@@ -151,8 +178,8 @@ impl SelectQuery {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn cursor_mark<T: AsRef<str>>(mut self, cursor_mark: T) -> Self {
-        self.cursor_mark = Some(cursor_mark.as_ref().to_string());
+    pub fn cursor_mark<S: Into<String>, O: Into<Option<S>>>(mut self, cursor_mark: O) -> Self {
+        self.cursor_mark = cursor_mark.into().map(|x| x.into());
         self
     }
 
@@ -169,7 +196,7 @@ impl SelectQuery {
     /// let builder = SelectQuery::new()
     ///     .grouping(
     ///         &GroupingComponent::new()
-    ///             .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
+    ///             .queries(["age:[0 TO 59]", "age:[60 TO *]"])
     ///             .limit(10),
     ///     );
     /// let response = client.select(&builder, "collection").await?;
@@ -178,8 +205,8 @@ impl SelectQuery {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn grouping<T: AsRef<GroupingComponent>>(mut self, grouping: T) -> Self {
-        self.grouping = Some(grouping.as_ref().clone());
+    pub fn grouping<G: Into<GroupingComponent>, O: Into<Option<G>>>(mut self, grouping: O) -> Self {
+        self.grouping = grouping.into().map(|x| x.into());
         self
     }
 
@@ -198,45 +225,49 @@ impl SelectQuery {
     /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
     /// let builder = SelectQuery::new()
     ///     .q("outdoors")
-    ///     .def_type(&DefType::Edismax(EdismaxQuery::new().qf("interests^20").bq(&["interests:cars^20"])));
+    ///     .def_type(&DefType::Edismax(EdismaxQuery::new().qf("interests^20").bq(["interests:cars^20"])));
     /// let response = client.select(&builder, "collection").await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn def_type<T: Into<DefType>>(mut self, def_type: T) -> Self {
-        self.def_type = Some(def_type.into());
+    pub fn def_type<T: Into<DefType>, O: Into<Option<T>>>(mut self, def_type: O) -> Self {
+        self.def_type = def_type.into().map(|x| x.into());
         self
     }
 
-    pub fn facetset<T: AsRef<FacetSetComponent>>(mut self, facetset: T) -> Self {
-        self.facetset = Some(facetset.as_ref().clone());
+    pub fn facetset<T: Into<FacetSetComponent>, O: Into<Option<T>>>(mut self, facetset: O) -> Self {
+        self.facetset = facetset.into().map(|x| x.into());
         self
     }
 
-    pub fn json_facet<T: AsRef<JsonFacetComponent>>(mut self, json_facet: T) -> Self {
-        self.json_facet = Some(json_facet.as_ref().clone());
+    pub fn json_facet<T: Into<JsonFacetComponent>, O: Into<Option<T>>>(
+        mut self,
+        json_facet: O,
+    ) -> Self {
+        self.json_facet = json_facet.into().map(|x| x.into());
         self
     }
 
-    pub async fn execute<T: AsRef<str>>(
+    pub async fn execute<T: AsRef<str>, C: AsRef<SolrServerContext>>(
         &self,
-        builder: &SolrServerContext,
+        context: C,
         collection: T,
     ) -> Result<SolrResponse, SolrError> {
         let solr_url = format!(
             "{}/solr/{}/{}",
-            builder.host.get_solr_node().await?,
+            context.as_ref().host.get_solr_node().await?,
             collection.as_ref(),
             &self.handle
         );
         let wrapper = PostQueryWrapper {
             params: self.clone(),
         };
-        let mut request = builder
+        let mut request = context
+            .as_ref()
             .client
             .post(&solr_url)
             .json::<PostQueryWrapper>(&wrapper);
-        if let Some(auth) = &builder.auth {
+        if let Some(auth) = &context.as_ref().auth {
             request = auth.add_auth_to_request(request);
         }
         let data = request.send().await?.json::<SolrResponse>().await?;
@@ -249,12 +280,12 @@ impl SelectQuery {
 use crate::runtime::RUNTIME;
 #[cfg(feature = "blocking")]
 impl SelectQuery {
-    pub fn execute_blocking(
+    pub fn execute_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
         &self,
-        builder: &SolrServerContext,
-        collection: &str,
+        context: C,
+        collection: S,
     ) -> Result<SolrResponse, SolrError> {
-        RUNTIME.handle().block_on(self.execute(builder, collection))
+        RUNTIME.handle().block_on(self.execute(context, collection))
     }
 }
 
@@ -264,11 +295,20 @@ pub mod tests {
     use crate::queries::select::SelectQuery;
 
     #[test]
+    pub fn serialize_select_arguments_work() {
+        let _ = SelectQuery::new()
+            .fq(["id:1"])
+            .fq(vec!["id:1"])
+            .fq(vec![String::from("id:1")])
+            .fq(&[String::from("id:1")]);
+    }
+
+    #[test]
     pub fn serialize_select_query_builder_works() {
-        let builder = SelectQuery::new().fq(&["id:1", "id:2"]).grouping(
-            &GroupingComponent::new()
-                .queries(&["id:1", "id:2"])
-                .fields(&["id", "name"])
+        let builder = SelectQuery::new().fq(["id:1", "id:2"]).grouping(
+            GroupingComponent::new()
+                .queries(["id:1", "id:2"])
+                .fields(["id", "name"])
                 .limit(10),
         );
         let serialized = serde_json::to_string(&builder).unwrap();

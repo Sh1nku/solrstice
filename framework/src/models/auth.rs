@@ -28,10 +28,10 @@ impl SolrBasicAuth {
     /// Create a new Basic Authentication
     /// use solrstice::models::auth::SolrBasicAuth;
     /// let auth = SolrBasicAuth::new("solr", Some("SolrRocks"));
-    pub fn new(username: &str, password: Option<&str>) -> SolrBasicAuth {
+    pub fn new<S: Into<String>, O: Into<Option<S>>>(username: S, password: O) -> SolrBasicAuth {
         SolrBasicAuth {
-            username: username.to_string(),
-            password: password.map(|x| x.to_string()),
+            username: username.into(),
+            password: password.into().map(|x| x.into()),
         }
     }
 }

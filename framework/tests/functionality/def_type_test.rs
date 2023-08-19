@@ -15,7 +15,7 @@ pub async fn test_dismax_query_parser() -> Result<(), SolrError> {
     let query = SelectQuery::new().q("outdoors").def_type(
         DismaxQuery::new()
             .qf("interests^20")
-            .bq(&["interests:cars^20"]),
+            .bq(["interests:cars^20"]),
     );
     let response = query
         .execute(&config.context, &config.collection_name)
@@ -44,7 +44,7 @@ pub async fn test_edismax_query_parser() -> Result<(), SolrError> {
         .def_type(&DefType::Edismax(
             EdismaxQuery::new()
                 .qf("interests^20")
-                .bq(&["interests:cars^20"]),
+                .bq(["interests:cars^20"]),
         ))
         .execute(&config.context, &config.collection_name)
         .await?;

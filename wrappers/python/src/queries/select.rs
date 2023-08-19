@@ -6,8 +6,10 @@ use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
+use solrstice::models::context::SolrServerContext;
 use solrstice::models::error::SolrError;
 use solrstice::queries::components::grouping::GroupingComponent;
+use solrstice::queries::def_type::DefType;
 use solrstice::queries::select::SelectQuery;
 
 #[pyclass(name = "SelectQuery", module = "solrstice.queries")]
@@ -19,11 +21,11 @@ impl SelectQueryWrapper {
     #[new]
     fn new(
         q: Option<String>,
-        fl: Option<Vec<&str>>,
-        fq: Option<Vec<&str>>,
+        fl: Option<Vec<String>>,
+        fq: Option<Vec<String>>,
         rows: Option<usize>,
         start: Option<usize>,
-        sort: Option<Vec<&str>>,
+        sort: Option<Vec<String>>,
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
         def_type: Option<DefTypeWrapper>,
@@ -32,30 +34,19 @@ impl SelectQueryWrapper {
         if let Some(q) = q {
             builder = builder.q(q);
         }
-        if let Some(fl) = fl {
-            builder = builder.fl(&fl);
-        }
-        if let Some(fq) = fq {
-            builder = builder.fq(&fq);
-        }
+        builder = builder.fl::<String, Vec<String>, Option<Vec<String>>>(fl);
+        builder = builder.fq::<String, Vec<String>, Option<Vec<String>>>(fq);
         if let Some(rows) = rows {
             builder = builder.rows(rows);
         }
         if let Some(start) = start {
             builder = builder.start(start);
         }
-        if let Some(sort) = sort {
-            builder = builder.sort(&sort);
-        }
-        if let Some(cursor_mark) = cursor_mark {
-            builder = builder.cursor_mark(cursor_mark);
-        }
-        if let Some(grouping) = grouping {
-            builder = builder.grouping::<GroupingComponent>(grouping.into());
-        }
-        if let Some(def_type) = def_type {
-            builder = builder.def_type(def_type);
-        }
+        builder = builder.sort::<String, Vec<String>, Option<Vec<String>>>(sort);
+        builder = builder.cursor_mark::<String, Option<String>>(cursor_mark);
+        builder = builder
+            .grouping::<GroupingComponent, Option<GroupingComponent>>(grouping.map(|x| x.into()));
+        builder = builder.def_type::<DefType, Option<DefType>>(def_type.map(|x| x.into()));
         Self(builder)
     }
 
@@ -67,8 +58,9 @@ impl SelectQueryWrapper {
     ) -> PyResult<&'a PyAny> {
         let builder = self.0.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move {
+            let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute(&context.into(), &collection)
+                .execute(&context, &collection)
                 .await
                 .map_err(PyErrWrapper::from)?
                 .into();
@@ -79,13 +71,14 @@ impl SelectQueryWrapper {
     pub fn execute_blocking(
         &self,
         py: Python,
-        contect: SolrServerContextWrapper,
+        context: SolrServerContextWrapper,
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
         py.allow_threads(move || {
+            let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute_blocking(&contect.into(), &collection)
+                .execute_blocking(&context, &collection)
                 .map_err(PyErrWrapper::from)?
                 .into();
             Ok(result)

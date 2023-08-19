@@ -12,9 +12,7 @@ use crate::queries::alias::alias;
 use crate::queries::collection::collection;
 use crate::queries::config::config;
 use crate::queries::def_type::def_type as def_type_module;
-use crate::queries::index::{
-    CommitTypeWrapper, DeleteQueryWrapper, UpdateQueryWrapper,
-};
+use crate::queries::index::{CommitTypeWrapper, DeleteQueryWrapper, UpdateQueryWrapper};
 use crate::queries::select::SelectQueryWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;

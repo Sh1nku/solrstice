@@ -38,7 +38,7 @@ pub async fn client_example_test() {
 
     // Search documents
     let server_docs = client
-        .select(&SelectQuery::new().fq(&["id:example_document"]), name)
+        .select(&SelectQuery::new().fq(["id:example_document"]), name)
         .await
         .unwrap()
         .get_docs_response()
@@ -49,7 +49,7 @@ pub async fn client_example_test() {
 
     // Delete documents
     client
-        .delete(&DeleteQuery::new().ids(&["example_document"]), name)
+        .delete(&DeleteQuery::new().ids(["example_document"]), name)
         .await
         .unwrap();
 

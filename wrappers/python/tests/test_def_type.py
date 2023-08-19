@@ -8,11 +8,7 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.def_type import (
-    DismaxQuery,
-    EdismaxQuery,
-    LuceneQuery,
-)
+from solrstice.def_type import DismaxQuery, EdismaxQuery, LuceneQuery
 from solrstice.queries import SelectQuery
 
 

@@ -50,7 +50,7 @@
 //!     // Search and retrieve the document
 //!     let docs = client
 //!         .select(
-//!             &SelectQuery::new().fq(&["id:example_document"]),
+//!             &SelectQuery::new().fq(["id:example_document"]),
 //!             "example_collection",
 //!         )
 //!         .await?
@@ -61,7 +61,7 @@
 //!     // Delete the document
 //!     client
 //!         .delete(
-//!             &DeleteQuery::new().ids(&["example_document"]),
+//!             &DeleteQuery::new().ids(["example_document"]),
 //!             "example_collection",
 //!         )
 //!         .await?;

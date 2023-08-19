@@ -1,6 +1,7 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use pyo3::prelude::*;
+use solrstice::models::context::SolrServerContext;
 use solrstice::queries::collection::{
     collection_exists as collection_exists_rs, create_collection as create_collection_rs,
     delete_collection as delete_collection_rs, get_collections as get_collections_rs,
@@ -36,8 +37,9 @@ pub fn create_collection(
     replication_factor: Option<usize>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
+        let context: SolrServerContext = context.into();
         let result = create_collection_rs(
-            &context.into(),
+            &context,
             name.as_str(),
             config.as_str(),
             shards.unwrap_or(1),
@@ -59,8 +61,9 @@ pub fn create_collection_blocking(
     replication_factor: Option<usize>,
 ) -> PyResult<()> {
     py.allow_threads(move || {
+        let context: SolrServerContext = context.into();
         create_collection_blocking_rs(
-            &context.into(),
+            &context,
             name.as_str(),
             config.as_str(),
             shards.unwrap_or(1),
@@ -74,7 +77,8 @@ pub fn create_collection_blocking(
 #[pyfunction]
 pub fn get_collections(py: Python, context: SolrServerContextWrapper) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let result = get_collections_rs(&context.into())
+        let context: SolrServerContext = context.into();
+        let result = get_collections_rs(&context)
             .await
             .map_err(PyErrWrapper::from)?;
         Ok(Python::with_gil(|_| result))
@@ -87,7 +91,8 @@ pub fn get_collections_blocking(
     context: SolrServerContextWrapper,
 ) -> PyResult<Vec<String>> {
     py.allow_threads(move || {
-        let result = get_collections_blocking_rs(&context.into()).map_err(PyErrWrapper::from)?;
+        let context: SolrServerContext = context.into();
+        let result = get_collections_blocking_rs(&context).map_err(PyErrWrapper::from)?;
         Ok(result)
     })
 }
@@ -99,7 +104,8 @@ pub fn collection_exists(
     name: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let result = collection_exists_rs(&context.into(), name.as_str())
+        let context: SolrServerContext = context.into();
+        let result = collection_exists_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
         Ok(Python::with_gil(|_| result))
@@ -113,8 +119,9 @@ pub fn collection_exists_blocking(
     name: String,
 ) -> PyResult<bool> {
     py.allow_threads(move || {
-        let result = collection_exists_blocking_rs(&context.into(), name.as_str())
-            .map_err(PyErrWrapper::from)?;
+        let context: SolrServerContext = context.into();
+        let result =
+            collection_exists_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
         Ok(result)
     })
 }
@@ -126,7 +133,8 @@ pub fn delete_collection(
     name: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        delete_collection_rs(&context.into(), name.as_str())
+        let context: SolrServerContext = context.into();
+        delete_collection_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
         Ok(())
@@ -140,8 +148,8 @@ pub fn delete_collection_blocking(
     name: String,
 ) -> PyResult<()> {
     py.allow_threads(move || {
-        delete_collection_blocking_rs(&context.into(), name.as_str())
-            .map_err(PyErrWrapper::from)?;
+        let context: SolrServerContext = context.into();
+        delete_collection_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
         Ok(())
     })
 }

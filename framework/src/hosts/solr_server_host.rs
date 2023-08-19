@@ -37,10 +37,8 @@ impl SolrSingleServerHost {
     /// let host = SolrSingleServerHost::new("localhost:8983");
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
     /// ```
-    pub fn new(host: &str) -> SolrSingleServerHost {
-        SolrSingleServerHost {
-            host: host.to_string(),
-        }
+    pub fn new<S: Into<String>>(host: S) -> SolrSingleServerHost {
+        SolrSingleServerHost { host: host.into() }
     }
 }
 
@@ -53,7 +51,7 @@ impl SolrSingleServerHost {
 /// use solrstice::hosts::solr_server_host::{SolrMultipleServerHost};
 /// use solrstice::models::context::{SolrServerContextBuilder};
 ///
-/// let host = SolrMultipleServerHost::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
+/// let host = SolrMultipleServerHost::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
 /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
 /// ```
 #[derive(Clone)]
@@ -106,12 +104,15 @@ impl SolrMultipleServerHost {
     /// use solrstice::hosts::solr_server_host::{SolrMultipleServerHost};
     /// use solrstice::models::context::{SolrServerContextBuilder};
     ///
-    /// let host = SolrMultipleServerHost::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
+    /// let host = SolrMultipleServerHost::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
     /// ```
-    pub fn new(hosts: &[&str], timeout: Duration) -> SolrMultipleServerHost {
+    pub fn new<S: Into<String>, V: IntoIterator<Item = S>>(
+        hosts: V,
+        timeout: Duration,
+    ) -> SolrMultipleServerHost {
         SolrMultipleServerHost {
-            hosts: hosts.iter().map(|x| x.to_string()).collect(),
+            hosts: hosts.into_iter().map(|s| s.into()).collect(),
             timeout,
         }
     }

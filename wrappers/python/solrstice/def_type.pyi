@@ -12,11 +12,12 @@ class DefType(abc.ABC):
 class LuceneQuery(DefType):
     """
     Create a Lucene query builder.
-    
+
     :param q_op: Query operator.
     :param df: Default field
     :param sow: Split on whitespace
     """
+
     def __init__(
         self,
         q_op: Optional[QueryOperator] = None,
@@ -28,7 +29,7 @@ class LuceneQuery(DefType):
 class DismaxQuery(DefType):
     """
     Create a DisMax query builder.
-    
+
     :param q_alt: Alternate query
     :param qf: Query fields
     :param mm: Minimum match
@@ -39,6 +40,7 @@ class DismaxQuery(DefType):
     :param bq: Boost query
     :param bf: Boost functions
     """
+
     def __init__(
         self,
         q_alt: Optional[str] = None,
@@ -56,7 +58,7 @@ class DismaxQuery(DefType):
 class EdismaxQuery(DefType):
     """
     Create an Edismax query builder.
-    
+
     :param q_alt: Alternate query
     :param qf: Query fields
     :param mm: Minimum match
@@ -77,6 +79,7 @@ class EdismaxQuery(DefType):
     :param stopwords: Stopwords
     :param uf: User fields
     """
+
     def __init__(
         self,
         q_alt: Optional[str] = None,

@@ -15,7 +15,7 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
         .await?;
 
     let query = SelectQuery::new()
-        .facetset(&FacetSetComponent::new().pivots(&PivotFacetComponent::new(&["interests,age"])));
+        .facetset(&FacetSetComponent::new().pivots(&PivotFacetComponent::new(["interests,age"])));
     let response = config
         .async_client
         .select(&query, &config.collection_name)
@@ -52,7 +52,7 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQuery::new().facetset(&FacetSetComponent::new().queries(&["age:[0 TO 59]"]));
+    let query = SelectQuery::new().facetset(&FacetSetComponent::new().queries(["age:[0 TO 59]"]));
     let response = config
         .async_client
         .select(&query, &config.collection_name)

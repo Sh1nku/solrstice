@@ -27,8 +27,8 @@ impl fmt::Display for GroupFormatting {
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let response = SelectQuery::new()
-///     .fq(&["age:[* TO *]"])
-///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
+///     .fq(["age:[* TO *]"])
+///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10))
 ///     .execute(&context, "collection_name")
 ///     .await?;
 /// let groups = response.get_groups().ok_or("No groups")?;
@@ -79,8 +79,8 @@ impl GroupingComponent {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let response = SelectQuery::new()
-    ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
+    ///     .fq(["age:[* TO *]"])
+    ///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -113,10 +113,15 @@ impl GroupingComponent {
     /// # Examples
     /// ```rust
     /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// GroupingComponent::new().fields(&["age"]);
+    /// GroupingComponent::new().fields(["age"]);
     /// ```
-    pub fn fields<T: AsRef<str>>(mut self, fields: &[T]) -> Self {
-        self.field = Some(fields.into_iter().map(|x| x.as_ref().to_string()).collect());
+    pub fn fields<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
+        mut self,
+        fields: O,
+    ) -> Self {
+        self.field = fields
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
@@ -124,15 +129,15 @@ impl GroupingComponent {
     /// # Examples
     /// ```rust
     /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// GroupingComponent::new().queries(&["age:[0 TO 59]", "age:[60 TO *]"]);
+    /// GroupingComponent::new().queries(["age:[0 TO 59]", "age:[60 TO *]"]);
     /// ```
-    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
-        self.queries = Some(
-            queries
-                .into_iter()
-                .map(|x| x.as_ref().to_string())
-                .collect(),
-        );
+    pub fn queries<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
+        mut self,
+        queries: O,
+    ) -> Self {
+        self.queries = queries
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
@@ -142,8 +147,8 @@ impl GroupingComponent {
     /// use solrstice::queries::components::grouping::GroupingComponent;
     /// GroupingComponent::new().limit(10);
     /// ```
-    pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(limit);
+    pub fn limit<O: Into<Option<usize>>>(mut self, limit: O) -> Self {
+        self.limit = limit.into();
         self
     }
 
@@ -153,8 +158,8 @@ impl GroupingComponent {
     /// use solrstice::queries::components::grouping::GroupingComponent;
     /// GroupingComponent::new().limit(10).offset(10);
     /// ```
-    pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(offset);
+    pub fn offset<O: Into<Option<usize>>>(mut self, offset: O) -> Self {
+        self.offset = offset.into();
         self
     }
 
@@ -162,10 +167,15 @@ impl GroupingComponent {
     /// # Examples
     /// ```rust
     /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// GroupingComponent::new().sort(&["age asc"]);
+    /// GroupingComponent::new().sort(["age asc"]);
     /// ```
-    pub fn sort<T: AsRef<str>>(mut self, sort: &[T]) -> Self {
-        self.sort = Some(sort.into_iter().map(|x| x.as_ref().to_string()).collect());
+    pub fn sort<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
+        mut self,
+        sort: O,
+    ) -> Self {
+        self.sort = sort
+            .into()
+            .map(|fq| fq.into_iter().map(|s| s.into()).collect());
         self
     }
 
@@ -175,8 +185,8 @@ impl GroupingComponent {
     /// use solrstice::queries::components::grouping::{GroupingComponent, GroupFormatting};
     /// GroupingComponent::new().format(GroupFormatting::Simple);
     /// ```
-    pub fn format(mut self, format: GroupFormatting) -> Self {
-        self.format = Some(format);
+    pub fn format<O: Into<Option<GroupFormatting>>>(mut self, format: O) -> Self {
+        self.format = format.into();
         self
     }
 
@@ -186,8 +196,8 @@ impl GroupingComponent {
     /// use solrstice::queries::components::grouping::GroupingComponent;
     /// GroupingComponent::new().main(true);
     /// ```
-    pub fn main(mut self, main: bool) -> Self {
-        self.main = Some(main);
+    pub fn main<O: Into<Option<bool>>>(mut self, main: O) -> Self {
+        self.main = main.into();
         self
     }
 
@@ -197,20 +207,20 @@ impl GroupingComponent {
     /// use solrstice::queries::components::grouping::GroupingComponent;
     /// GroupingComponent::new().n_groups(true);
     /// ```
-    pub fn n_groups(mut self, n_groups: bool) -> Self {
-        self.n_groups = Some(n_groups);
+    pub fn n_groups<O: Into<Option<bool>>>(mut self, n_groups: O) -> Self {
+        self.n_groups = n_groups.into();
         self
     }
 
     /// Not really sure what this does.
-    pub fn truncate(mut self, truncate: bool) -> Self {
-        self.truncate = Some(truncate);
+    pub fn truncate<O: Into<Option<bool>>>(mut self, truncate: O) -> Self {
+        self.truncate = truncate.into();
         self
     }
 
     /// Not really sure what this does.
-    pub fn facet(mut self, facet: bool) -> Self {
-        self.facet = Some(facet);
+    pub fn facet<O: Into<Option<bool>>>(mut self, facet: O) -> Self {
+        self.facet = facet.into();
         self
     }
 }
@@ -218,5 +228,11 @@ impl GroupingComponent {
 impl AsRef<GroupingComponent> for GroupingComponent {
     fn as_ref(&self) -> &Self {
         self
+    }
+}
+
+impl From<&GroupingComponent> for GroupingComponent {
+    fn from(component: &GroupingComponent) -> Self {
+        component.clone()
     }
 }

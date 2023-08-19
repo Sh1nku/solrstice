@@ -153,7 +153,7 @@ impl SolrResponse {
     /// let groups = client.select(&SelectQuery::new()
     ///     .grouping(
     ///         &GroupingComponent::new()
-    ///             .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
+    ///             .queries(["age:[0 TO 59]", "age:[60 TO *]"])
     ///             .limit(10),
     ///     ), "collection").await?
     ///     .get_groups().ok_or("No groups returned")?;

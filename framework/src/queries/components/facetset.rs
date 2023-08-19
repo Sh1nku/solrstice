@@ -6,20 +6,20 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct FacetSetComponent {
-    pub facet: bool,
+    facet: bool,
     #[serde(rename = "facet.query")]
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub queries: Vec<String>,
+    queries: Vec<String>,
     #[serde(
         serialize_with = "serialize_fields",
         deserialize_with = "deserialize_fields",
         flatten
     )]
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub fields: Vec<FieldFacetComponent>,
+    fields: Vec<FieldFacetComponent>,
     #[serde(flatten)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pivots: Option<PivotFacetComponent>,
+    pivots: Option<PivotFacetComponent>,
 }
 
 fn serialize_fields<S>(fields: &Vec<FieldFacetComponent>, serializer: S) -> Result<S::Ok, S::Error>
@@ -122,18 +122,21 @@ impl FacetSetComponent {
         }
     }
 
-    pub fn pivots<T: AsRef<PivotFacetComponent>>(mut self, pivots: T) -> Self {
-        self.pivots = Some(pivots.as_ref().clone());
+    pub fn pivots<T: Into<PivotFacetComponent>, O: Into<Option<T>>>(mut self, pivots: O) -> Self {
+        self.pivots = pivots.into().map(|x| x.into());
         self
     }
 
-    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
-        self.queries = queries.iter().map(|q| q.as_ref().to_string()).collect();
+    pub fn queries<S: Into<String>, I: IntoIterator<Item = S>>(mut self, queries: I) -> Self {
+        self.queries = queries.into_iter().map(|x| x.into()).collect();
         self
     }
 
-    pub fn fields<T: AsRef<FieldFacetComponent>>(mut self, fields: &[T]) -> Self {
-        self.fields = fields.iter().map(|f| f.as_ref().clone()).collect();
+    pub fn fields<S: Into<FieldFacetComponent>, I: IntoIterator<Item = S>>(
+        mut self,
+        fields: I,
+    ) -> Self {
+        self.fields = fields.into_iter().map(|x| x.into()).collect();
         self
     }
 }
@@ -150,26 +153,32 @@ impl AsRef<FacetSetComponent> for FacetSetComponent {
     }
 }
 
+impl From<&FacetSetComponent> for FacetSetComponent {
+    fn from(facet_set: &FacetSetComponent) -> Self {
+        facet_set.clone()
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct PivotFacetComponent {
     /// The field to facet on.
     #[serde(rename = "facet.pivot")]
-    pub pivots: Vec<String>,
+    pivots: Vec<String>,
     /// The minimum count for a facet to be returned. Default is 1.
     #[serde(rename = "facet.pivot.mincount")]
-    pub min_count: Option<usize>,
+    min_count: Option<usize>,
 }
 
 impl PivotFacetComponent {
-    pub fn new<T: AsRef<str>>(pivots: &[T]) -> Self {
+    pub fn new<S: Into<String>, I: IntoIterator<Item = S>>(pivots: I) -> Self {
         PivotFacetComponent {
-            pivots: pivots.iter().map(|p| p.as_ref().to_string()).collect(),
+            pivots: pivots.into_iter().map(|x| x.into()).collect(),
             min_count: None,
         }
     }
 
-    pub fn min_count(mut self, min_count: usize) -> Self {
-        self.min_count = Some(min_count);
+    pub fn min_count<O: Into<Option<usize>>>(mut self, min_count: O) -> Self {
+        self.min_count = min_count.into();
         self
     }
 }
@@ -180,29 +189,35 @@ impl AsRef<PivotFacetComponent> for PivotFacetComponent {
     }
 }
 
+impl From<&PivotFacetComponent> for PivotFacetComponent {
+    fn from(pivot: &PivotFacetComponent) -> Self {
+        pivot.clone()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FieldFacetComponent {
-    pub field: String,
-    pub prefix: Option<String>,
-    pub contains: Option<String>,
+    field: String,
+    prefix: Option<String>,
+    contains: Option<String>,
 }
 
 impl FieldFacetComponent {
-    pub fn new(field: &str) -> Self {
+    pub fn new<S: Into<String>>(field: S) -> Self {
         FieldFacetComponent {
-            field: field.to_string(),
+            field: field.into(),
             prefix: None,
             contains: None,
         }
     }
 
-    pub fn prefix<T: AsRef<str>>(mut self, prefix: T) -> Self {
-        self.prefix = Some(prefix.as_ref().to_string());
+    pub fn prefix<S: Into<String>, O: Into<Option<S>>>(mut self, prefix: O) -> Self {
+        self.prefix = prefix.into().map(|s| s.into());
         self
     }
 
-    pub fn contains<T: AsRef<str>>(mut self, contains: T) -> Self {
-        self.contains = Some(contains.as_ref().to_string());
+    pub fn contains<S: Into<String>, O: Into<Option<S>>>(mut self, contains: O) -> Self {
+        self.contains = contains.into().map(|s| s.into());
         self
     }
 }
@@ -213,21 +228,25 @@ impl AsRef<FieldFacetComponent> for FieldFacetComponent {
     }
 }
 
+impl From<&FieldFacetComponent> for FieldFacetComponent {
+    fn from(f: &FieldFacetComponent) -> Self {
+        f.clone()
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
     use crate::queries::components::facetset::FacetSetComponent;
 
     #[test]
     fn serialize_fields_works() {
-        let builder = FacetSetComponent::new()
-            .queries(&["age:[* TO *]"])
-            .fields(
-                &[&crate::queries::components::facetset::FieldFacetComponent {
-                    field: "field".to_string(),
-                    prefix: Some("prefix".to_string()),
-                    contains: Some("contains".to_string()),
-                }],
-            );
+        let builder = FacetSetComponent::new().queries(["age:[* TO *]"]).fields([
+            &crate::queries::components::facetset::FieldFacetComponent {
+                field: "field".to_string(),
+                prefix: Some("prefix".to_string()),
+                contains: Some("contains".to_string()),
+            },
+        ]);
         let serialized = serde_json::to_string_pretty(&builder).unwrap();
         let deserialized = serde_json::from_str::<FacetSetComponent>(&serialized).unwrap();
         assert_eq!(builder, deserialized);

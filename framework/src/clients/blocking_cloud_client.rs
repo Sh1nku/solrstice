@@ -44,8 +44,10 @@ impl BlockingSolrCloudClient {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
     /// ```
-    pub fn new(context: SolrServerContext) -> BlockingSolrCloudClient {
-        BlockingSolrCloudClient { context }
+    pub fn new<C: Into<SolrServerContext>>(context: C) -> BlockingSolrCloudClient {
+        BlockingSolrCloudClient {
+            context: context.into(),
+        }
     }
 
     /// Upload a config to SolrCloud
@@ -62,7 +64,11 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn upload_config(&self, name: &str, path: &Path) -> Result<(), SolrError> {
+    pub fn upload_config<S: AsRef<str>, P: AsRef<Path>>(
+        &self,
+        name: S,
+        path: P,
+    ) -> Result<(), SolrError> {
         upload_config_blocking(&self.context, name, path)
     }
 
@@ -98,7 +104,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn config_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         config_exists_blocking(&self.context, name)
     }
 
@@ -116,7 +122,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_config(&self, name: &str) -> Result<(), SolrError> {
+    pub fn delete_config<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
         delete_config_blocking(&self.context, name)
     }
 
@@ -133,10 +139,10 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn create_collection(
+    pub fn create_collection<S: AsRef<str>>(
         &self,
-        name: &str,
-        config: &str,
+        name: S,
+        config: S,
         shards: usize,
         replication_factor: usize,
     ) -> Result<(), SolrError> {
@@ -174,7 +180,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn collection_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         collection_exists_blocking(&self.context, name)
     }
 
@@ -191,7 +197,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_collection(&self, name: &str) -> Result<(), SolrError> {
+    pub fn delete_collection<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
         delete_collection_blocking(&self.context, name)
     }
 
@@ -208,7 +214,11 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn create_alias(&self, alias: &str, collections: &[&str]) -> Result<(), SolrError> {
+    pub fn create_alias<S: AsRef<str>>(
+        &self,
+        alias: S,
+        collections: &[S],
+    ) -> Result<(), SolrError> {
         create_alias_blocking(&self.context, alias, collections)
     }
 
@@ -243,7 +253,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn alias_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub fn alias_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         alias_exists_blocking(&self.context, name)
     }
 
@@ -260,7 +270,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_alias(&self, name: &str) -> Result<(), SolrError> {
+    pub fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
         delete_alias_blocking(&self.context, name)
     }
 
@@ -282,13 +292,15 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn index<T: Serialize>(
+    pub fn index<T: Serialize, S: AsRef<str>, B: AsRef<UpdateQuery>>(
         &self,
-        builder: &UpdateQuery,
-        collection: &str,
+        builder: B,
+        collection: S,
         data: &[T],
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute_blocking(&self.context, collection, data)
+        builder
+            .as_ref()
+            .execute_blocking(&self.context, collection, data)
     }
 
     /// Select some data from SolrCloud
@@ -301,16 +313,16 @@ impl BlockingSolrCloudClient {
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQuery::new().fq(&["age:[* TO *]"]), "collection_name")?;
+    /// let response = client.select(&SelectQuery::new().fq(["age:[* TO *]"]), "collection_name")?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select(
+    pub fn select<S: AsRef<str>, B: AsRef<SelectQuery>>(
         &self,
-        builder: &SelectQuery,
-        collection: &str,
+        builder: B,
+        collection: S,
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute_blocking(&self.context, collection)
+        builder.as_ref().execute_blocking(&self.context, collection)
     }
 
     /// Delete some data from SolrCloud
@@ -324,15 +336,15 @@ impl BlockingSolrCloudClient {
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQuery::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name")?;
+    /// let response = client.delete(&DeleteQuery::new().ids(["document1"]).queries(["age:[* TO *]"]), "collection_name")?;
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete(
+    pub fn delete<S: AsRef<str>, B: AsRef<DeleteQuery>>(
         &self,
-        builder: &DeleteQuery,
-        collection: &str,
+        builder: B,
+        collection: S,
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute_blocking(&self.context, collection)
+        builder.as_ref().execute_blocking(&self.context, collection)
     }
 }

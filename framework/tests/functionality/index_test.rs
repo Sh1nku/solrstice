@@ -64,8 +64,8 @@ async fn index_indexes_correct_documents() -> Result<(), SolrError> {
         .await?;
 
     let returned_data = SelectQuery::new()
-        .fl(&["*", "[child]"])
-        .fq(&["city_name:[* TO *]"])
+        .fl(["*", "[child]"])
+        .fq(["city_name:[* TO *]"])
         .execute(&config.context, &collection_name)
         .await
         .unwrap()
@@ -103,7 +103,7 @@ async fn delete_deletes_documents_by_id() {
     assert_ne!(num_found, 0);
 
     DeleteQuery::new()
-        .queries(&["*:*"])
+        .queries(["*:*"])
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap();

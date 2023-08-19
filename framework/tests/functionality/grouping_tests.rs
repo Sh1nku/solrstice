@@ -16,8 +16,8 @@ async fn group_fields() -> Result<(), SolrError> {
         .await?;
 
     let response = SelectQuery::new()
-        .fq(&["age:[* TO *]"])
-        .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
+        .fq(["age:[* TO *]"])
+        .grouping(&GroupingComponent::new().fields(["age"]).limit(10))
         .execute(&config.context, &config.collection_name)
         .await?;
     let groups = response
@@ -50,7 +50,7 @@ async fn group_queries() -> Result<(), SolrError> {
     let response = SelectQuery::new()
         .grouping(
             &GroupingComponent::new()
-                .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
+                .queries(["age:[0 TO 59]", "age:[60 TO *]"])
                 .limit(10),
         )
         .execute(&config.context, &config.collection_name)
@@ -85,10 +85,10 @@ async fn group_n_groups() -> Result<(), SolrError> {
         .await?;
 
     let response = SelectQuery::new()
-        .fq(&["age:[* TO *]"])
+        .fq(["age:[* TO *]"])
         .grouping(
             &GroupingComponent::new()
-                .fields(&["age"])
+                .fields(["age"])
                 .limit(10)
                 .n_groups(true),
         )
@@ -119,7 +119,7 @@ async fn group_main() -> Result<(), SolrError> {
     let result = SelectQuery::new()
         .grouping(
             &GroupingComponent::new()
-                .queries(&["age:[0 TO 59]"])
+                .queries(["age:[0 TO 59]"])
                 .limit(10)
                 .main(true),
         )
@@ -146,7 +146,7 @@ async fn group_main_false() -> Result<(), SolrError> {
     let result = SelectQuery::new()
         .grouping(
             &GroupingComponent::new()
-                .queries(&["age:[0 TO 59]"])
+                .queries(["age:[0 TO 59]"])
                 .limit(10)
                 .main(false),
         )
@@ -171,7 +171,7 @@ async fn group_simple() -> Result<(), SolrError> {
     let result = SelectQuery::new()
         .grouping(
             &GroupingComponent::new()
-                .fields(&["age"])
+                .fields(["age"])
                 .limit(10)
                 .format(GroupFormatting::Simple),
         )

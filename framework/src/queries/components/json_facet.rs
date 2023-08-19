@@ -4,12 +4,43 @@ use std::collections::HashMap;
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JsonFacetComponent {
     #[serde(rename = "json.facet", serialize_with = "json_facet_as_string")]
-    pub facet: HashMap<String, JsonFacetType>,
+    facet: HashMap<String, JsonFacetType>,
 }
 
 impl AsRef<JsonFacetComponent> for JsonFacetComponent {
     fn as_ref(&self) -> &JsonFacetComponent {
         self
+    }
+}
+
+impl From<&JsonFacetComponent> for JsonFacetComponent {
+    fn from(component: &JsonFacetComponent) -> Self {
+        component.clone()
+    }
+}
+
+impl JsonFacetComponent {
+    pub fn new() -> Self {
+        JsonFacetComponent {
+            facet: Default::default(),
+        }
+    }
+
+    pub fn facets<K: Into<String>, V: Into<JsonFacetType>, I: IntoIterator<Item = (K, V)>>(
+        mut self,
+        facets: I,
+    ) -> Self {
+        self.facet = facets
+            .into_iter()
+            .map(|(k, v)| (k.into(), v.into()))
+            .collect();
+        self
+    }
+}
+
+impl Default for JsonFacetComponent {
+    fn default() -> Self {
+        JsonFacetComponent::new()
     }
 }
 
@@ -47,6 +78,58 @@ pub struct JsonTermsFacet {
     facet: Option<HashMap<String, JsonFacetType>>,
 }
 
+impl From<JsonTermsFacet> for JsonFacetType {
+    fn from(facet: JsonTermsFacet) -> Self {
+        JsonFacetType::Terms(Box::new(facet))
+    }
+}
+
+impl JsonTermsFacet {
+    pub fn new<S: Into<String>>(field: S) -> Self {
+        JsonTermsFacet {
+            type_: "terms".to_string(),
+            field: field.into(),
+            offset: None,
+            limit: None,
+            sort: None,
+            facet: None,
+        }
+    }
+
+    pub fn offset<O: Into<Option<usize>>>(mut self, offset: O) -> Self {
+        self.offset = offset.into();
+        self
+    }
+
+    pub fn limit<O: Into<Option<usize>>>(mut self, limit: O) -> Self {
+        self.limit = limit.into();
+        self
+    }
+
+    pub fn sort<S: Into<String>, O: Into<Option<S>>>(mut self, sort: O) -> Self {
+        self.sort = sort.into().map(|s| s.into());
+        self
+    }
+
+    pub fn facets<
+        K: Into<String>,
+        V: Into<JsonFacetType>,
+        I: IntoIterator<Item = (K, V)>,
+        O: Into<Option<I>>,
+    >(
+        mut self,
+        facets: O,
+    ) -> Self {
+        self.facet = facets.into().map(|facets| {
+            facets
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect()
+        });
+        self
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct JsonQueryFacet {
     #[serde(rename = "type")]
@@ -64,75 +147,9 @@ pub struct JsonQueryFacet {
     facet: Option<HashMap<String, JsonFacetType>>,
 }
 
-impl JsonFacetComponent {
-    pub fn new() -> Self {
-        JsonFacetComponent {
-            facet: Default::default(),
-        }
-    }
-
-    pub fn facets<K: AsRef<str>, V: Into<JsonFacetType> + Clone>(
-        mut self,
-        facets: &[(K, V)],
-    ) -> Self {
-        self.facet = facets
-            .iter()
-            .map(|(name, facet)| (name.as_ref().to_string(), facet.clone().into()))
-            .collect();
-        self
-    }
-}
-
-impl Default for JsonFacetComponent {
-    fn default() -> Self {
-        JsonFacetComponent::new()
-    }
-}
-
 impl From<JsonQueryFacet> for JsonFacetType {
     fn from(facet: JsonQueryFacet) -> Self {
         JsonFacetType::Query(Box::new(facet))
-    }
-}
-
-impl JsonTermsFacet {
-    pub fn new<T: AsRef<str>>(field: T) -> Self {
-        JsonTermsFacet {
-            type_: "terms".to_string(),
-            field: field.as_ref().to_string(),
-            offset: None,
-            limit: None,
-            sort: None,
-            facet: None,
-        }
-    }
-
-    pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(offset);
-        self
-    }
-
-    pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(limit);
-        self
-    }
-
-    pub fn sort<T: AsRef<str>>(mut self, sort: T) -> Self {
-        self.sort = Some(sort.as_ref().to_string());
-        self
-    }
-
-    pub fn facets<K: AsRef<str>, V: Into<JsonFacetType> + Clone>(
-        mut self,
-        facets: &[(K, V)],
-    ) -> Self {
-        self.facet = Some(
-            facets
-                .iter()
-                .map(|(name, facet)| (name.as_ref().to_string(), facet.clone().into()))
-                .collect(),
-        );
-        self
     }
 }
 
@@ -149,36 +166,46 @@ impl JsonQueryFacet {
         }
     }
 
-    pub fn limit(mut self, limit: usize) -> Self {
-        self.limit = Some(limit);
+    pub fn limit<O: Into<Option<usize>>>(mut self, limit: O) -> Self {
+        self.limit = limit.into();
         self
     }
 
-    pub fn offset(mut self, offset: usize) -> Self {
-        self.offset = Some(offset);
+    pub fn offset<O: Into<Option<usize>>>(mut self, offset: O) -> Self {
+        self.offset = offset.into();
         self
     }
 
-    pub fn sort<T: AsRef<str>>(mut self, sort: T) -> Self {
-        self.sort = Some(sort.as_ref().to_string());
+    pub fn sort<S: Into<String>, O: Into<Option<S>>>(mut self, sort: O) -> Self {
+        self.sort = sort.into().map(|s| s.into());
         self
     }
 
-    pub fn fq<T: AsRef<str>>(mut self, fq: &[T]) -> Self {
-        self.fq = Some(fq.iter().map(|s| s.as_ref().to_string()).collect());
-        self
-    }
-
-    pub fn facets<K: AsRef<str>, V: Into<JsonFacetType> + Clone>(
+    pub fn fq<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
         mut self,
-        facets: &[(K, V)],
+        fq: O,
     ) -> Self {
-        self.facet = Some(
+        self.fq = fq
+            .into()
+            .map(|fq| fq.into_iter().map(|s| s.into()).collect());
+        self
+    }
+
+    pub fn facets<
+        K: Into<String>,
+        V: Into<JsonFacetType>,
+        I: IntoIterator<Item = (K, V)>,
+        O: Into<Option<I>>,
+    >(
+        mut self,
+        facets: O,
+    ) -> Self {
+        self.facet = facets.into().map(|facets| {
             facets
-                .iter()
-                .map(|(name, facet)| (name.as_ref().to_string(), facet.clone().into()))
-                .collect(),
-        );
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect()
+        });
         self
     }
 }

@@ -110,3 +110,15 @@ impl From<SolrServerContextBuilder> for SolrServerContext {
         }
     }
 }
+
+impl From<&SolrServerContext> for SolrServerContext {
+    fn from(context: &SolrServerContext) -> Self {
+        context.clone()
+    }
+}
+
+impl AsRef<SolrServerContext> for SolrServerContext {
+    fn as_ref(&self) -> &SolrServerContext {
+        self
+    }
+}

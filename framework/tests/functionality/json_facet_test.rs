@@ -17,7 +17,7 @@ pub async fn test_json_facet_works() -> Result<(), SolrError> {
         .await?;
 
     let query = SelectQuery::new().json_facet(
-        &JsonFacetComponent::new().facets(&[("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+        &JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
     );
     let response = config
         .async_client
@@ -44,9 +44,9 @@ pub async fn test_json_facet_sub_works() -> Result<(), SolrError> {
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQuery::new().json_facet(&JsonFacetComponent::new().facets(&[(
+    let query = SelectQuery::new().json_facet(&JsonFacetComponent::new().facets([(
         "below_60",
-        JsonQueryFacet::new("age:[0 TO 59]").facets(&[(
+        JsonQueryFacet::new("age:[0 TO 59]").facets([(
             "total_people",
             JsonFacetType::StringQuery("sum(count)".to_string()),
         )]),

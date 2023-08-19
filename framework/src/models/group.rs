@@ -27,8 +27,8 @@ impl SolrGroupResult {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let response = SelectQuery::new()
-    ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10))
+    ///     .fq(["age:[* TO *]"])
+    ///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -58,7 +58,7 @@ impl SolrGroupResult {
     /// let response = SelectQuery::new()
     ///     .grouping(
     ///         &GroupingComponent::new()
-    ///             .queries(&["age:[0 TO 59]", "age:[60 TO *]"])
+    ///             .queries(["age:[0 TO 59]", "age:[60 TO *]"])
     ///             .limit(10),
     ///     )
     ///     .execute(&context, "collection_name")
@@ -87,8 +87,8 @@ impl SolrGroupResult {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let response = SelectQuery::new()
-    ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10).format(GroupFormatting::Simple))
+    ///     .fq(["age:[* TO *]"])
+    ///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10).format(GroupFormatting::Simple))
     ///     .execute(&context, "collection_name")
     ///     .await?;
     /// let groups = response.get_groups().ok_or("No groups")?;
@@ -126,8 +126,8 @@ impl SolrGroupResult {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
 /// let response = client.select(&SelectQuery::new()
-///     .fq(&["age:[* TO *]"])
-///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
+///     .fq(["age:[* TO *]"])
+///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10)), "collection_name").await?;
 /// let groups = response
 ///     .get_groups()
 ///     .ok_or("No groups found")?;
@@ -162,8 +162,8 @@ impl SolrGroupFieldResult {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
     /// let response = client.select(&SelectQuery::new()
-    ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
+    ///     .fq(["age:[* TO *]"])
+    ///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10)), "collection_name").await?;
     /// let groups = response
     ///     .get_groups()
     ///     .ok_or("No groups found")?;
@@ -190,8 +190,8 @@ impl SolrGroupFieldResult {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
     /// let response = client.select(&SelectQuery::new()
-    ///     .fq(&["age:[* TO *]"])
-    ///     .grouping(&GroupingComponent::new().fields(&["age"]).limit(10)), "collection_name").await?;
+    ///     .fq(["age:[* TO *]"])
+    ///     .grouping(&GroupingComponent::new().fields(["age"]).limit(10)), "collection_name").await?;
     /// let groups = response
     ///     .get_groups()
     ///     .ok_or("No groups found")?;

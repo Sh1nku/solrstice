@@ -34,7 +34,6 @@ class SelectQuery:
         def_type: Optional["DefType"] = None,
     ) -> None:
         pass
-
     async def execute(
         self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
@@ -69,7 +68,6 @@ class UpdateQuery:
         commit_type: Optional[CommitType] = CommitType.Hard,
     ) -> None:
         pass
-
     async def execute(
         self, context: "SolrServerContext", collection: str, data: List[Dict]
     ) -> "SolrResponse":
@@ -104,7 +102,6 @@ class DeleteQuery:
         queries: Optional[List[str]] = None,
     ) -> None:
         pass
-
     async def execute(
         self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":

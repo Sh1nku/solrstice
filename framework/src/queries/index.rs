@@ -25,8 +25,20 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Debug)]
 pub struct UpdateQuery {
-    pub handler: String,
-    pub commit_type: CommitType,
+    handler: String,
+    commit_type: CommitType,
+}
+
+impl From<&UpdateQuery> for UpdateQuery {
+    fn from(query: &UpdateQuery) -> Self {
+        query.clone()
+    }
+}
+
+impl AsRef<UpdateQuery> for UpdateQuery {
+    fn as_ref(&self) -> &Self {
+        self
+    }
 }
 
 impl UpdateQuery {
@@ -62,8 +74,8 @@ impl UpdateQuery {
     /// use solrstice::queries::index::UpdateQuery;
     /// let builder = UpdateQuery::new().handler("custom_handler");
     /// ```
-    pub fn handler<T: AsRef<str>>(mut self, handler: T) -> Self {
-        self.handler = handler.as_ref().to_string();
+    pub fn handler<S: Into<String>>(mut self, handler: S) -> Self {
+        self.handler = handler.into();
         self
     }
 
@@ -82,25 +94,26 @@ impl UpdateQuery {
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [AsyncSolrCloudClient::index](crate::clients::async_cloud_client::AsyncSolrCloudClient::index) instead.
-    pub async fn execute<T: Serialize>(
+    pub async fn execute<C: AsRef<SolrServerContext>, D: Serialize, S: AsRef<str>>(
         &self,
-        builder: &SolrServerContext,
-        collection: &str,
-        data: &[T],
+        context: C,
+        collection: S,
+        data: &[D],
     ) -> Result<SolrResponse, SolrError> {
         let solr_url = format!(
             "{}/solr/{}/{}",
-            &builder.host.get_solr_node().await?,
-            &collection,
+            context.as_ref().host.get_solr_node().await?,
+            collection.as_ref(),
             &self.handler
         );
 
-        let mut request = builder
+        let mut request = context
+            .as_ref()
             .client
             .post(solr_url)
             .query(&[("overwrite", "true"), ("wt", "json")])
             .json(data);
-        if let Some(auth) = &builder.auth {
+        if let Some(auth) = &context.as_ref().auth {
             request = auth.add_auth_to_request(request)
         }
 
@@ -131,20 +144,32 @@ impl UpdateQuery {
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
-/// let response = client.delete(&DeleteQuery::new().ids(&["document1", "document2"]), "collection_name").await?;
+/// let response = client.delete(&DeleteQuery::new().ids(["document1", "document2"]), "collection_name").await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Default, Serialize, Deserialize, PartialEq, Debug)]
 pub struct DeleteQuery {
     /// The handler for the query. Default is "update".
-    pub handler: String,
+    handler: String,
     /// The commit type for the query. Default is CommitType::Hard.
-    pub commit_type: CommitType,
+    commit_type: CommitType,
     /// Ids to delete
-    pub ids: Option<Vec<String>>,
+    ids: Option<Vec<String>>,
     /// Queries to delete
-    pub queries: Option<Vec<String>>,
+    queries: Option<Vec<String>>,
+}
+
+impl From<&DeleteQuery> for DeleteQuery {
+    fn from(query: &DeleteQuery) -> Self {
+        query.clone()
+    }
+}
+
+impl AsRef<DeleteQuery> for DeleteQuery {
+    fn as_ref(&self) -> &DeleteQuery {
+        self
+    }
 }
 
 impl DeleteQuery {
@@ -163,7 +188,7 @@ impl DeleteQuery {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQuery::new().ids(&["document1", "document2"]), "collection_name").await?;
+    /// let response = client.delete(&DeleteQuery::new().ids(["document1", "document2"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
@@ -182,8 +207,8 @@ impl DeleteQuery {
     /// use solrstice::queries::index::DeleteQuery;
     /// let builder = DeleteQuery::new().handler("custom_handler");
     /// ```
-    pub fn handler<T: AsRef<str>>(mut self, handler: T) -> Self {
-        self.handler = handler.as_ref().to_string();
+    pub fn handler<S: Into<String>>(mut self, handler: S) -> Self {
+        self.handler = handler.into();
         self
     }
 
@@ -203,10 +228,15 @@ impl DeleteQuery {
     /// # Examples
     /// ```no_run
     /// use solrstice::queries::index::DeleteQuery;
-    /// let builder = DeleteQuery::new().ids(&["document1", "document2"]);
+    /// let builder = DeleteQuery::new().ids(["document1", "document2"]);
     /// ```
-    pub fn ids<T: AsRef<str>>(mut self, ids: &[T]) -> Self {
-        self.ids = Some(ids.iter().map(|s| s.as_ref().to_string()).collect());
+    pub fn ids<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        ids: O,
+    ) -> Self {
+        self.ids = ids
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
@@ -214,25 +244,30 @@ impl DeleteQuery {
     /// # Examples
     /// ```no_run
     /// use solrstice::queries::index::DeleteQuery;
-    /// let builder = DeleteQuery::new().queries(&["age:[* TO *]"]);
+    /// let builder = DeleteQuery::new().queries(["age:[* TO *]"]);
     /// ```
-    pub fn queries<T: AsRef<str>>(mut self, queries: &[T]) -> Self {
-        self.queries = Some(queries.iter().map(|s| s.as_ref().to_string()).collect());
+    pub fn queries<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        queries: O,
+    ) -> Self {
+        self.queries = queries
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [AsyncSolrCloudClient::delete](crate::clients::async_cloud_client::AsyncSolrCloudClient::delete) instead.
-    pub async fn execute(
+    pub async fn execute<C: AsRef<SolrServerContext>, S: AsRef<str>>(
         &self,
-        context: &SolrServerContext,
-        collection: &str,
+        context: C,
+        collection: S,
     ) -> Result<SolrResponse, SolrError> {
         let solr_url = format!(
             "{}/solr/{}/{}",
-            &context.host.get_solr_node().await?,
-            &collection,
+            &context.as_ref().host.get_solr_node().await?,
+            &collection.as_ref(),
             &self.handler
         );
         let ids = self.ids.as_ref().map(|ids| {
@@ -250,6 +285,7 @@ impl DeleteQuery {
         });
 
         let mut request = context
+            .as_ref()
             .client
             .post(solr_url)
             .query(&[("overwrite", "true"), ("wt", "json")])
@@ -259,7 +295,7 @@ impl DeleteQuery {
                 ids.unwrap_or_default(),
                 queries.unwrap_or_default()
             ));
-        if let Some(auth) = &context.auth {
+        if let Some(auth) = &context.as_ref().auth {
             request = auth.add_auth_to_request(request)
         }
 
@@ -280,11 +316,11 @@ impl UpdateQuery {
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [BlockingSolrCloudClient::index](crate::clients::blocking_cloud_client::BlockingSolrCloudClient::index) instead.
-    pub fn execute_blocking<T: Serialize>(
+    pub fn execute_blocking<D: Serialize, C: AsRef<SolrServerContext>, S: AsRef<str>>(
         &self,
-        context: &SolrServerContext,
-        collection: &str,
-        data: &[T],
+        context: C,
+        collection: S,
+        data: &[D],
     ) -> Result<SolrResponse, SolrError> {
         RUNTIME
             .handle()
@@ -296,10 +332,10 @@ impl DeleteQuery {
     /// Execute the query.
     ///
     /// This is not meant to be used directly. Use [BlockingSolrCloudClient::delete](crate::clients::blocking_cloud_client::BlockingSolrCloudClient::delete) instead.
-    pub fn execute_blocking(
+    pub fn execute_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
         &self,
-        context: &SolrServerContext,
-        collection: &str,
+        context: C,
+        collection: S,
     ) -> Result<SolrResponse, SolrError> {
         RUNTIME.handle().block_on(self.execute(context, collection))
     }
