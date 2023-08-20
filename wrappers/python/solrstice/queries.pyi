@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
     from solrstice.def_type import DefType
+    from solrstice.facetset import FacetSetComponent
     from solrstice.group import GroupingComponent
     from solrstice.hosts import SolrServerContext
     from solrstice.response import SolrResponse
@@ -19,6 +20,7 @@ class SelectQuery:
     :param cursor_mark: Set the cursor mark
     :param grouping: Set the grouping component
     :param def_type: Set the query type
+    :param facetset: Facet counts
     """
 
     def __init__(
@@ -32,6 +34,7 @@ class SelectQuery:
         cursor_mark: Optional[str] = None,
         grouping: Optional["GroupingComponent"] = None,
         def_type: Optional["DefType"] = None,
+        facetset: Optional["FacetSetComponent"] = None,
     ) -> None:
         pass
     async def execute(

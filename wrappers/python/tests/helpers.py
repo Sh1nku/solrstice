@@ -9,6 +9,7 @@ from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
 from solrstice.auth import SolrBasicAuth
+from solrstice.clients import AsyncSolrCloudClient
 from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
 from solrstice.hosts import SolrServerContext, SolrSingleServerHost
@@ -23,6 +24,7 @@ class Config:
     solr_password: Optional[str]
     context: SolrServerContext
     config_path: str
+    async_client: AsyncSolrCloudClient
 
 
 def create_config() -> Config:
@@ -36,14 +38,16 @@ def create_config() -> Config:
     host = os.getenv("SOLR_HOST")
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
     solr_host = SolrSingleServerHost(host)
+    context = SolrServerContext(solr_host, solr_auth)
     wait_for_solr(host, 30)
     return Config(
         host,
         speedbump_host,
         solr_username,
         solr_password,
-        SolrServerContext(solr_host, solr_auth),
+        context,
         "../../test_setup/test_collection",
+        AsyncSolrCloudClient(context),
     )
 
 

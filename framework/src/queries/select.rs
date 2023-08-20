@@ -1,7 +1,7 @@
 use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
-use crate::queries::components::facetset::FacetSetComponent;
+use crate::queries::components::facet_set::FacetSetComponent;
 use crate::queries::components::grouping::GroupingComponent;
 use crate::queries::components::json_facet::JsonFacetComponent;
 use crate::queries::def_type::DefType;

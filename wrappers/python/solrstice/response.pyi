@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 if TYPE_CHECKING:
+    from solrstice.facet_set import SolrFacetSetResult
     from solrstice.group import SolrGroupResult
 
 class SolrDocsResponse:
@@ -18,7 +19,9 @@ class SolrResponse:
 
     def get_docs_response(self) -> Optional[SolrDocsResponse]:
         """Get the response from a solr query"""
-    def get_groups(self) -> Optional[Dict[str, "SolrGroupResult"]]:
+    def get_groups(self) -> Dict[str, "SolrGroupResult"]:
         """Get the groups from a solr query"""
     def get_next_cursor_mark(self) -> Optional[str]:
         """Get the next cursor mark from a solr query"""
+    def get_facet_set(self) -> "SolrFacetSetResult":
+        """Get facet counts"""

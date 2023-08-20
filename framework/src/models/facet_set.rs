@@ -3,23 +3,23 @@ use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct FacetSet {
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Default)]
+pub struct SolrFacetSetResult {
     #[serde(rename = "facet_queries", default)]
     queries: HashMap<String, usize>,
     #[serde(rename = "facet_pivot", default)]
-    pivots: HashMap<String, Vec<PivotFacetResult>>,
+    pivots: HashMap<String, Vec<SolrPivotFacetResult>>,
     #[serde(
         rename = "facet_fields",
         default,
         deserialize_with = "fields_deserializer"
     )]
-    fields: HashMap<String, Vec<FieldFacetResult>>,
+    fields: HashMap<String, Vec<SolrFieldFacetResult>>,
 }
 
 pub fn fields_deserializer<'de, D>(
     deserializer: D,
-) -> Result<HashMap<String, Vec<FieldFacetResult>>, D::Error>
+) -> Result<HashMap<String, Vec<SolrFieldFacetResult>>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -61,44 +61,44 @@ where
             .map_err(|e| {
                 serde::de::Error::custom(format!("Error deserializing field facet: {}", e))
             })?;
-            field_facets.push(FieldFacetResult { key, count });
+            field_facets.push(SolrFieldFacetResult { key, count });
         }
         map.insert(key, field_facets);
     }
     Ok(map)
 }
 
-impl FacetSet {
+impl SolrFacetSetResult {
     pub fn get_queries(&self) -> &HashMap<String, usize> {
         &self.queries
     }
 
-    pub fn get_pivots(&self) -> &HashMap<String, Vec<PivotFacetResult>> {
+    pub fn get_pivots(&self) -> &HashMap<String, Vec<SolrPivotFacetResult>> {
         &self.pivots
     }
 
-    pub fn get_fields(&self) -> &HashMap<String, Vec<FieldFacetResult>> {
+    pub fn get_fields(&self) -> &HashMap<String, Vec<SolrFieldFacetResult>> {
         &self.fields
     }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct PivotFacetResult {
+pub struct SolrPivotFacetResult {
     field: String,
     value: serde_json::Value,
     count: usize,
     #[serde(rename = "pivot", default)]
-    pivots: Vec<PivotFacetResult>,
+    pivots: Vec<SolrPivotFacetResult>,
     #[serde(default)]
     queries: HashMap<String, usize>,
 }
 
-impl PivotFacetResult {
+impl SolrPivotFacetResult {
     pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
         Ok(serde_json::from_value::<T>(self.value.clone())?)
     }
 
-    pub fn get_pivots(&self) -> &[PivotFacetResult] {
+    pub fn get_pivots(&self) -> &[SolrPivotFacetResult] {
         self.pivots.as_slice()
     }
 
@@ -116,12 +116,12 @@ impl PivotFacetResult {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct FieldFacetResult {
+pub struct SolrFieldFacetResult {
     key: serde_json::Value,
     count: usize,
 }
 
-impl FieldFacetResult {
+impl SolrFieldFacetResult {
     pub fn get_key<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
         Ok(serde_json::from_value::<T>(self.key.clone())?)
     }

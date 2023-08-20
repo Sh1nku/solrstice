@@ -99,7 +99,7 @@ impl From<&PivotFacetComponent> for PivotFacetComponent {
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldFacetComponent {
     fields: Vec<FieldFacetEntry>,
-    exclude_terms: Option<Vec<String>>,
+    exclude_terms: Option<String>,
 }
 
 impl Serialize for FieldFacetComponent {
@@ -161,7 +161,7 @@ impl Serialize for FieldFacetComponent {
             map.serialize_entry("facet.field", &field_fields)?;
         }
         if let Some(exclude_terms) = &self.exclude_terms {
-            map.serialize_entry("facet.excludeTerms", exclude_terms.join(",").as_str())?;
+            map.serialize_entry("facet.excludeTerms", exclude_terms.as_str())?;
         }
         map.end()
     }
@@ -270,8 +270,7 @@ impl<'de> Deserialize<'de> for FieldFacetComponent {
                     serde_json::from_value::<String>(value.clone()).map_err(|e| {
                         Error::custom(format!("Error deserializing field facet: {}", e))
                     })?;
-                component =
-                    component.exclude_terms(exclude_terms.split(',').map(|x| x.to_string()));
+                component = component.exclude_terms(exclude_terms);
             } else {
                 return Err(Error::custom(format!("Invalid facet field: {}", key)));
             }
@@ -309,13 +308,8 @@ impl FieldFacetComponent {
         self
     }
 
-    pub fn exclude_terms<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
-        mut self,
-        exclude_terms: O,
-    ) -> Self {
-        self.exclude_terms = exclude_terms
-            .into()
-            .map(|x| x.into_iter().map(|x| x.into()).collect());
+    pub fn exclude_terms<S: Into<String>, O: Into<Option<S>>>(mut self, exclude_terms: O) -> Self {
+        self.exclude_terms = exclude_terms.into().map(|x| x.into());
         self
     }
 }
@@ -453,17 +447,17 @@ impl From<&FieldFacetEntry> for FieldFacetEntry {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::queries::components::facetset::{FacetSetComponent, FieldFacetComponent};
+    use crate::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent};
 
     #[test]
     fn serialize_fields_works() {
         let builder = FacetSetComponent::new().queries(["age:[* TO *]"]).fields(
             FieldFacetComponent::new([
-                &crate::queries::components::facetset::FieldFacetEntry::new("field_field")
+                &crate::queries::components::facet_set::FieldFacetEntry::new("field_field")
                     .prefix("prefix")
                     .contains("contains")
-                    .method(crate::queries::components::facetset::FieldFacetMethod::Enum)
-                    .sort(crate::queries::components::facetset::FieldFacetSort::Count)
+                    .method(crate::queries::components::facet_set::FieldFacetMethod::Enum)
+                    .sort(crate::queries::components::facet_set::FieldFacetSort::Count)
                     .limit(10)
                     .offset(10)
                     .min_count(10)
@@ -471,7 +465,7 @@ pub mod tests {
                     .enum_cache_min_df(10)
                     .exists(true),
             ])
-            .exclude_terms(["exclude_terms"]),
+            .exclude_terms("exclude_terms"),
         );
         let serialized = serde_json::to_string_pretty(&builder).unwrap();
         let deserialized = serde_json::from_str::<FacetSetComponent>(&serialized).unwrap();

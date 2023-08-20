@@ -1,4 +1,5 @@
 use crate::models::error::PyErrWrapper;
+use crate::models::facet_set::SolrFacetSetResultWrapper;
 use crate::models::group::{SolrGroupFieldResultWrapper, SolrGroupResultWrapper};
 use pyo3::prelude::*;
 use pythonize::pythonize;
@@ -90,21 +91,29 @@ impl SolrResponseWrapper {
             .map(SolrDocsResponseWrapper::from)
     }
 
-    pub fn get_groups(&self) -> Option<HashMap<String, SolrGroupResultWrapper>> {
+    pub fn get_groups(&self) -> HashMap<String, SolrGroupResultWrapper> {
         let groups = self.0.get_groups();
         match groups {
-            None => None,
+            None => HashMap::new(),
             Some(groups) => {
                 let groups = groups
                     .iter()
                     .map(|(k, v)| (k.to_owned(), SolrGroupResultWrapper::from(v.to_owned())))
                     .collect::<HashMap<String, SolrGroupResultWrapper>>();
-                Some(groups)
+                groups
             }
         }
     }
 
     pub fn get_next_cursor_mark(&self) -> Option<&str> {
         self.0.next_cursor_mark.as_deref()
+    }
+
+    pub fn get_facet_set(&self) -> SolrFacetSetResultWrapper {
+        let facet_set = self.0.get_facet_set();
+        match facet_set {
+            None => SolrFacetSetResultWrapper::default(),
+            Some(facet_set) => facet_set.into(),
+        }
     }
 }

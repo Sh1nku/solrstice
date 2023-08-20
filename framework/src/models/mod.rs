@@ -9,7 +9,7 @@ pub mod context;
 /// Error types for the library.
 pub mod error;
 /// Facet
-pub mod facetset;
+pub mod facet_set;
 /// Models used by the GroupingComponent.
 pub mod group;
 /// Facets returned by JSON faceting.

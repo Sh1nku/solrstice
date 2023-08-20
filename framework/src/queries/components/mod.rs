@@ -4,5 +4,5 @@
 pub mod grouping;
 
 /// Facetset
-pub mod facetset;
+pub mod facet_set;
 pub mod json_facet;

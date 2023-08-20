@@ -6,6 +6,7 @@ pub mod queries;
 use crate::clients::clients as clients_module;
 use crate::hosts::hosts as hosts_module;
 use crate::models::auth::auth as auth_module;
+use crate::models::facet_set::facet_set as facet_set_module;
 use crate::models::group::group as group_module;
 use crate::models::response::response as response_module;
 use crate::queries::alias::alias;
@@ -63,5 +64,8 @@ fn solrstice(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_wrapped(wrap_pymodule!(def_type_module))?;
     sys_modules.set_item("solrstice.def_type", m.getattr("def_type")?)?;
+
+    m.add_wrapped(wrap_pymodule!(facet_set_module))?;
+    sys_modules.set_item("solrstice.facet_set", m.getattr("facet_set")?)?;
     Ok(())
 }
