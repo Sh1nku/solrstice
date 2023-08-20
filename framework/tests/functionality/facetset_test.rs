@@ -1,6 +1,8 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use solrstice::models::error::SolrError;
-use solrstice::queries::components::facetset::{FacetSetComponent, PivotFacetComponent};
+use solrstice::queries::components::facetset::{
+    FacetSetComponent, FieldFacetComponent, FieldFacetEntry, PivotFacetComponent,
+};
 use solrstice::queries::index::UpdateQuery;
 use solrstice::queries::select::SelectQuery;
 
@@ -61,6 +63,61 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
     let queries = facets.get_queries();
     let query = queries.get("age:[0 TO 59]").ok_or("No age query")?;
     assert_eq!(*query, 4);
+
+    let _ = config.tear_down().await;
+    Ok(())
+}
+
+#[tokio::test]
+pub async fn test_facet_field_works() -> Result<(), SolrError> {
+    let config = FunctionalityTestsBuildup::build_up("FacetField")
+        .await
+        .unwrap();
+    let update = UpdateQuery::new();
+    update
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await?;
+
+    let query = SelectQuery::new().facetset(
+        FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+    );
+    let response = config
+        .async_client
+        .select(&query, &config.collection_name)
+        .await?;
+    let facets = response.get_facetset().ok_or("No facets")?;
+    let fields = facets.get_fields();
+    let age = fields.get("age").ok_or("No age field")?;
+    assert_eq!(age.len(), 3);
+
+    let _ = config.tear_down().await;
+    Ok(())
+}
+
+#[tokio::test]
+pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
+    let config = FunctionalityTestsBuildup::build_up("FacetField")
+        .await
+        .unwrap();
+    let update = UpdateQuery::new();
+    update
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await?;
+
+    let query = SelectQuery::new().facetset(
+        FacetSetComponent::new().fields(
+            FieldFacetComponent::new([FieldFacetEntry::new("interests")])
+                .exclude_terms(["cars", "partying"]),
+        ),
+    );
+    let response = config
+        .async_client
+        .select(&query, &config.collection_name)
+        .await?;
+    let facets = response.get_facetset().ok_or("No facets")?;
+    let fields = facets.get_fields();
+    let age = fields.get("interests").ok_or("No interests field")?;
+    assert_eq!(age.len(), 1);
 
     let _ = config.tear_down().await;
     Ok(())
