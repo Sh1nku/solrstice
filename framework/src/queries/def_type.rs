@@ -3,9 +3,15 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum DefType {
-    Lucene(LuceneQueryBuilder),
-    Dismax(DismaxQueryBuilder),
-    Edismax(EdismaxQueryBuilder),
+    Lucene(LuceneQuery),
+    Dismax(DismaxQuery),
+    Edismax(EdismaxQuery),
+}
+
+impl From<&DefType> for DefType {
+    fn from(def_type: &DefType) -> Self {
+        def_type.clone()
+    }
 }
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
@@ -22,22 +28,22 @@ pub enum QueryOperator {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, LuceneQueryBuilder};
-/// # use solrstice::queries::select::SelectQueryBuilder;
+/// # use solrstice::queries::def_type::{DefType, LuceneQuery};
+/// # use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
-/// let response = client.select(&SelectQueryBuilder::new()
+/// let response = client.select(&SelectQuery::new()
 ///     .q("outdoors")
 ///     .def_type(&DefType::Lucene(
-///         LuceneQueryBuilder::new().df("interests")
+///         LuceneQuery::new().df("interests")
 ///     )), "collection_name")
 ///     .await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct LuceneQueryBuilder {
+pub struct LuceneQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.op", skip_serializing_if = "Option::is_none")]
@@ -48,7 +54,7 @@ pub struct LuceneQueryBuilder {
     pub sow: Option<bool>,
 }
 
-impl Default for LuceneQueryBuilder {
+impl Default for LuceneQuery {
     fn default() -> Self {
         Self {
             def_type: "lucene".to_string(),
@@ -59,22 +65,28 @@ impl Default for LuceneQueryBuilder {
     }
 }
 
-impl LuceneQueryBuilder {
+impl From<LuceneQuery> for DefType {
+    fn from(lucene_query: LuceneQuery) -> Self {
+        DefType::Lucene(lucene_query)
+    }
+}
+
+impl LuceneQuery {
     /// Create a new lucene query
     /// # Examples
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, LuceneQueryBuilder};
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::def_type::{DefType, LuceneQuery};
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .q("outdoors")
     ///     .def_type(&DefType::Lucene(
-    ///         LuceneQueryBuilder::new().df("interests")
+    ///         LuceneQuery::new().df("interests")
     ///     )), "collection_name")
     ///     .await?;
     /// # Ok(())
@@ -85,20 +97,20 @@ impl LuceneQueryBuilder {
     }
 
     /// Which query operator to use. Default is OR, but can be AND
-    pub fn q_op(mut self, q_op: QueryOperator) -> Self {
-        self.q_op = Some(q_op);
+    pub fn q_op<Q: Into<QueryOperator>, O: Into<Option<Q>>>(mut self, q_op: O) -> Self {
+        self.q_op = q_op.into().map(|q| q.into());
         self
     }
 
     /// Default searchable field
-    pub fn df(mut self, df: &str) -> Self {
-        self.df = Some(df.to_string());
+    pub fn df<S: Into<String>, O: Into<Option<S>>>(mut self, df: O) -> Self {
+        self.df = df.into().map(|s| s.into());
         self
     }
 
     /// Split on whitespace
-    pub fn sow(mut self, sow: bool) -> Self {
-        self.sow = Some(sow);
+    pub fn sow<O: Into<Option<bool>>>(mut self, sow: O) -> Self {
+        self.sow = sow.into();
         self
     }
 }
@@ -111,22 +123,22 @@ impl LuceneQueryBuilder {
 /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 /// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, DismaxQueryBuilder};
-/// # use solrstice::queries::select::SelectQueryBuilder;
+/// # use solrstice::queries::def_type::{DefType, DismaxQuery};
+/// # use solrstice::queries::select::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
-/// let response = client.select(&SelectQueryBuilder::new()
+/// let response = client.select(&SelectQuery::new()
 ///     .q("outdoors")
 ///     .def_type(&DefType::Dismax(
-///         DismaxQueryBuilder::new().qf("interests^20").bq(&["interests:cars^20"]),
+///         DismaxQuery::new().qf("interests^20").bq(["interests:cars^20"]),
 ///     )), "collection_name")
 ///     .await?;
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct DismaxQueryBuilder {
+pub struct DismaxQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.alt", skip_serializing_if = "Option::is_none")]
@@ -149,7 +161,7 @@ pub struct DismaxQueryBuilder {
     pub bf: Option<Vec<String>>,
 }
 
-impl Default for DismaxQueryBuilder {
+impl Default for DismaxQuery {
     fn default() -> Self {
         Self {
             def_type: "dismax".to_string(),
@@ -166,22 +178,28 @@ impl Default for DismaxQueryBuilder {
     }
 }
 
-impl DismaxQueryBuilder {
+impl From<DismaxQuery> for DefType {
+    fn from(dismax_query: DismaxQuery) -> Self {
+        DefType::Dismax(dismax_query)
+    }
+}
+
+impl DismaxQuery {
     /// Create a new dismax query
     ///
     /// ```no_run
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, DismaxQueryBuilder};
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::def_type::{DefType, DismaxQuery};
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new()
+    /// let response = client.select(&SelectQuery::new()
     ///     .q("outdoors")
     ///     .def_type(&DefType::Dismax(
-    ///         DismaxQueryBuilder::new().qf("interests^20").bq(&["interests:cars^20"]),
+    ///         DismaxQuery::new().qf("interests^20").bq(["interests:cars^20"]),
     ///     )), "collection_name")
     ///     .await?;
     /// # Ok(())
@@ -192,56 +210,60 @@ impl DismaxQueryBuilder {
     }
 
     /// Alternate query
-    pub fn q_alt(mut self, q_alt: &str) -> Self {
-        self.q_alt = Some(q_alt.to_string());
+    pub fn q_alt<S: Into<String>, O: Into<Option<S>>>(mut self, q_alt: O) -> Self {
+        self.q_alt = q_alt.into().map(|s| s.into());
         self
     }
 
     /// Query fields
-    pub fn qf(mut self, qf: &str) -> Self {
-        self.qf = Some(qf.to_string());
+    pub fn qf<S: Into<String>, O: Into<Option<S>>>(mut self, qf: O) -> Self {
+        self.qf = qf.into().map(|s| s.into());
         self
     }
 
     /// Minimum match
-    pub fn mm(mut self, mm: &str) -> Self {
-        self.mm = Some(mm.to_string());
+    pub fn mm<S: Into<String>, O: Into<Option<S>>>(mut self, mm: O) -> Self {
+        self.mm = mm.into().map(|s| s.into());
         self
     }
 
     /// Phrase fields
-    pub fn pf(mut self, pf: &str) -> Self {
-        self.pf = Some(pf.to_string());
+    pub fn pf<S: Into<String>, O: Into<Option<S>>>(mut self, pf: O) -> Self {
+        self.pf = pf.into().map(|s| s.into());
         self
     }
 
     /// Phrase slop
-    pub fn ps(mut self, ps: &str) -> Self {
-        self.ps = Some(ps.to_string());
+    pub fn ps<S: Into<String>, O: Into<Option<S>>>(mut self, ps: O) -> Self {
+        self.ps = ps.into().map(|s| s.into());
         self
     }
 
     /// Query slop
-    pub fn qs(mut self, qs: &str) -> Self {
-        self.qs = Some(qs.to_string());
+    pub fn qs<S: Into<String>, O: Into<Option<S>>>(mut self, qs: O) -> Self {
+        self.qs = qs.into().map(|s| s.into());
         self
     }
 
     /// Tie breaker
-    pub fn tie(mut self, tie: &str) -> Self {
-        self.tie = Some(tie.to_string());
+    pub fn tie<S: Into<String>, O: Into<Option<S>>>(mut self, tie: O) -> Self {
+        self.tie = tie.into().map(|s| s.into());
         self
     }
 
     /// Boost query
-    pub fn bq(mut self, bq: &[&str]) -> Self {
-        self.bq = Some(bq.iter().map(|s| s.to_string()).collect());
+    pub fn bq<S: Into<String>, V: Into<Vec<S>>, O: Into<Option<V>>>(mut self, bq: O) -> Self {
+        self.bq = bq
+            .into()
+            .map(|v| v.into().into_iter().map(|s| s.into()).collect());
         self
     }
 
     /// Boost functions
-    pub fn bf(mut self, bf: &[&str]) -> Self {
-        self.bf = Some(bf.iter().map(|s| s.to_string()).collect());
+    pub fn bf<S: Into<String>, V: Into<Vec<S>>, O: Into<Option<V>>>(mut self, bf: O) -> Self {
+        self.bf = bf
+            .into()
+            .map(|v| v.into().into_iter().map(|s| s.into()).collect());
         self
     }
 }
@@ -250,7 +272,7 @@ impl DismaxQueryBuilder {
 ///
 /// Documentation can be found at [SolrDocs](https://solr.apache.org/guide/8_11/the-extended-dismax-query-parser.html)
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct EdismaxQueryBuilder {
+pub struct EdismaxQuery {
     #[serde(rename = "defType")]
     pub def_type: String,
     #[serde(rename = "q.alt", skip_serializing_if = "Option::is_none")]
@@ -293,7 +315,7 @@ pub struct EdismaxQueryBuilder {
     pub uf: Option<String>,
 }
 
-impl Default for EdismaxQueryBuilder {
+impl Default for EdismaxQuery {
     fn default() -> Self {
         Self {
             def_type: "edismax".to_string(),
@@ -320,122 +342,139 @@ impl Default for EdismaxQueryBuilder {
     }
 }
 
-impl EdismaxQueryBuilder {
+impl From<EdismaxQuery> for DefType {
+    fn from(edismax_query: EdismaxQuery) -> Self {
+        DefType::Edismax(edismax_query)
+    }
+}
+
+impl EdismaxQuery {
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Alternate query
-    pub fn q_alt(mut self, q_alt: &str) -> Self {
-        self.q_alt = Some(q_alt.to_string());
+    pub fn q_alt<S: Into<String>, O: Into<Option<S>>>(mut self, q_alt: O) -> Self {
+        self.q_alt = q_alt.into().map(|s| s.into());
         self
     }
 
     /// Query fields
-    pub fn qf(mut self, qf: &str) -> Self {
-        self.qf = Some(qf.to_string());
+    pub fn qf<S: Into<String>, O: Into<Option<S>>>(mut self, qf: O) -> Self {
+        self.qf = qf.into().map(|s| s.into());
         self
     }
 
     /// Minimum match
-    pub fn mm(mut self, mm: &str) -> Self {
-        self.mm = Some(mm.to_string());
+    pub fn mm<S: Into<String>, O: Into<Option<S>>>(mut self, mm: O) -> Self {
+        self.mm = mm.into().map(|s| s.into());
         self
     }
 
     /// Minimum match auto relax
-    pub fn mm_auto_relax(mut self, mm_auto_relax: bool) -> Self {
-        self.mm_auto_relax = Some(mm_auto_relax);
+    pub fn mm_auto_relax<O: Into<Option<bool>>>(mut self, mm_auto_relax: O) -> Self {
+        self.mm_auto_relax = mm_auto_relax.into();
         self
     }
 
     /// Phrase fields
-    pub fn pf(mut self, pf: &str) -> Self {
-        self.pf = Some(pf.to_string());
+    pub fn pf<S: Into<String>, O: Into<Option<S>>>(mut self, pf: O) -> Self {
+        self.pf = pf.into().map(|s| s.into());
         self
     }
 
     /// Phrase fields 2
-    pub fn pf2(mut self, pf2: &str) -> Self {
-        self.pf2 = Some(pf2.to_string());
+    pub fn pf2<S: Into<String>, O: Into<Option<S>>>(mut self, pf2: O) -> Self {
+        self.pf2 = pf2.into().map(|s| s.into());
         self
     }
 
     /// Phrase fields 3
-    pub fn pf3(mut self, pf3: &str) -> Self {
-        self.pf3 = Some(pf3.to_string());
+    pub fn pf3<S: Into<String>, O: Into<Option<S>>>(mut self, pf3: O) -> Self {
+        self.pf3 = pf3.into().map(|s| s.into());
         self
     }
 
     /// Phrase slop
-    pub fn ps(mut self, ps: &str) -> Self {
-        self.ps = Some(ps.to_string());
+    pub fn ps<S: Into<String>, O: Into<Option<S>>>(mut self, ps: O) -> Self {
+        self.ps = ps.into().map(|s| s.into());
         self
     }
 
     /// Phrase slop 2
-    pub fn ps2(mut self, ps2: &str) -> Self {
-        self.ps2 = Some(ps2.to_string());
+    pub fn ps2<S: Into<String>, O: Into<Option<S>>>(mut self, ps2: O) -> Self {
+        self.ps2 = ps2.into().map(|s| s.into());
         self
     }
 
     /// Phrase slop 3
-    pub fn ps3(mut self, ps3: &str) -> Self {
-        self.ps3 = Some(ps3.to_string());
+    pub fn ps3<S: Into<String>, O: Into<Option<S>>>(mut self, ps3: O) -> Self {
+        self.ps3 = ps3.into().map(|s| s.into());
         self
     }
 
     /// Query slop
-    pub fn qs(mut self, qs: &str) -> Self {
-        self.qs = Some(qs.to_string());
+    pub fn qs<S: Into<String>, O: Into<Option<S>>>(mut self, qs: O) -> Self {
+        self.qs = qs.into().map(|s| s.into());
         self
     }
 
     /// Tie breaker
-    pub fn tie(mut self, tie: &str) -> Self {
-        self.tie = Some(tie.to_string());
+    pub fn tie<S: Into<String>, O: Into<Option<S>>>(mut self, tie: O) -> Self {
+        self.tie = tie.into().map(|s| s.into());
         self
     }
 
     /// Boost query
-    pub fn bq(mut self, bq: &[&str]) -> Self {
-        self.bq = Some(bq.iter().map(|s| s.to_string()).collect());
+    pub fn bq<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        bq: O,
+    ) -> Self {
+        self.bq = bq.into().map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     /// Boost functions
-    pub fn bf(mut self, bf: &[&str]) -> Self {
-        self.bf = Some(bf.iter().map(|s| s.to_string()).collect());
+    pub fn bf<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        bf: O,
+    ) -> Self {
+        self.bf = bf.into().map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     /// Split on whitespace
-    pub fn sow(mut self, sow: bool) -> Self {
-        self.sow = Some(sow);
+    pub fn sow<O: Into<Option<bool>>>(mut self, sow: O) -> Self {
+        self.sow = sow.into();
         self
     }
 
     /// Boost
-    pub fn boost(mut self, boost: &[&str]) -> Self {
-        self.boost = Some(boost.iter().map(|s| s.to_string()).collect());
+    pub fn boost<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
+        mut self,
+        boost: O,
+    ) -> Self {
+        self.boost = boost
+            .into()
+            .map(|x| x.into_iter().map(|x| x.into()).collect());
         self
     }
 
     /// Lowercase operators
-    pub fn lowercase_operators(mut self, lowercase_operators: bool) -> Self {
-        self.lowercase_operators = Some(lowercase_operators);
+    pub fn lowercase_operators<O: Into<Option<bool>>>(mut self, lowercase_operators: O) -> Self {
+        self.lowercase_operators = lowercase_operators.into();
         self
     }
 
     /// Stopwords
-    pub fn stopwords(mut self, stopwords: bool) -> Self {
-        self.stopwords = Some(stopwords);
+    pub fn stopwords<O: Into<Option<bool>>>(mut self, stopwords: O) -> Self {
+        self.stopwords = stopwords.into();
         self
     }
 
     /// User fields
-    pub fn uf(mut self, uf: &str) -> Self {
-        self.uf = Some(uf.to_string());
+    pub fn uf<S: Into<String>, O: Into<Option<S>>>(mut self, uf: O) -> Self {
+        self.uf = uf.into().map(|s| s.into());
         self
     }
 }

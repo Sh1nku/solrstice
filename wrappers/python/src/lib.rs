@@ -6,16 +6,16 @@ pub mod queries;
 use crate::clients::clients as clients_module;
 use crate::hosts::hosts as hosts_module;
 use crate::models::auth::auth as auth_module;
+use crate::models::facet_set::facet_set as facet_set_module;
 use crate::models::group::group as group_module;
+use crate::models::json_facet::json_facet as json_facet_module;
 use crate::models::response::response as response_module;
 use crate::queries::alias::alias;
 use crate::queries::collection::collection;
 use crate::queries::config::config;
 use crate::queries::def_type::def_type as def_type_module;
-use crate::queries::index::{
-    CommitTypeWrapper, DeleteQueryBuilderWrapper, UpdateQueryBuilderWrapper,
-};
-use crate::queries::select::SelectQueryBuilderWrapper;
+use crate::queries::index::{CommitTypeWrapper, DeleteQueryWrapper, UpdateQueryWrapper};
+use crate::queries::select::SelectQueryWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::wrap_pymodule;
@@ -23,9 +23,9 @@ use pyo3::wrap_pymodule;
 #[pymodule]
 #[pyo3(name = "queries")]
 fn queries_module(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_class::<SelectQueryBuilderWrapper>()?;
-    m.add_class::<UpdateQueryBuilderWrapper>()?;
-    m.add_class::<DeleteQueryBuilderWrapper>()?;
+    m.add_class::<SelectQueryWrapper>()?;
+    m.add_class::<UpdateQueryWrapper>()?;
+    m.add_class::<DeleteQueryWrapper>()?;
     m.add_class::<CommitTypeWrapper>()?;
     Ok(())
 }
@@ -65,5 +65,11 @@ fn solrstice(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_wrapped(wrap_pymodule!(def_type_module))?;
     sys_modules.set_item("solrstice.def_type", m.getattr("def_type")?)?;
+
+    m.add_wrapped(wrap_pymodule!(facet_set_module))?;
+    sys_modules.set_item("solrstice.facet_set", m.getattr("facet_set")?)?;
+
+    m.add_wrapped(wrap_pymodule!(json_facet_module))?;
+    sys_modules.set_item("solrstice.json_facet", m.getattr("json_facet")?)?;
     Ok(())
 }

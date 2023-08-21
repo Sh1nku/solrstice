@@ -1,8 +1,8 @@
 use crate::structures::BaseTestsBuildup;
 use serde::{Deserialize, Serialize};
 use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+use solrstice::queries::select::SelectQuery;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -32,19 +32,16 @@ pub async fn client_example_test() {
         id: "example_document".to_string(),
     }];
     client
-        .index(&UpdateQueryBuilder::new(), name, docs.as_slice())
+        .index(&UpdateQuery::new(), name, docs.as_slice())
         .await
         .unwrap();
 
     // Search documents
     let server_docs = client
-        .select(
-            &SelectQueryBuilder::new().fq(&["id:example_document"]),
-            name,
-        )
+        .select(&SelectQuery::new().fq(["id:example_document"]), name)
         .await
         .unwrap()
-        .get_response()
+        .get_docs_response()
         .unwrap()
         .get_docs::<TestData>()
         .unwrap();
@@ -52,7 +49,7 @@ pub async fn client_example_test() {
 
     // Delete documents
     client
-        .delete(&DeleteQueryBuilder::new().ids(&["example_document"]), name)
+        .delete(&DeleteQuery::new().ids(["example_document"]), name)
         .await
         .unwrap();
 

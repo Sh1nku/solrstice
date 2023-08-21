@@ -2,8 +2,9 @@ name: Count lines of code for the project, and upload to the badge store
 
 on:
   push:
-    branches:
-      - 'master'
+    tags:
+      - '*'
+  workflow_dispatch:
 
 jobs:
   count-loc-and-upload:

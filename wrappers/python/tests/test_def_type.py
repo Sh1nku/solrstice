@@ -8,12 +8,8 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.def_type import (
-    DismaxQueryBuilder,
-    EdismaxQueryBuilder,
-    LuceneQueryBuilder,
-)
-from solrstice.queries import SelectQueryBuilder
+from solrstice.def_type import DismaxQuery, EdismaxQuery, LuceneQuery
+from solrstice.queries import SelectQuery
 
 
 @pytest.fixture()
@@ -30,9 +26,9 @@ async def test_lucene_query_parser(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = LuceneQueryBuilder(df="population")
-        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
-        (await select_builder.execute(config.context, name)).get_response()
+        query_parser = LuceneQuery(df="population")
+        select_builder = SelectQuery(q="outdoors", def_type=query_parser)
+        (await select_builder.execute(config.context, name)).get_docs_response()
     finally:
         await teardown_collection(config.context, name)
 
@@ -46,10 +42,12 @@ async def test_dismax_query_parser(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = DismaxQueryBuilder(qf="interests^20", bq=["interests:cars^20"])
-        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
-        response = (await select_builder.execute(config.context, name)).get_response()
-        first_doc = response.docs[0]
+        query_parser = DismaxQuery(qf="interests^20", bq=["interests:cars^20"])
+        select_builder = SelectQuery(q="outdoors", def_type=query_parser)
+        response = (
+            await select_builder.execute(config.context, name)
+        ).get_docs_response()
+        first_doc = response.get_docs()[0]
         assert first_doc["id"] == "city_Alta_20"
     finally:
         await teardown_collection(config.context, name)
@@ -57,17 +55,19 @@ async def test_dismax_query_parser(config: Config):
 
 @pytest.mark.asyncio
 async def test_edismax_query_parser(config: Config):
-    name = "EDismaxQueryParser"
+    name = "EdismaxQueryParser"
     wait_for_solr(config.solr_host, 30)
 
     try:
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        query_parser = EdismaxQueryBuilder(qf="interests^20", bq=["interests:cars^20"])
-        select_builder = SelectQueryBuilder(q="outdoors", def_type=query_parser)
-        response = (await select_builder.execute(config.context, name)).get_response()
-        first_doc = response.docs[0]
+        query_parser = EdismaxQuery(qf="interests^20", bq=["interests:cars^20"])
+        select_builder = SelectQuery(q="outdoors", def_type=query_parser)
+        response = (
+            await select_builder.execute(config.context, name)
+        ).get_docs_response()
+        first_doc = response.get_docs()[0]
         assert first_doc["id"] == "city_Alta_20"
     finally:
         await teardown_collection(config.context, name)

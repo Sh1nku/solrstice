@@ -2,7 +2,7 @@ use crate::hosts::solr_host::SolrHost;
 use crate::models::error::SolrError;
 use async_trait::async_trait;
 use log::info;
-use std::borrow::{Borrow, Cow};
+use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 use zookeeper_async::{WatchedEvent, Watcher, ZkResult, ZooKeeper};
@@ -15,7 +15,7 @@ use zookeeper_async::{WatchedEvent, Watcher, ZkResult, ZooKeeper};
 /// use solrstice::models::context::{SolrServerContextBuilder};
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+/// let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
 /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
 /// # Ok(())
 /// # }
@@ -35,14 +35,17 @@ impl ZookeeperEnsembleHostConnector {
     /// use solrstice::models::context::{SolrServerContextBuilder};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+    /// let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(hosts: &[&str], timeout: Duration) -> ZookeeperEnsembleHostConnector {
+    pub fn new<S: Into<String>, V: IntoIterator<Item = S>>(
+        hosts: V,
+        timeout: Duration,
+    ) -> ZookeeperEnsembleHostConnector {
         ZookeeperEnsembleHostConnector {
-            hosts: hosts.iter().map(|x| x.to_string()).collect(),
+            hosts: hosts.into_iter().map(|s| s.into()).collect(),
             timeout,
         }
     }
@@ -55,13 +58,13 @@ impl ZookeeperEnsembleHostConnector {
     /// use solrstice::models::context::{SolrServerContextBuilder};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+    /// let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn connect(&self) -> Result<ZookeeperEnsembleHost, SolrError> {
-        ZookeeperEnsembleHost::new(&self.hosts, self.timeout).await
+    pub async fn connect(self) -> Result<ZookeeperEnsembleHost, SolrError> {
+        ZookeeperEnsembleHost::new(self.hosts.as_slice(), self.timeout).await
     }
 }
 
@@ -78,12 +81,12 @@ impl ZookeeperEnsembleHostConnector {
     /// use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
     /// use solrstice::models::context::{SolrServerContextBuilder};
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect_blocking()?;
+    /// let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect_blocking()?;
     /// let client = BlockingSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
     /// # Ok(())
     /// # }
     /// ```
-    pub fn connect_blocking(&self) -> Result<ZookeeperEnsembleHost, SolrError> {
+    pub fn connect_blocking(self) -> Result<ZookeeperEnsembleHost, SolrError> {
         RUNTIME.block_on(self.connect())
     }
 }
@@ -96,7 +99,7 @@ impl ZookeeperEnsembleHostConnector {
 /// use solrstice::models::context::{SolrServerContextBuilder};
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+/// let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
 /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
 /// # Ok(())
 /// # }
@@ -107,12 +110,14 @@ pub struct ZookeeperEnsembleHost {
 }
 
 impl ZookeeperEnsembleHost {
-    pub(crate) async fn new<T: Borrow<str>>(
-        hosts: &[T],
+    pub(crate) async fn new<S: Into<String>, V: IntoIterator<Item = S>>(
+        hosts: V,
         timeout: Duration,
     ) -> Result<ZookeeperEnsembleHost, SolrError> {
+        let hosts = hosts.into_iter().map(|s| s.into()).collect::<Vec<String>>();
+        let hosts = hosts.join(",");
         Ok(ZookeeperEnsembleHost {
-            client: Arc::new(ZooKeeper::connect(&hosts.join(","), timeout, LoggingWatcher).await?),
+            client: Arc::new(ZooKeeper::connect(hosts.as_ref(), timeout, LoggingWatcher).await?),
         })
     }
 }
@@ -141,6 +146,6 @@ impl Watcher for LoggingWatcher {
     }
 }
 
-pub async fn get_hosts_from_zookeeper(client: &ZooKeeper) -> ZkResult<Vec<String>> {
+pub(crate) async fn get_hosts_from_zookeeper(client: &ZooKeeper) -> ZkResult<Vec<String>> {
     client.get_children("/live_nodes", true).await
 }

@@ -88,5 +88,9 @@ def test_alias_all_blocking_functions_exported(config: Config):
     create_collection_blocking(config.context, name, name, 1, 1)
     create_alias_blocking(config.context, name, [name])
     assert alias_exists_blocking(config.context, name)
-    delete_collection_blocking(config.context, name)
-    delete_config_blocking(config.context, name)
+
+    for function in functions:
+        try:
+            function(config.context, name)
+        except RuntimeError:
+            pass

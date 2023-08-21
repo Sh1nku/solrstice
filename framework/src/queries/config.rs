@@ -40,31 +40,32 @@ where
     zip.finish()?;
     Ok(())
 }
-pub async fn upload_config(
-    builder: &SolrServerContext,
-    name: &str,
-    path: &Path,
+pub async fn upload_config<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<Path>>(
+    context: C,
+    name: S,
+    path: P,
 ) -> Result<(), SolrError> {
-    let query_params = [("action", "UPLOAD"), ("name", name)];
-    let mut request = builder
+    let query_params = [("action", "UPLOAD"), ("name", name.as_ref())];
+    let mut request = context
+        .as_ref()
         .client
         .post(format!(
             "{}/solr/admin/configs",
-            builder.host.get_solr_node().await?
+            context.as_ref().host.get_solr_node().await?
         ))
         .header("Content-Type", "application/octet-stream")
         .query(&query_params);
-    if let Some(auth) = &builder.auth {
+    if let Some(auth) = &context.as_ref().auth {
         request = auth.add_auth_to_request(request)
     }
     let mut outfile = tempfile()?;
-    path.try_exists()?;
-    if path.is_dir() {
-        let walkdir = WalkDir::new(path);
+    path.as_ref().try_exists()?;
+    if path.as_ref().is_dir() {
+        let walkdir = WalkDir::new(path.as_ref());
         let it = walkdir.into_iter();
         zip_dir(
             &mut it.filter_map(|e| e.ok()),
-            path,
+            path.as_ref(),
             &outfile,
             zip::CompressionMethod::Stored,
         )?;
@@ -80,23 +81,31 @@ pub async fn upload_config(
     Ok(())
 }
 
-pub async fn get_configs(builder: &SolrServerContext) -> Result<Vec<String>, SolrError> {
+pub async fn get_configs<C: AsRef<SolrServerContext>>(
+    context: C,
+) -> Result<Vec<String>, SolrError> {
     let query_params = [("action", "LIST"), ("wt", "json")];
-    let json = basic_solr_request(builder, "/solr/admin/configs", query_params.as_ref()).await?;
+    let json = basic_solr_request(context, "/solr/admin/configs", query_params.as_ref()).await?;
     match json.config_sets {
         None => Err(SolrError::Unknown("Could not get configsets".to_string())),
         Some(config_sets) => Ok(config_sets),
     }
 }
 
-pub async fn config_exists(builder: &SolrServerContext, name: &str) -> Result<bool, SolrError> {
-    let configs = get_configs(builder).await?;
-    Ok(configs.contains(&name.to_string()))
+pub async fn config_exists<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<bool, SolrError> {
+    let configs = get_configs(context).await?;
+    Ok(configs.contains(&name.as_ref().to_string()))
 }
 
-pub async fn delete_config(builder: &SolrServerContext, name: &str) -> Result<(), SolrError> {
-    let query_params = [("action", "DELETE"), ("name", name)];
-    basic_solr_request(builder, "/solr/admin/configs", query_params.as_ref()).await?;
+pub async fn delete_config<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<(), SolrError> {
+    let query_params = [("action", "DELETE"), ("name", name.as_ref())];
+    basic_solr_request(context, "/solr/admin/configs", query_params.as_ref()).await?;
     Ok(())
 }
 
@@ -104,27 +113,35 @@ pub async fn delete_config(builder: &SolrServerContext, name: &str) -> Result<()
 use crate::runtime::RUNTIME;
 
 #[cfg(feature = "blocking")]
-pub fn upload_config_blocking(
-    builder: &SolrServerContext,
-    name: &str,
-    path: &Path,
+pub fn upload_config_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<Path>>(
+    context: C,
+    name: S,
+    path: P,
 ) -> Result<(), SolrError> {
     RUNTIME
         .handle()
-        .block_on(upload_config(builder, name, path))
+        .block_on(upload_config(context, name, path))
 }
 
 #[cfg(feature = "blocking")]
-pub fn get_configs_blocking(builder: &SolrServerContext) -> Result<Vec<String>, SolrError> {
-    RUNTIME.handle().block_on(get_configs(builder))
+pub fn get_configs_blocking<C: AsRef<SolrServerContext>>(
+    context: C,
+) -> Result<Vec<String>, SolrError> {
+    RUNTIME.handle().block_on(get_configs(context))
 }
 
 #[cfg(feature = "blocking")]
-pub fn config_exists_blocking(builder: &SolrServerContext, name: &str) -> Result<bool, SolrError> {
-    RUNTIME.handle().block_on(config_exists(builder, name))
+pub fn config_exists_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<bool, SolrError> {
+    RUNTIME.handle().block_on(config_exists(context, name))
 }
 
 #[cfg(feature = "blocking")]
-pub fn delete_config_blocking(builder: &SolrServerContext, name: &str) -> Result<(), SolrError> {
-    RUNTIME.handle().block_on(delete_config(builder, name))
+pub fn delete_config_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<(), SolrError> {
+    RUNTIME.handle().block_on(delete_config(context, name))
 }

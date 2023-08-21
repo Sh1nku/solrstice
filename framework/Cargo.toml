@@ -1,7 +1,7 @@
 [package]
 name = "solrstice"
 description = "A Solr 8+ client"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["solr", "search"]
@@ -24,10 +24,11 @@ zip = { version = "0.6", default-features = false }
 tempfile = "3.3"
 walkdir = "2.3"
 tokio = { version = "1.25", optional = true }
-lazy_static = {version = "1.4", optional = true}
+lazy_static = {version = "1.4"}
 dyn-clone = "1.0"
+regex = "1"
 [features]
-blocking = ["tokio", "lazy_static"]
+blocking = ["tokio"]
 
 [dev-dependencies]
 tokio = { features = ["macros", "rt", "rt-multi-thread"], version = "1.25.0"}

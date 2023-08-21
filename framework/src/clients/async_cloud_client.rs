@@ -6,8 +6,8 @@ use crate::queries::collection::{
     collection_exists, create_collection, delete_collection, get_collections,
 };
 use crate::queries::config::{config_exists, delete_config, get_configs, upload_config};
-use crate::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use crate::queries::select::SelectQueryBuilder;
+use crate::queries::index::{DeleteQuery, UpdateQuery};
+use crate::queries::select::SelectQuery;
 use serde::Serialize;
 use std::collections::HashMap;
 use std::path::Path;
@@ -39,8 +39,10 @@ impl AsyncSolrCloudClient {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
     /// ```
-    pub fn new(context: SolrServerContext) -> AsyncSolrCloudClient {
-        AsyncSolrCloudClient { context }
+    pub fn new<C: Into<SolrServerContext>>(context: C) -> AsyncSolrCloudClient {
+        AsyncSolrCloudClient {
+            context: context.into(),
+        }
     }
 
     /// Upload a config to SolrCloud
@@ -57,7 +59,11 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn upload_config(&self, name: &str, path: &Path) -> Result<(), SolrError> {
+    pub async fn upload_config<N: AsRef<str>, P: AsRef<Path>>(
+        &self,
+        name: N,
+        path: P,
+    ) -> Result<(), SolrError> {
         upload_config(&self.context, name, path).await
     }
 
@@ -93,7 +99,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn config_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub async fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         config_exists(&self.context, name).await
     }
 
@@ -111,7 +117,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_config(&self, name: &str) -> Result<(), SolrError> {
+    pub async fn delete_config<N: AsRef<str>>(&self, name: N) -> Result<(), SolrError> {
         delete_config(&self.context, name).await
     }
 
@@ -128,10 +134,10 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn create_collection(
+    pub async fn create_collection<S: AsRef<str>>(
         &self,
-        name: &str,
-        config: &str,
+        name: S,
+        config: S,
         shards: usize,
         replication_factor: usize,
     ) -> Result<(), SolrError> {
@@ -168,7 +174,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn collection_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub async fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         collection_exists(&self.context, name).await
     }
 
@@ -185,7 +191,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_collection(&self, name: &str) -> Result<(), SolrError> {
+    pub async fn delete_collection<N: AsRef<str>>(&self, name: N) -> Result<(), SolrError> {
         delete_collection(&self.context, name).await
     }
 
@@ -202,7 +208,11 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn create_alias(&self, alias: &str, collections: &[&str]) -> Result<(), SolrError> {
+    pub async fn create_alias<S: AsRef<str>>(
+        &self,
+        alias: S,
+        collections: &[S],
+    ) -> Result<(), SolrError> {
         create_alias(&self.context, alias, collections).await
     }
 
@@ -237,7 +247,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn alias_exists(&self, name: &str) -> Result<bool, SolrError> {
+    pub async fn alias_exists<N: AsRef<str>>(&self, name: N) -> Result<bool, SolrError> {
         alias_exists(&self.context, name).await
     }
 
@@ -254,7 +264,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_alias(&self, name: &str) -> Result<(), SolrError> {
+    pub async fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
         delete_alias(&self.context, name).await
     }
 
@@ -264,7 +274,7 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQueryBuilder;
+    /// # use solrstice::queries::index::UpdateQuery;
     /// # use serde::Serialize;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
@@ -272,17 +282,20 @@ impl AsyncSolrCloudClient {
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.index(&UpdateQueryBuilder::new(), "collection_name", &[Data {id: "test".to_string()}]).await?;
+    /// let response = client.index(&UpdateQuery::new(), "collection_name", &[Data {id: "test".to_string()}]).await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn index<T: Serialize>(
+    pub async fn index<T: Serialize, B: AsRef<UpdateQuery>, C: AsRef<str>>(
         &self,
-        builder: &UpdateQueryBuilder,
-        collection: &str,
+        builder: B,
+        collection: C,
         data: &[T],
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute(&self.context, collection, data).await
+        builder
+            .as_ref()
+            .execute(&self.context, collection, data)
+            .await
     }
 
     /// Select some data from SolrCloud
@@ -291,20 +304,20 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.select(&SelectQueryBuilder::new().fq(&["age:[* TO *]"]), "collection_name").await?;
+    /// let response = client.select(&SelectQuery::new().fq(["age:[* TO *]"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn select(
+    pub async fn select<B: AsRef<SelectQuery>, C: AsRef<str>>(
         &self,
-        builder: &SelectQueryBuilder,
-        collection: &str,
+        builder: B,
+        collection: C,
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute(&self.context, collection).await
+        builder.as_ref().execute(&self.context, collection).await
     }
 
     /// Delete some data from SolrCloud
@@ -313,20 +326,20 @@ impl AsyncSolrCloudClient {
     /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
     /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
     /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQueryBuilder;
-    /// # use solrstice::queries::select::SelectQueryBuilder;
+    /// # use solrstice::queries::index::DeleteQuery;
+    /// # use solrstice::queries::select::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
-    /// let response = client.delete(&DeleteQueryBuilder::new().ids(&["document1"]).queries(&["age:[* TO *]"]), "collection_name").await?;
+    /// let response = client.delete(&DeleteQuery::new().ids(["document1"]).queries(["age:[* TO *]"]), "collection_name").await?;
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete(
+    pub async fn delete<B: AsRef<DeleteQuery>, C: AsRef<str>>(
         &self,
-        builder: &DeleteQueryBuilder,
-        collection: &str,
+        builder: B,
+        collection: C,
     ) -> Result<SolrResponse, SolrError> {
-        builder.execute(&self.context, collection).await
+        builder.as_ref().execute(&self.context, collection).await
     }
 }

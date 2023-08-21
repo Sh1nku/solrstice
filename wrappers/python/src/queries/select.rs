@@ -1,140 +1,68 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
+use crate::queries::components::facet_set::FacetSetComponentWrapper;
 use crate::queries::components::grouping::GroupingComponentWrapper;
-use crate::queries::def_type::DefTypeQueryBuilder;
+use crate::queries::components::json_facet::JsonFacetComponentWrapper;
+use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
+use solrstice::models::context::SolrServerContext;
 use solrstice::models::error::SolrError;
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::components::facet_set::FacetSetComponent;
+use solrstice::queries::components::grouping::GroupingComponent;
+use solrstice::queries::components::json_facet::JsonFacetComponent;
+use solrstice::queries::def_type::DefType;
+use solrstice::queries::select::SelectQuery;
 
-#[pyclass(name = "SelectQueryBuilder", module = "solrstice.queries")]
+#[pyclass(name = "SelectQuery", module = "solrstice.queries")]
 #[derive(Clone, Serialize, Deserialize)]
-pub struct SelectQueryBuilderWrapper(SelectQueryBuilder);
+pub struct SelectQueryWrapper(SelectQuery);
 
 #[pymethods]
-impl SelectQueryBuilderWrapper {
+impl SelectQueryWrapper {
     #[new]
     fn new(
         q: Option<String>,
-        fl: Option<Vec<&str>>,
-        fq: Option<Vec<&str>>,
+        fl: Option<Vec<String>>,
+        fq: Option<Vec<String>>,
         rows: Option<usize>,
         start: Option<usize>,
-        sort: Option<Vec<&str>>,
+        sort: Option<Vec<String>>,
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
-        def_type: Option<DefTypeQueryBuilder>,
+        def_type: Option<DefTypeWrapper>,
+        facet_set: Option<FacetSetComponentWrapper>,
+        json_facet: Option<JsonFacetComponentWrapper>,
     ) -> Self {
-        let builder = SelectQueryBuilder::new();
-        let mut s = Self(builder);
+        let mut builder = SelectQuery::new();
         if let Some(q) = q {
-            s.set_q(q);
+            builder = builder.q(q);
         }
-        s.set_fl(fl);
-        s.set_fq(fq);
+        builder = builder.fl::<String, Vec<String>, Option<Vec<String>>>(fl);
+        builder = builder.fq::<String, Vec<String>, Option<Vec<String>>>(fq);
         if let Some(rows) = rows {
-            s.set_rows(rows);
+            builder = builder.rows(rows);
         }
         if let Some(start) = start {
-            s.set_start(start);
+            builder = builder.start(start);
         }
-        s.set_sort(sort);
-        s.set_cursor_mark(cursor_mark);
-        s.set_grouping(grouping);
-        s.set_def_type(def_type);
-        s
-    }
-
-    #[getter]
-    fn get_q(&self) -> &str {
-        &self.0.q
-    }
-
-    #[setter]
-    fn set_q(&mut self, q: String) {
-        self.0.q = q
-    }
-
-    #[getter]
-    fn get_fl(&self) -> Option<Vec<String>> {
-        self.0.fl.clone()
-    }
-
-    #[setter]
-    fn set_fl(&mut self, fl: Option<Vec<&str>>) {
-        self.0.fl = fl.map(|f| f.into_iter().map(|x| x.to_string()).collect())
-    }
-
-    #[getter]
-    fn get_fq(&self) -> Option<Vec<String>> {
-        self.0.fq.clone()
-    }
-
-    #[setter]
-    fn set_fq(&mut self, fq: Option<Vec<&str>>) {
-        self.0.fq = fq.map(|f| f.into_iter().map(|x| x.to_string()).collect())
-    }
-
-    #[getter]
-    fn get_rows(&self) -> usize {
-        self.0.rows
-    }
-
-    #[setter]
-    fn set_rows(&mut self, rows: usize) {
-        self.0.rows = rows
-    }
-
-    #[getter]
-    fn get_start(&self) -> usize {
-        self.0.start
-    }
-
-    #[setter]
-    fn set_start(&mut self, start: usize) {
-        self.0.start = start
-    }
-
-    #[getter]
-    fn get_sort(&self) -> Option<Vec<String>> {
-        self.0.sort.clone()
-    }
-
-    #[setter]
-    fn set_sort(&mut self, sort: Option<Vec<&str>>) {
-        self.0.sort = sort.map(|f| f.into_iter().map(|x| x.to_string()).collect())
-    }
-
-    #[getter]
-    fn get_cursor_mark(&self) -> Option<String> {
-        self.0.cursor_mark.clone()
-    }
-
-    #[setter]
-    fn set_cursor_mark(&mut self, cursor_mark: Option<String>) {
-        self.0.cursor_mark = cursor_mark
-    }
-
-    #[getter]
-    fn get_grouping(&self) -> Option<GroupingComponentWrapper> {
-        self.0.grouping.clone().map(|g| g.into())
-    }
-
-    #[setter]
-    fn set_grouping(&mut self, grouping: Option<GroupingComponentWrapper>) {
-        self.0.grouping = grouping.map(|g| g.into())
-    }
-
-    #[getter]
-    fn get_def_type(&self) -> Option<DefTypeQueryBuilder> {
-        self.0.def_type.clone().map(|g| g.into())
-    }
-
-    #[setter]
-    fn set_def_type(&mut self, def_type: Option<DefTypeQueryBuilder>) {
-        self.0.def_type = def_type.map(|g| g.into())
+        if let Some(sort) = sort {
+            builder = builder.sort(sort);
+        }
+        if let Some(cursor_mark) = cursor_mark {
+            builder = builder.cursor_mark(cursor_mark);
+        }
+        builder = builder
+            .grouping::<GroupingComponent, Option<GroupingComponent>>(grouping.map(|x| x.into()));
+        builder = builder.def_type::<DefType, Option<DefType>>(def_type.map(|x| x.into()));
+        builder = builder
+            .facet_set::<FacetSetComponent, Option<FacetSetComponent>>(facet_set.map(|x| x.into()));
+        builder = builder.json_facet::<JsonFacetComponent, Option<JsonFacetComponent>>(
+            json_facet.map(|x| x.into()),
+        );
+        Self(builder)
     }
 
     pub fn execute<'a>(
@@ -145,8 +73,9 @@ impl SelectQueryBuilderWrapper {
     ) -> PyResult<&'a PyAny> {
         let builder = self.0.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move {
+            let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute(&context.into(), &collection)
+                .execute(&context, &collection)
                 .await
                 .map_err(PyErrWrapper::from)?
                 .into();
@@ -157,13 +86,14 @@ impl SelectQueryBuilderWrapper {
     pub fn execute_blocking(
         &self,
         py: Python,
-        contect: SolrServerContextWrapper,
+        context: SolrServerContextWrapper,
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
         py.allow_threads(move || {
+            let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute_blocking(&contect.into(), &collection)
+                .execute_blocking(&context, &collection)
                 .map_err(PyErrWrapper::from)?
                 .into();
             Ok(result)

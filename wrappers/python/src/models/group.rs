@@ -18,41 +18,20 @@ pub fn group(_py: Python, m: &PyModule) -> PyResult<()> {
 #[pyclass(name = "SolrGroupResult", module = "solrstice.group")]
 pub struct SolrGroupResultWrapper(SolrGroupResult);
 
-#[derive(Clone)]
-#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.group")]
-pub struct SolrGroupFieldResultWrapper {
-    #[pyo3(get)]
-    pub group_value: PyObject,
-    #[pyo3(get)]
-    pub doc_list: SolrDocsResponseWrapper,
-}
-
 #[pymethods]
 impl SolrGroupResultWrapper {
-    #[getter]
     pub fn get_matches(&self) -> usize {
-        self.0.matches
+        self.0.get_matches()
     }
 
-    #[getter]
     pub fn get_n_groups(&self) -> Option<usize> {
-        self.0.n_groups
+        self.0.get_n_groups()
     }
 
-    pub fn get_field_result(&self) -> PyResult<Option<Vec<SolrGroupFieldResultWrapper>>> {
-        let result = self.0.get_field_result();
-        match result {
-            Some(v) => {
-                let result = v
-                    .iter()
-                    .map(|v| {
-                        SolrGroupFieldResultWrapper::try_from(v.clone()).map_err(PyErrWrapper::from)
-                    })
-                    .collect::<Result<Vec<SolrGroupFieldResultWrapper>, PyErrWrapper>>();
-                Ok(Some(result?.to_vec()))
-            }
-            None => Ok(None),
-        }
+    pub fn get_field_result(&self) -> Option<Vec<SolrGroupFieldResultWrapper>> {
+        self.0
+            .get_field_result()
+            .map(|v| v.into_iter().map(|v| v.to_owned().into()).collect())
     }
 
     pub fn get_query_result(&self) -> PyResult<Option<SolrDocsResponseWrapper>> {
@@ -76,16 +55,41 @@ impl From<SolrGroupResult> for SolrGroupResultWrapper {
     }
 }
 
-impl TryFrom<SolrGroupFieldResult> for SolrGroupFieldResultWrapper {
-    type Error = PyErrWrapper;
+impl From<SolrGroupResultWrapper> for SolrGroupResult {
+    fn from(value: SolrGroupResultWrapper) -> Self {
+        value.0
+    }
+}
 
-    fn try_from(value: SolrGroupFieldResult) -> Result<Self, Self::Error> {
-        Python::with_gil(|py| -> Result<Self, Self::Error> {
-            let group_value = pythonize(py, &value.group_value).map_err(PyErrWrapper::from)?;
-            Ok(SolrGroupFieldResultWrapper {
-                group_value,
-                doc_list: SolrDocsResponseWrapper::try_from(value.doc_list)?,
-            })
+#[derive(Clone)]
+#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.group")]
+pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
+
+#[pymethods]
+impl SolrGroupFieldResultWrapper {
+    pub fn get_group_value(&self) -> PyResult<PyObject> {
+        Python::with_gil(|py| -> PyResult<PyObject> {
+            let value = self
+                .0
+                .get_group_value::<serde_json::Value>()
+                .map_err(PyErrWrapper::from)?;
+            Ok(pythonize(py, &value)?)
         })
+    }
+
+    pub fn get_doc_list(&self) -> SolrDocsResponseWrapper {
+        self.0.get_doc_list().into()
+    }
+}
+
+impl From<SolrGroupFieldResult> for SolrGroupFieldResultWrapper {
+    fn from(value: SolrGroupFieldResult) -> Self {
+        SolrGroupFieldResultWrapper(value)
+    }
+}
+
+impl From<SolrGroupFieldResultWrapper> for SolrGroupFieldResult {
+    fn from(value: SolrGroupFieldResultWrapper) -> Self {
+        value.0
     }
 }

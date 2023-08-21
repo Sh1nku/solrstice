@@ -9,7 +9,7 @@ from helpers import (
 )
 
 from solrstice.group import GroupingComponent
-from solrstice.queries import SelectQueryBuilder
+from solrstice.queries import SelectQuery
 
 
 @pytest.fixture()
@@ -27,12 +27,12 @@ async def test_get_group_field_result_works(config: Config):
         await index_test_data(config.context, name)
 
         group_builder = GroupingComponent(fields=["age"], limit=10)
-        select_builder = SelectQueryBuilder(fq=["age:[* TO *]"], grouping=group_builder)
+        select_builder = SelectQuery(fq=["age:[* TO *]"], grouping=group_builder)
         groups = (await select_builder.execute(config.context, name)).get_groups()
         age_group = groups["age"]
         group = age_group.get_field_result()
-        assert age_group.n_groups is None
-        assert age_group.matches > 0
+        assert age_group.get_n_groups() is None
+        assert age_group.get_matches() > 0
         assert len(group) > 0
     finally:
         await teardown_collection(config.context, name)
@@ -50,11 +50,10 @@ async def test_get_group_query_result_works(config: Config):
         group_builder = GroupingComponent(
             queries=["age:[0 TO 59]", "age:[60 TO *]"], limit=10
         )
-        select_builder = SelectQueryBuilder(fq=["age:[* TO *]"], grouping=group_builder)
+        select_builder = SelectQuery(fq=["age:[* TO *]"], grouping=group_builder)
         groups = (await select_builder.execute(config.context, name)).get_groups()
         age_group = groups["age:[0 TO 59]"]
         group = age_group.get_query_result()
-        group.docs
-        assert len(group.docs) > 0
+        assert len(group.get_docs()) > 0
     finally:
         await teardown_collection(config.context, name)

@@ -12,8 +12,8 @@ use crate::queries::config::{
     config_exists, config_exists_blocking, delete_config, delete_config_blocking, get_configs,
     get_configs_blocking, upload_config, upload_config_blocking,
 };
-use crate::queries::index::{DeleteQueryBuilderWrapper, UpdateQueryBuilderWrapper};
-use crate::queries::select::SelectQueryBuilderWrapper;
+use crate::queries::index::{DeleteQueryWrapper, UpdateQueryWrapper};
+use crate::queries::select::SelectQueryWrapper;
 use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -111,7 +111,7 @@ impl AsyncSolrCloudClientWrapper {
     pub fn index<'a>(
         &self,
         py: Python<'a>,
-        builder: UpdateQueryBuilderWrapper,
+        builder: UpdateQueryWrapper,
         collection: String,
         data: Vec<PyObject>,
     ) -> PyResult<&'a PyAny> {
@@ -122,7 +122,7 @@ impl AsyncSolrCloudClientWrapper {
     pub fn select<'a>(
         &self,
         py: Python<'a>,
-        builder: &SelectQueryBuilderWrapper,
+        builder: &SelectQueryWrapper,
         collection: String,
     ) -> PyResult<&'a PyAny> {
         let context = self.0.clone();
@@ -132,7 +132,7 @@ impl AsyncSolrCloudClientWrapper {
     pub fn delete<'a>(
         &self,
         py: Python<'a>,
-        builder: &DeleteQueryBuilderWrapper,
+        builder: &DeleteQueryWrapper,
         collection: String,
     ) -> PyResult<&'a PyAny> {
         let context = self.0.clone();
@@ -221,7 +221,7 @@ impl BlockingSolrCloudClientWrapper {
     pub fn index(
         &self,
         py: Python,
-        builder: UpdateQueryBuilderWrapper,
+        builder: UpdateQueryWrapper,
         collection: String,
         data: Vec<PyObject>,
     ) -> PyResult<SolrResponseWrapper> {
@@ -232,7 +232,7 @@ impl BlockingSolrCloudClientWrapper {
     pub fn select(
         &self,
         py: Python,
-        builder: &SelectQueryBuilderWrapper,
+        builder: &SelectQueryWrapper,
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let context = self.0.clone();
@@ -242,7 +242,7 @@ impl BlockingSolrCloudClientWrapper {
     pub fn delete(
         &self,
         py: Python,
-        builder: &DeleteQueryBuilderWrapper,
+        builder: &DeleteQueryWrapper,
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let context = self.0.clone();

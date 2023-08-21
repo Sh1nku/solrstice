@@ -17,7 +17,7 @@
 //! use solrstice::models::context::{SolrServerContextBuilder};
 //!
 //! # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-//! let host = ZookeeperEnsembleHostConnector::new(&["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
+//! let host = ZookeeperEnsembleHostConnector::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3)).connect().await?;
 //! let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
 //! # Ok(())
 //! # }

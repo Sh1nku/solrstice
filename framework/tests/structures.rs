@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 use solrstice::models::auth::SolrBasicAuth;
 use solrstice::models::context::{SolrServerContext, SolrServerContextBuilder};
@@ -45,6 +46,7 @@ impl BaseTestsBuildup {
 
 pub struct FunctionalityTestsBuildup {
     pub context: SolrServerContext,
+    pub async_client: AsyncSolrCloudClient,
     pub config_path: String,
     pub basename: String,
     pub config_name: String,
@@ -86,7 +88,8 @@ impl FunctionalityTestsBuildup {
             .unwrap();
 
         Ok(Self {
-            context: solr_request,
+            context: solr_request.clone(),
+            async_client: AsyncSolrCloudClient::new(solr_request),
             basename: basename.to_string(),
             config_path,
             collection_name,

@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
     from solrstice.def_type import DefType
+    from solrstice.facet_set import FacetSetComponent
     from solrstice.group import GroupingComponent
     from solrstice.hosts import SolrServerContext
+    from solrstice.json_facet import JsonFacetComponent
     from solrstice.response import SolrResponse
 
-class SelectQueryBuilder:
+class SelectQuery:
     """Builder for a select query
 
     :param q: The query string
@@ -19,6 +21,8 @@ class SelectQueryBuilder:
     :param cursor_mark: Set the cursor mark
     :param grouping: Set the grouping component
     :param def_type: Set the query type
+    :param facet_set: Facet counts
+    :param json_facet: Json facets
     """
 
     def __init__(
@@ -32,18 +36,10 @@ class SelectQueryBuilder:
         cursor_mark: Optional[str] = None,
         grouping: Optional["GroupingComponent"] = None,
         def_type: Optional["DefType"] = None,
+        facet_set: Optional["FacetSetComponent"] = None,
+        json_facet: Optional["JsonFacetComponent"] = None,
     ) -> None:
         pass
-    q: str
-    fq: Optional[List[str]]
-    fl: Optional[List[str]]
-    sort: Optional[List[str]]
-    rows: int
-    start: int
-    cursor_mark: str
-    grouping: Optional["GroupingComponent"]
-    def_type: Optional["DefType"]
-
     async def execute(
         self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
@@ -65,7 +61,7 @@ class CommitType(Enum):
     Hard = ("Hard",)
     Soft = "Soft"
 
-class UpdateQueryBuilder:
+class UpdateQuery:
     """Builder for an update query
 
     :param handler: The handler for the update query
@@ -78,9 +74,6 @@ class UpdateQueryBuilder:
         commit_type: Optional[CommitType] = CommitType.Hard,
     ) -> None:
         pass
-    handler: str
-    commit_type: CommitType
-
     async def execute(
         self, context: "SolrServerContext", collection: str, data: List[Dict]
     ) -> "SolrResponse":
@@ -100,7 +93,7 @@ class UpdateQueryBuilder:
         :param data: The data to update
         """
 
-class DeleteQueryBuilder:
+class DeleteQuery:
     """Builder for a delete query
 
     :param handler: The handler for the delete query
@@ -115,11 +108,6 @@ class DeleteQueryBuilder:
         queries: Optional[List[str]] = None,
     ) -> None:
         pass
-    handler: str
-    commit_type: CommitType
-    ids: List[str]
-    queries: List[str]
-
     async def execute(
         self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":

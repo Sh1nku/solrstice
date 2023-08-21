@@ -38,18 +38,18 @@ let docs = vec![TestData {
     id: "example_document".to_string(),
 }];
 client
-    .index( &UpdateQueryBuilder::new(), "example_collection", docs.as_slice())
+    .index( &UpdateQuery::new(), "example_collection", docs.as_slice())
     .await?;
 ```
 ### Selecting data
 ```rust
 let docs = client
     .select(
-        &SelectQueryBuilder::new().fq(&["id:example_document"]),
+        &SelectQuery::new().fq(["id:example_document"]),
         "example_collection",
     )
     .await?
-    .get_response()
+    .get_docs_response()
     .ok_or("No response provided")?
     .get_docs::<TestData>()?;
 ```
@@ -57,7 +57,7 @@ let docs = client
 ```rust
 client
     .delete(
-        &DeleteQueryBuilder::new().ids(&["example_document"]),
+        &DeleteQuery::new().ids(["example_document"]),
         "example_collection",
     )
     .await?;

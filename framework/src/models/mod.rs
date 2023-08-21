@@ -8,7 +8,11 @@ pub mod commit_type;
 pub mod context;
 /// Error types for the library.
 pub mod error;
+/// Facet
+pub mod facet_set;
 /// Models used by the GroupingComponent.
 pub mod group;
+/// Facets returned by JSON faceting.
+pub mod json_facet;
 /// Models used to get responses from Solr
 pub mod response;

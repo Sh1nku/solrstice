@@ -2,8 +2,8 @@ use crate::structures::{get_test_data, BaseTestsBuildup, City, FunctionalityTest
 use solrstice::models::error::SolrError;
 use solrstice::queries::collection::{create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
-use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+use solrstice::queries::select::SelectQuery;
 use std::path::Path;
 
 #[tokio::test]
@@ -26,7 +26,7 @@ async fn index_indexes_documents() -> Result<(), SolrError> {
         .await
         .unwrap();
 
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &collection_name, &get_test_data())
         .await?;
@@ -58,18 +58,18 @@ async fn index_indexes_correct_documents() -> Result<(), SolrError> {
         .await
         .unwrap();
 
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &collection_name, &get_test_data())
         .await?;
 
-    let returned_data = SelectQueryBuilder::new()
-        .fl(&["*", "[child]"])
-        .fq(&["city_name:[* TO *]"])
+    let returned_data = SelectQuery::new()
+        .fl(["*", "[child]"])
+        .fq(["city_name:[* TO *]"])
         .execute(&config.context, &collection_name)
         .await
         .unwrap()
-        .get_response()
+        .get_docs_response()
         .unwrap()
         .get_docs::<City>()
         .unwrap();
@@ -88,32 +88,32 @@ async fn delete_deletes_documents_by_id() {
     let config = FunctionalityTestsBuildup::build_up(&test_data_name)
         .await
         .unwrap();
-    let update = UpdateQueryBuilder::new();
+    let update = UpdateQuery::new();
     update
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await
         .unwrap();
-    let num_found = SelectQueryBuilder::new()
+    let num_found = SelectQuery::new()
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap()
-        .get_response()
+        .get_docs_response()
         .unwrap()
-        .num_found;
+        .get_num_found();
     assert_ne!(num_found, 0);
 
-    DeleteQueryBuilder::new()
-        .queries(&["*:*"])
+    DeleteQuery::new()
+        .queries(["*:*"])
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap();
 
-    let num_found = SelectQueryBuilder::new()
+    let num_found = SelectQuery::new()
         .execute(&config.context, &config.collection_name)
         .await
         .unwrap()
-        .get_response()
+        .get_docs_response()
         .unwrap()
-        .num_found;
+        .get_num_found();
     assert_eq!(num_found, 0);
 }

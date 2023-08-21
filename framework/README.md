@@ -11,6 +11,8 @@ It also provides a wrapper to python.
 * Select Documents
   * Grouping Component Query
   * DefTypes (lucene, dismax, edismax)
+  * Facet Counts (Query, Field, Pivot)
+  * Json Facet (Query, Stat, Terms, Nested)
 * Indexing Documents
 * Deleting Documents
 ## Examples
@@ -22,8 +24,8 @@ use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 use solrstice::models::auth::SolrBasicAuth;
 use solrstice::models::context::SolrServerContextBuilder;
 use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+use solrstice::queries::select::SelectQuery;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -55,7 +57,7 @@ pub async fn example() -> Result<(), SolrError> {
     }];
     client
         .index(
-            &UpdateQueryBuilder::new(),
+            &UpdateQuery::new(),
             "example_collection",
             docs.as_slice(),
         )
@@ -64,18 +66,18 @@ pub async fn example() -> Result<(), SolrError> {
     // Search and retrieve the document
     let docs = client
         .select(
-            &SelectQueryBuilder::new().fq(&["id:example_document"]),
+            &SelectQuery::new().fq(["id:example_document"]),
             "example_collection",
         )
         .await?
-        .get_response()
+        .get_docs_response()
         .ok_or("No response provided")?
         .get_docs::<TestData>()?;
 
     // Delete the document
     client
         .delete(
-            &DeleteQueryBuilder::new().ids(&["example_document"]),
+            &DeleteQuery::new().ids(["example_document"]),
             "example_collection",
         )
         .await?;

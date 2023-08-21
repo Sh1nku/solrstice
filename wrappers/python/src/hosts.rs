@@ -63,11 +63,7 @@ impl SolrMultipleServerHostWrapper {
             SolrMultipleServerHostWrapper {},
             SolrHostWrapper {
                 solr_host: Arc::new(SolrMultipleServerHost::new(
-                    hosts
-                        .iter()
-                        .map(|x| x.as_str())
-                        .collect::<Vec<_>>()
-                        .as_slice(),
+                    hosts,
                     Duration::from_secs_f32(timeout),
                 )),
             },
@@ -105,7 +101,12 @@ impl ZookeeperEnsembleHostConnectorWrapper {
 
     pub fn connect_blocking(&self) -> PyResult<SolrHostWrapper> {
         let host = SolrHostWrapper {
-            solr_host: Arc::new(self.0.connect_blocking().map_err(PyErrWrapper::from)?),
+            solr_host: Arc::new(
+                self.0
+                    .clone()
+                    .connect_blocking()
+                    .map_err(PyErrWrapper::from)?,
+            ),
         };
         Ok(Python::with_gil(|_| host))
     }

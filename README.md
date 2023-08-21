@@ -13,6 +13,8 @@ Use the [Rust documentation](https://docs.rs/solrstice) or the [Python documenta
 * Select Documents
   * Grouping Component Query
   * DefTypes (lucene, dismax, edismax)
+  * Facet Counts (Query, Field, Pivot)
+  * Json Facet (Query, Stat, Terms, Nested)
 * Indexing Documents
 * Deleting Documents
 ## Examples
@@ -25,8 +27,8 @@ use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 use solrstice::models::auth::SolrBasicAuth;
 use solrstice::models::context::SolrServerContextBuilder;
 use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQueryBuilder, UpdateQueryBuilder};
-use solrstice::queries::select::SelectQueryBuilder;
+use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+use solrstice::queries::select::SelectQuery;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -58,7 +60,7 @@ pub async fn example() -> Result<(), SolrError> {
     }];
     client
         .index(
-          &UpdateQueryBuilder::new(),
+          &UpdateQuery::new(),
           "example_collection",
           docs.as_slice(),
         )
@@ -67,18 +69,18 @@ pub async fn example() -> Result<(), SolrError> {
     // Search and retrieve the document
     let docs = client
         .select(
-          &SelectQueryBuilder::new().fq(&["id:example_document"]),
+          &SelectQuery::new().fq(["id:example_document"]),
           "example_collection",
         )
         .await?
-        .get_response()
+        .get_docs_response()
         .ok_or("No response provided")?
         .get_docs::<TestData>()?;
     
     // Delete the document
     client
         .delete(
-          &DeleteQueryBuilder::new().ids(&["example_document"]),
+          &DeleteQuery::new().ids(["example_document"]),
           "example_collection",
         )
         .await?;
@@ -91,7 +93,7 @@ import asyncio
 from solrstice.clients import AsyncSolrCloudClient
 from solrstice.hosts import SolrSingleServerHost, SolrServerContext
 from solrstice.auth import SolrBasicAuth
-from solrstice.queries import UpdateQueryBuilder, SelectQueryBuilder, DeleteQueryBuilder
+from solrstice.queries import UpdateQuery, SelectQuery, DeleteQuery
 
 # A SolrServerContext specifies how the library should interact with Solr
 context = SolrServerContext(SolrSingleServerHost('localhost:8983'), SolrBasicAuth('solr', 'SolrRocks'))
@@ -103,14 +105,14 @@ async def main():
     await client.create_collection('example_collection', 'example_config', shards=1, replication_factor=1)
     
     # Index a document
-    await client.index(UpdateQueryBuilder(), 'example_collection', [{'id': 'example_document', 'title': 'Example document'}])
+    await client.index(UpdateQuery(), 'example_collection', [{'id': 'example_document', 'title': 'Example document'}])
     
     # Search for the document
-    response = await client.select(SelectQueryBuilder(fq=['title:Example document']), 'example_collection')
-    docs = response.get_response().docs
+    response = await client.select(SelectQuery(fq=['title:Example document']), 'example_collection')
+    docs = response.get_docs_response().get_docs()
     
     # Delete the document
-    await client.delete(DeleteQueryBuilder(ids=['example_document']), 'example_collection')
+    await client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
     
 
 asyncio.run(main())

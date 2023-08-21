@@ -2,29 +2,31 @@ use crate::models::context::SolrServerContext;
 use crate::models::error::SolrError;
 use crate::queries::helpers::basic_solr_request;
 
-pub async fn create_collection(
-    builder: &SolrServerContext,
-    name: &str,
-    config: &str,
+pub async fn create_collection<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+    config: S,
     shards: usize,
     replication_factor: usize,
 ) -> Result<(), SolrError> {
     let query_params = [
         ("action", "CREATE"),
         ("wt", "json"),
-        ("name", name),
+        ("name", name.as_ref()),
         ("numShards", &shards.to_string()),
         ("replicationFactor", &replication_factor.to_string()),
-        ("collection.configName", config),
+        ("collection.configName", config.as_ref()),
     ];
-    basic_solr_request(builder, "/solr/admin/collections", query_params.as_ref()).await?;
+    basic_solr_request(context, "/solr/admin/collections", query_params.as_ref()).await?;
     Ok(())
 }
 
-pub async fn get_collections(builder: &SolrServerContext) -> Result<Vec<String>, SolrError> {
+pub async fn get_collections<C: AsRef<SolrServerContext>>(
+    context: C,
+) -> Result<Vec<String>, SolrError> {
     let query_params = [("action", "LIST"), ("wt", "json")];
     let json = basic_solr_request(
-        &builder,
+        context,
         &format!("/solr/admin/collections"),
         query_params.as_ref(),
     )
@@ -35,15 +37,21 @@ pub async fn get_collections(builder: &SolrServerContext) -> Result<Vec<String>,
     }
 }
 
-pub async fn collection_exists(builder: &SolrServerContext, name: &str) -> Result<bool, SolrError> {
-    let collections = get_collections(builder).await?;
-    Ok(collections.contains(&name.to_string()))
+pub async fn collection_exists<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<bool, SolrError> {
+    let collections = get_collections(context).await?;
+    Ok(collections.contains(&name.as_ref().to_string()))
 }
 
-pub async fn delete_collection(builder: &SolrServerContext, name: &str) -> Result<(), SolrError> {
-    let query_params = [("action", "DELETE"), ("name", name)];
+pub async fn delete_collection<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+) -> Result<(), SolrError> {
+    let query_params = [("action", "DELETE"), ("name", name.as_ref())];
     basic_solr_request(
-        builder,
+        context,
         &format!("/solr/admin/collections"),
         query_params.as_ref(),
     )
@@ -54,15 +62,15 @@ pub async fn delete_collection(builder: &SolrServerContext, name: &str) -> Resul
 #[cfg(feature = "blocking")]
 use crate::runtime::RUNTIME;
 #[cfg(feature = "blocking")]
-pub fn create_collection_blocking(
-    builder: &SolrServerContext,
-    name: &str,
-    config: &str,
+pub fn create_collection_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
+    config: S,
     shards: usize,
     replication_factor: usize,
 ) -> Result<(), SolrError> {
     RUNTIME.handle().block_on(create_collection(
-        builder,
+        context,
         name,
         config,
         shards,
@@ -71,22 +79,24 @@ pub fn create_collection_blocking(
 }
 
 #[cfg(feature = "blocking")]
-pub fn get_collections_blocking(builder: &SolrServerContext) -> Result<Vec<String>, SolrError> {
-    RUNTIME.handle().block_on(get_collections(builder))
+pub fn get_collections_blocking<C: AsRef<SolrServerContext>>(
+    context: C,
+) -> Result<Vec<String>, SolrError> {
+    RUNTIME.handle().block_on(get_collections(context))
 }
 
 #[cfg(feature = "blocking")]
-pub fn collection_exists_blocking(
-    builder: &SolrServerContext,
-    name: &str,
+pub fn collection_exists_blocking<'a, C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
 ) -> Result<bool, SolrError> {
-    RUNTIME.handle().block_on(collection_exists(builder, name))
+    RUNTIME.handle().block_on(collection_exists(context, name))
 }
 
 #[cfg(feature = "blocking")]
-pub fn delete_collection_blocking(
-    builder: &SolrServerContext,
-    name: &str,
+pub fn delete_collection_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    context: C,
+    name: S,
 ) -> Result<(), SolrError> {
-    RUNTIME.handle().block_on(delete_collection(builder, name))
+    RUNTIME.handle().block_on(delete_collection(context, name))
 }
