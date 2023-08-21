@@ -8,7 +8,7 @@ class JsonFacetComponent:
     :param facets: A dictionary of facets to apply to the query
     """
 
-    def __init__(self, facets: Optional[Dict[str, JsonFacetType]] = None):
+    def __init__(self, facets: Optional[Dict[str, "JsonFacetType"]] = None):
         pass
 
 class JsonFacetType(abc.ABC):
