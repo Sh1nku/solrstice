@@ -1,18 +1,19 @@
+use crate::models::error::SolrError;
 use serde::de::{DeserializeOwned, Error};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
-pub struct JsonFacetResponse {
+pub struct SolrJsonFacetResponse {
     count: usize,
-    buckets: Vec<JsonFacetBucket>,
+    buckets: Vec<SolrJsonFacetBucketResponse>,
     #[serde(flatten)]
     flat_facets: HashMap<String, serde_json::Value>,
-    nested_facets: HashMap<String, JsonFacetResponse>,
+    nested_facets: HashMap<String, SolrJsonFacetResponse>,
 }
 
-impl JsonFacetResponse {
-    pub fn get_buckets(&self) -> impl Iterator<Item = &JsonFacetBucket> {
+impl SolrJsonFacetResponse {
+    pub fn get_buckets(&self) -> impl Iterator<Item = &SolrJsonFacetBucketResponse> {
         self.buckets.iter()
     }
 
@@ -20,7 +21,7 @@ impl JsonFacetResponse {
         &self.flat_facets
     }
 
-    pub fn get_nested_facets(&self) -> &HashMap<String, JsonFacetResponse> {
+    pub fn get_nested_facets(&self) -> &HashMap<String, SolrJsonFacetResponse> {
         &self.nested_facets
     }
 
@@ -30,14 +31,14 @@ impl JsonFacetResponse {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct JsonFacetBucket {
+pub struct SolrJsonFacetBucketResponse {
     val: serde_json::Value,
     count: usize,
 }
 
-impl JsonFacetBucket {
-    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, serde_json::Error> {
-        serde_json::from_value::<T>(self.val.clone())
+impl SolrJsonFacetBucketResponse {
+    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
+        serde_json::from_value::<T>(self.val.clone()).map_err(SolrError::from)
     }
 
     pub fn get_count(&self) -> usize {
@@ -45,7 +46,7 @@ impl JsonFacetBucket {
     }
 }
 
-impl<'de> Deserialize<'de> for JsonFacetResponse {
+impl<'de> Deserialize<'de> for SolrJsonFacetResponse {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -59,14 +60,14 @@ impl<'de> Deserialize<'de> for JsonFacetResponse {
 
         let buckets = map
             .remove("buckets")
-            .and_then(|b| serde_json::from_value::<Vec<JsonFacetBucket>>(b).ok())
+            .and_then(|b| serde_json::from_value::<Vec<SolrJsonFacetBucketResponse>>(b).ok())
             .unwrap_or_default();
 
         let mut flat_facets = HashMap::new();
-        let nested_facets: HashMap<String, JsonFacetResponse> = map
+        let nested_facets: HashMap<String, SolrJsonFacetResponse> = map
             .drain()
             .filter_map(|(key, value)| {
-                match serde_json::from_value::<JsonFacetResponse>(value.clone()) {
+                match serde_json::from_value::<SolrJsonFacetResponse>(value.clone()) {
                     Ok(v) => Some((key, v)),
                     Err(_) => {
                         flat_facets.insert(key, value);

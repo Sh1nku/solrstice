@@ -17,7 +17,7 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
         .await?;
 
     let query = SelectQuery::new()
-        .facetset(&FacetSetComponent::new().pivots(&PivotFacetComponent::new(["interests,age"])));
+        .facet_set(&FacetSetComponent::new().pivots(&PivotFacetComponent::new(["interests,age"])));
     let response = config
         .async_client
         .select(&query, &config.collection_name)
@@ -54,7 +54,7 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQuery::new().facetset(&FacetSetComponent::new().queries(["age:[0 TO 59]"]));
+    let query = SelectQuery::new().facet_set(&FacetSetComponent::new().queries(["age:[0 TO 59]"]));
     let response = config
         .async_client
         .select(&query, &config.collection_name)
@@ -78,7 +78,7 @@ pub async fn test_facet_field_works() -> Result<(), SolrError> {
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQuery::new().facetset(
+    let query = SelectQuery::new().facet_set(
         FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
     );
     let response = config
@@ -104,7 +104,7 @@ pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
         .execute(&config.context, &config.collection_name, &get_test_data())
         .await?;
 
-    let query = SelectQuery::new().facetset(
+    let query = SelectQuery::new().facet_set(
         FacetSetComponent::new().fields(
             FieldFacetComponent::new([FieldFacetEntry::new("interests")])
                 .exclude_terms("cars,partying"),
@@ -134,7 +134,7 @@ pub async fn test_facet_field_exclude_works_missing() -> Result<(), SolrError> {
         .await?;
 
     let query =
-        SelectQuery::new().facetset(FacetSetComponent::new().fields(FieldFacetComponent::new([
+        SelectQuery::new().facet_set(FacetSetComponent::new().fields(FieldFacetComponent::new([
             FieldFacetEntry::new("interests").missing(true),
         ])));
     let response = config

@@ -1,7 +1,7 @@
 use crate::models::error::SolrError;
 use crate::models::facet_set::SolrFacetSetResult;
 use crate::models::group::SolrGroupResult;
-use crate::models::json_facet::JsonFacetResponse;
+use crate::models::json_facet::SolrJsonFacetResponse;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::value::RawValue;
@@ -111,9 +111,9 @@ pub struct SolrResponse {
     #[serde(rename = "nextCursorMark")]
     pub next_cursor_mark: Option<String>,
     #[serde(rename = "facet_counts")]
-    pub(crate) facetset: Option<SolrFacetSetResult>,
+    pub(crate) facet_set: Option<SolrFacetSetResult>,
     #[serde(rename = "facets")]
-    pub(crate) json_facet: Option<JsonFacetResponse>,
+    pub(crate) json_facet: Option<SolrJsonFacetResponse>,
 }
 
 impl SolrResponse {
@@ -165,10 +165,10 @@ impl SolrResponse {
     }
 
     pub fn get_facet_set(&self) -> Option<&SolrFacetSetResult> {
-        self.facetset.as_ref()
+        self.facet_set.as_ref()
     }
 
-    pub fn get_json_facets(&self) -> Option<&JsonFacetResponse> {
+    pub fn get_json_facets(&self) -> Option<&SolrJsonFacetResponse> {
         self.json_facet.as_ref()
     }
 }

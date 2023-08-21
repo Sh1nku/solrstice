@@ -48,7 +48,7 @@ pub async fn test_json_facet_sub_works() -> Result<(), SolrError> {
         "below_60",
         JsonQueryFacet::new("age:[0 TO 59]").facets([(
             "total_people",
-            JsonFacetType::StringQuery("sum(count)".to_string()),
+            JsonFacetType::Stat("sum(count)".to_string()),
         )]),
     )]));
     let response = config

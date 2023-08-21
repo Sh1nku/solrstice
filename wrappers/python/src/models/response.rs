@@ -1,6 +1,7 @@
 use crate::models::error::PyErrWrapper;
 use crate::models::facet_set::SolrFacetSetResultWrapper;
 use crate::models::group::{SolrGroupFieldResultWrapper, SolrGroupResultWrapper};
+use crate::models::json_facet::SolrJsonFacetResponseWrapper;
 use pyo3::prelude::*;
 use pythonize::pythonize;
 use solrstice::models::response::{SolrDocsResponse, SolrResponse};
@@ -115,5 +116,9 @@ impl SolrResponseWrapper {
             None => SolrFacetSetResultWrapper::default(),
             Some(facet_set) => facet_set.into(),
         }
+    }
+
+    pub fn get_json_facets(&self) -> Option<SolrJsonFacetResponseWrapper> {
+        self.0.get_json_facets().map(|f| f.clone().into())
     }
 }

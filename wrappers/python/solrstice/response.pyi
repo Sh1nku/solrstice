@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 if TYPE_CHECKING:
     from solrstice.facet_set import SolrFacetSetResult
     from solrstice.group import SolrGroupResult
+    from solrstice.json_facet import SolrJsonFacetResponse
 
 class SolrDocsResponse:
     def get_num_found(self) -> int:
@@ -25,3 +26,5 @@ class SolrResponse:
         """Get the next cursor mark from a solr query"""
     def get_facet_set(self) -> "SolrFacetSetResult":
         """Get facet counts"""
+    def get_json_facets(self) -> Optional["SolrJsonFacetResponse"]:
+        """Get json facets"""

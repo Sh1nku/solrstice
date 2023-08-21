@@ -60,7 +60,7 @@ where
 pub enum JsonFacetType {
     Terms(Box<JsonTermsFacet>),
     Query(Box<JsonQueryFacet>),
-    StringQuery(String),
+    Stat(String),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -154,10 +154,10 @@ impl From<JsonQueryFacet> for JsonFacetType {
 }
 
 impl JsonQueryFacet {
-    pub fn new(q: &str) -> Self {
+    pub fn new<S: Into<String>>(q: S) -> Self {
         JsonQueryFacet {
             type_: "query".to_string(),
-            q: q.to_string(),
+            q: q.into(),
             limit: None,
             offset: None,
             sort: None,

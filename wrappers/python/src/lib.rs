@@ -8,6 +8,7 @@ use crate::hosts::hosts as hosts_module;
 use crate::models::auth::auth as auth_module;
 use crate::models::facet_set::facet_set as facet_set_module;
 use crate::models::group::group as group_module;
+use crate::models::json_facet::json_facet as json_facet_module;
 use crate::models::response::response as response_module;
 use crate::queries::alias::alias;
 use crate::queries::collection::collection;
@@ -67,5 +68,8 @@ fn solrstice(_py: Python, m: &PyModule) -> PyResult<()> {
 
     m.add_wrapped(wrap_pymodule!(facet_set_module))?;
     sys_modules.set_item("solrstice.facet_set", m.getattr("facet_set")?)?;
+
+    m.add_wrapped(wrap_pymodule!(json_facet_module))?;
+    sys_modules.set_item("solrstice.json_facet", m.getattr("json_facet")?)?;
     Ok(())
 }

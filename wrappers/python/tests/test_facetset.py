@@ -32,8 +32,8 @@ async def test_facet_pivot_works(config: Config):
         await index_test_data(config.context, name)
 
         pivot = PivotFacetComponent(["interests,age"])
-        facetset = FacetSetComponent(pivots=pivot)
-        select_builder = SelectQuery(facetset=facetset)
+        facet_set = FacetSetComponent(pivots=pivot)
+        select_builder = SelectQuery(facet_set=facet_set)
         response = await config.async_client.select(select_builder, name)
         facets = response.get_facet_set()
         pivot = facets.get_pivots()
@@ -55,8 +55,8 @@ async def test_facet_query_works(config: Config):
         await setup_collection(config.context, name, config.config_path)
         await index_test_data(config.context, name)
 
-        facetset = FacetSetComponent(queries=["age:[0 TO 59]"])
-        select_builder = SelectQuery(facetset=facetset)
+        facet_set = FacetSetComponent(queries=["age:[0 TO 59]"])
+        select_builder = SelectQuery(facet_set=facet_set)
         response = await config.async_client.select(select_builder, name)
         facets = response.get_facet_set()
         queries = facets.get_queries()
@@ -76,8 +76,8 @@ async def test_facet_field_works(config: Config):
         await index_test_data(config.context, name)
 
         fields = FieldFacetComponent(fields=[FieldFacetEntry("age")])
-        facetset = FacetSetComponent(fields=fields)
-        select_builder = SelectQuery(facetset=facetset)
+        facet_set = FacetSetComponent(fields=fields)
+        select_builder = SelectQuery(facet_set=facet_set)
         response = await config.async_client.select(select_builder, name)
         facets = response.get_facet_set()
         fields = facets.get_fields()

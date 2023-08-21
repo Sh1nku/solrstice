@@ -39,7 +39,7 @@ pub struct SelectQuery {
     #[serde(flatten)]
     def_type: Option<DefType>,
     #[serde(flatten)]
-    facetset: Option<FacetSetComponent>,
+    facet_set: Option<FacetSetComponent>,
     #[serde(flatten)]
     json_facet: Option<JsonFacetComponent>,
 }
@@ -76,7 +76,7 @@ impl SelectQuery {
             cursor_mark: None,
             grouping: None,
             def_type: None,
-            facetset: None,
+            facet_set: None,
             json_facet: None,
         }
     }
@@ -235,8 +235,11 @@ impl SelectQuery {
         self
     }
 
-    pub fn facetset<T: Into<FacetSetComponent>, O: Into<Option<T>>>(mut self, facetset: O) -> Self {
-        self.facetset = facetset.into().map(|x| x.into());
+    pub fn facet_set<T: Into<FacetSetComponent>, O: Into<Option<T>>>(
+        mut self,
+        facet_set: O,
+    ) -> Self {
+        self.facet_set = facet_set.into().map(|x| x.into());
         self
     }
 

@@ -1,8 +1,9 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
-use crate::queries::components::facetset::FacetSetComponentWrapper;
+use crate::queries::components::facet_set::FacetSetComponentWrapper;
 use crate::queries::components::grouping::GroupingComponentWrapper;
+use crate::queries::components::json_facet::JsonFacetComponentWrapper;
 use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
@@ -11,6 +12,7 @@ use solrstice::models::context::SolrServerContext;
 use solrstice::models::error::SolrError;
 use solrstice::queries::components::facet_set::FacetSetComponent;
 use solrstice::queries::components::grouping::GroupingComponent;
+use solrstice::queries::components::json_facet::JsonFacetComponent;
 use solrstice::queries::def_type::DefType;
 use solrstice::queries::select::SelectQuery;
 
@@ -31,7 +33,8 @@ impl SelectQueryWrapper {
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
         def_type: Option<DefTypeWrapper>,
-        facetset: Option<FacetSetComponentWrapper>,
+        facet_set: Option<FacetSetComponentWrapper>,
+        json_facet: Option<JsonFacetComponentWrapper>,
     ) -> Self {
         let mut builder = SelectQuery::new();
         if let Some(q) = q {
@@ -45,13 +48,20 @@ impl SelectQueryWrapper {
         if let Some(start) = start {
             builder = builder.start(start);
         }
-        builder = builder.sort::<String, Vec<String>, Option<Vec<String>>>(sort);
-        builder = builder.cursor_mark::<String, Option<String>>(cursor_mark);
+        if let Some(sort) = sort {
+            builder = builder.sort(sort);
+        }
+        if let Some(cursor_mark) = cursor_mark {
+            builder = builder.cursor_mark(cursor_mark);
+        }
         builder = builder
             .grouping::<GroupingComponent, Option<GroupingComponent>>(grouping.map(|x| x.into()));
         builder = builder.def_type::<DefType, Option<DefType>>(def_type.map(|x| x.into()));
         builder = builder
-            .facetset::<FacetSetComponent, Option<FacetSetComponent>>(facetset.map(|x| x.into()));
+            .facet_set::<FacetSetComponent, Option<FacetSetComponent>>(facet_set.map(|x| x.into()));
+        builder = builder.json_facet::<JsonFacetComponent, Option<JsonFacetComponent>>(
+            json_facet.map(|x| x.into()),
+        );
         Self(builder)
     }
 
