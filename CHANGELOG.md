@@ -1,3 +1,5 @@
+# v0.3.1
+* Fix error in python documentation
 # v0.3.0
 * Add Facet sets
 * Add Json facets

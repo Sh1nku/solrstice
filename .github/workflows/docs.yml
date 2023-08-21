@@ -2,6 +2,8 @@ name: Create documentation
 
 on:
   push:
+    branches:
+      - '*'
     tags:
       - '*'
   workflow_dispatch:
@@ -46,9 +48,11 @@ jobs:
           mkdir ../../docs/python
           mv docs/* ../../docs/python
       - name: Upload artifact
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: actions/upload-pages-artifact@v2
         with:
           path: 'docs/'
       - name: Deploy to GitHub Pages
+        if: "startsWith(github.ref, 'refs/tags/')"
         id: deployment
         uses: actions/deploy-pages@v2
