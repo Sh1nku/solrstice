@@ -11,6 +11,8 @@ It also provides a wrapper to python.
 * Select Documents
   * Grouping Component Query
   * DefTypes (lucene, dismax, edismax)
+  * Facet Counts (Query, Field, Pivot)
+  * Json Facet
 * Indexing Documents
 * Deleting Documents
 ## Examples

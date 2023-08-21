@@ -13,6 +13,8 @@ Use the [Rust documentation](https://docs.rs/solrstice) or the [Python documenta
 * Select Documents
   * Grouping Component Query
   * DefTypes (lucene, dismax, edismax)
+  * Facet Counts (Query, Field, Pivot)
+  * Json Facet
 * Indexing Documents
 * Deleting Documents
 ## Examples
