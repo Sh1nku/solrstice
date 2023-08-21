@@ -25,6 +25,9 @@ pub async fn example() -> Result<(), SolrError> {
     let context = config.context;
     let client = AsyncSolrCloudClient::new(context);
 
+    let _ = client.delete_collection("example_collection").await;
+    let _ = client.delete_config("example_config").await;
+
     // Upload config
     client
         .upload_config("example_config", Path::new(&config.config_path))
@@ -66,7 +69,7 @@ pub async fn example() -> Result<(), SolrError> {
         )
         .await?;
 
-    client.delete_collection("example_collection").await?;
-    client.delete_config("example_config").await?;
+    let _ = client.delete_collection("example_collection").await;
+    let _ = client.delete_config("example_config").await;
     Ok(())
 }

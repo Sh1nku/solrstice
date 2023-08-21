@@ -96,7 +96,7 @@ pub async fn test_facet_field_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
-    let config = FunctionalityTestsBuildup::build_up("FacetField")
+    let config = FunctionalityTestsBuildup::build_up("FacetFieldExclude")
         .await
         .unwrap();
     let update = UpdateQuery::new();

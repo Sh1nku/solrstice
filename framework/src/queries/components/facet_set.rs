@@ -4,6 +4,28 @@ use serde::ser::SerializeMap;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::collections::HashMap;
 
+/// Get facet counts for different types of faceting.
+/// # Examples
+/// ```no_run
+/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+/// # use solrstice::models::auth::SolrBasicAuth;
+/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::queries::components::facet_set::FacetSetComponent;
+/// # use solrstice::queries::select::SelectQuery;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+/// let client = AsyncSolrCloudClient::new(context);
+/// let response = client.select(SelectQuery::new()
+///     .facet_set(FacetSetComponent::new().queries(["age:[* TO 59]"])), "collection_name")
+///     .await?;
+/// let facets = response.get_facet_set().ok_or("No facets")?;
+/// let queries = facets.get_queries();
+/// let query = queries.get("age:[0 TO 59]").ok_or("No age query")?;
+/// assert_eq!(*query, 4);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct FacetSetComponent {
     facet: bool,
@@ -17,6 +39,28 @@ pub struct FacetSetComponent {
 }
 
 impl FacetSetComponent {
+    /// Get facet counts for different types of faceting.
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let response = client.select(SelectQuery::new()
+    ///     .facet_set(FacetSetComponent::new().queries(["age:[* TO 59]"])), "collection_name")
+    ///     .await?;
+    /// let facets = response.get_facet_set().ok_or("No facets")?;
+    /// let queries = facets.get_queries();
+    /// let query = queries.get("age:[0 TO 59]").ok_or("No age query")?;
+    /// assert_eq!(*query, 4);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new() -> Self {
         FacetSetComponent {
             facet: true,
@@ -26,16 +70,100 @@ impl FacetSetComponent {
         }
     }
 
+    /// Set pivot facets
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    ///     let query = SelectQuery::new()
+    ///        .facet_set(&FacetSetComponent::new().pivots(PivotFacetComponent::new(["interests,age"])));
+    ///    let response = client
+    ///        .select(&query, "collection_name")
+    ///        .await?;
+    ///    let facets = response.get_facet_set().ok_or("No facets")?;
+    ///    let pivot = facets.get_pivots();
+    ///    let interests_age = pivot.get("interests,age").ok_or("No interests,age pivot")?;
+    ///    assert_eq!(interests_age.len(), 3);
+    ///    let cars_pivot = interests_age
+    ///        .iter()
+    ///        .find(|p| match p.get_value::<String>() {
+    ///            Ok(val) => val.as_str() == "cars",
+    ///            Err(_) => false,
+    ///        })
+    ///        .ok_or("No cars pivot")?;
+    ///    assert_eq!(cars_pivot.get_count(), 1);
+    ///    let age_pivot = cars_pivot
+    ///        .get_pivots()
+    ///        .first()
+    ///        .ok_or("No age pivot in cars")?;
+    ///    assert_eq!(age_pivot.get_value::<usize>()?, 20);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn pivots<T: Into<PivotFacetComponent>, O: Into<Option<T>>>(mut self, pivots: O) -> Self {
         self.pivots = pivots.into().map(|x| x.into());
         self
     }
 
+    /// Set query facets
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let response = client.select(SelectQuery::new()
+    ///     .facet_set(FacetSetComponent::new().queries(["age:[* TO 59]"])), "collection_name")
+    ///     .await?;
+    /// let facets = response.get_facet_set().ok_or("No facets")?;
+    /// let queries = facets.get_queries();
+    /// let query = queries.get("age:[0 TO 59]").ok_or("No age query")?;
+    /// assert_eq!(*query, 4);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn queries<S: Into<String>, I: IntoIterator<Item = S>>(mut self, queries: I) -> Self {
         self.queries = queries.into_iter().map(|x| x.into()).collect();
         self
     }
 
+    /// Set field facets
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let query = SelectQuery::new().facet_set(
+    ///     FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+    /// );
+    /// let response = client
+    ///     .select(&query, "collection_name")
+    ///     .await?;
+    /// let facets = response.get_facet_set().ok_or("No facets")?;
+    /// let fields = facets.get_fields();
+    /// let age = fields.get("age").ok_or("No age field")?;
+    /// assert_eq!(age.len(), 3);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn fields<T: Into<FieldFacetComponent>, O: Into<Option<T>>>(mut self, fields: O) -> Self {
         self.fields = fields.into().map(|x| x.into());
         self
@@ -60,6 +188,43 @@ impl From<&FacetSetComponent> for FacetSetComponent {
     }
 }
 
+/// A facet component for pivot facets.
+/// # Examples
+/// ```no_run
+/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+/// # use solrstice::models::auth::SolrBasicAuth;
+/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
+/// # use solrstice::queries::select::SelectQuery;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+/// let client = AsyncSolrCloudClient::new(context);
+///     let query = SelectQuery::new()
+///        .facet_set(&FacetSetComponent::new().pivots(PivotFacetComponent::new(["interests,age"])));
+///    let response = client
+///        .select(&query, "collection_name")
+///        .await?;
+///    let facets = response.get_facet_set().ok_or("No facets")?;
+///    let pivot = facets.get_pivots();
+///    let interests_age = pivot.get("interests,age").ok_or("No interests,age pivot")?;
+///    assert_eq!(interests_age.len(), 3);
+///    let cars_pivot = interests_age
+///        .iter()
+///        .find(|p| match p.get_value::<String>() {
+///            Ok(val) => val.as_str() == "cars",
+///            Err(_) => false,
+///        })
+///        .ok_or("No cars pivot")?;
+///    assert_eq!(cars_pivot.get_count(), 1);
+///    let age_pivot = cars_pivot
+///        .get_pivots()
+///        .first()
+///        .ok_or("No age pivot in cars")?;
+///    assert_eq!(age_pivot.get_value::<usize>()?, 20);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct PivotFacetComponent {
     /// The field to facet on.
@@ -71,6 +236,43 @@ pub struct PivotFacetComponent {
 }
 
 impl PivotFacetComponent {
+    /// Create a new pivot facet component.
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    ///     let query = SelectQuery::new()
+    ///        .facet_set(&FacetSetComponent::new().pivots(PivotFacetComponent::new(["interests,age"])));
+    ///    let response = client
+    ///        .select(&query, "collection_name")
+    ///        .await?;
+    ///    let facets = response.get_facet_set().ok_or("No facets")?;
+    ///    let pivot = facets.get_pivots();
+    ///    let interests_age = pivot.get("interests,age").ok_or("No interests,age pivot")?;
+    ///    assert_eq!(interests_age.len(), 3);
+    ///    let cars_pivot = interests_age
+    ///        .iter()
+    ///        .find(|p| match p.get_value::<String>() {
+    ///            Ok(val) => val.as_str() == "cars",
+    ///            Err(_) => false,
+    ///        })
+    ///        .ok_or("No cars pivot")?;
+    ///    assert_eq!(cars_pivot.get_count(), 1);
+    ///    let age_pivot = cars_pivot
+    ///        .get_pivots()
+    ///        .first()
+    ///        .ok_or("No age pivot in cars")?;
+    ///    assert_eq!(age_pivot.get_value::<usize>()?, 20);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new<S: Into<String>, I: IntoIterator<Item = S>>(pivots: I) -> Self {
         PivotFacetComponent {
             pivots: pivots.into_iter().map(|x| x.into()).collect(),
@@ -78,6 +280,7 @@ impl PivotFacetComponent {
         }
     }
 
+    /// Set the minimum count for a facet to be returned.
     pub fn min_count<O: Into<Option<usize>>>(mut self, min_count: O) -> Self {
         self.min_count = min_count.into();
         self
@@ -96,6 +299,31 @@ impl From<&PivotFacetComponent> for PivotFacetComponent {
     }
 }
 
+/// Component for field facets
+/// # Examples
+/// ```no_run
+/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+/// # use solrstice::models::auth::SolrBasicAuth;
+/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
+/// # use solrstice::queries::select::SelectQuery;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+/// let client = AsyncSolrCloudClient::new(context);
+/// let query = SelectQuery::new().facet_set(
+///     FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+/// );
+/// let response = client
+///     .select(&query, "collection_name")
+///     .await?;
+/// let facets = response.get_facet_set().ok_or("No facets")?;
+/// let fields = facets.get_fields();
+/// let age = fields.get("age").ok_or("No age field")?;
+/// assert_eq!(age.len(), 3);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldFacetComponent {
     fields: Vec<FieldFacetEntry>,
@@ -293,6 +521,31 @@ fn get_or_insert_entry<'a>(
 }
 
 impl FieldFacetComponent {
+    /// Create a new field facet component.
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let query = SelectQuery::new().facet_set(
+    ///     FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+    /// );
+    /// let response = client
+    ///     .select(&query, "collection_name")
+    ///     .await?;
+    /// let facets = response.get_facet_set().ok_or("No facets")?;
+    /// let fields = facets.get_fields();
+    /// let age = fields.get("age").ok_or("No age field")?;
+    /// assert_eq!(age.len(), 3);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new<T: Into<FieldFacetEntry>, I: IntoIterator<Item = T>>(fields: I) -> Self {
         FieldFacetComponent {
             fields: fields.into_iter().map(|x| x.into()).collect(),
@@ -300,6 +553,7 @@ impl FieldFacetComponent {
         }
     }
 
+    /// Set the fields to facet on.
     pub fn fields<T: Into<FieldFacetEntry>, I: IntoIterator<Item = T>>(
         mut self,
         fields: I,
@@ -308,12 +562,14 @@ impl FieldFacetComponent {
         self
     }
 
+    /// Set terms to exclude from the facet.
     pub fn exclude_terms<S: Into<String>, O: Into<Option<S>>>(mut self, exclude_terms: O) -> Self {
         self.exclude_terms = exclude_terms.into().map(|x| x.into());
         self
     }
 }
 
+/// Set the sorting order of field facets
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub enum FieldFacetSort {
     #[serde(rename = "count")]
@@ -322,6 +578,7 @@ pub enum FieldFacetSort {
     Index,
 }
 
+/// Set the method to do the facet calculation. Default is Fc.
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub enum FieldFacetMethod {
     #[serde(rename = "enum")]
@@ -332,6 +589,31 @@ pub enum FieldFacetMethod {
     Fcs,
 }
 
+/// A field facet entry represents a single field facet.
+/// # Examples
+/// ```no_run
+/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+/// # use solrstice::models::auth::SolrBasicAuth;
+/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
+/// # use solrstice::queries::select::SelectQuery;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+/// let client = AsyncSolrCloudClient::new(context);
+/// let query = SelectQuery::new().facet_set(
+///     FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+/// );
+/// let response = client
+///     .select(&query, "collection_name")
+///     .await?;
+/// let facets = response.get_facet_set().ok_or("No facets")?;
+/// let fields = facets.get_fields();
+/// let age = fields.get("age").ok_or("No age field")?;
+/// assert_eq!(age.len(), 3);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FieldFacetEntry {
     field: String,
@@ -360,6 +642,31 @@ pub struct FieldFacetEntry {
 }
 
 impl FieldFacetEntry {
+    /// Create a new field facet entry
+    /// # Examples
+    /// ```no_run
+    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// # use solrstice::models::auth::SolrBasicAuth;
+    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
+    /// # use solrstice::queries::select::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let query = SelectQuery::new().facet_set(
+    ///     FacetSetComponent::new().fields(FieldFacetComponent::new([FieldFacetEntry::new("age")])),
+    /// );
+    /// let response = client
+    ///     .select(&query, "collection_name")
+    ///     .await?;
+    /// let facets = response.get_facet_set().ok_or("No facets")?;
+    /// let fields = facets.get_fields();
+    /// let age = fields.get("age").ok_or("No age field")?;
+    /// assert_eq!(age.len(), 3);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new<S: Into<String>>(field: S) -> Self {
         FieldFacetEntry {
             field: field.into(),
@@ -377,56 +684,67 @@ impl FieldFacetEntry {
         }
     }
 
+    /// Only include facets that start with the prefix
     pub fn prefix<S: Into<String>, O: Into<Option<S>>>(mut self, prefix: O) -> Self {
         self.prefix = prefix.into().map(|s| s.into());
         self
     }
 
+    /// Only include facets that contain the string
     pub fn contains<S: Into<String>, O: Into<Option<S>>>(mut self, contains: O) -> Self {
         self.contains = contains.into().map(|s| s.into());
         self
     }
 
+    /// Ignore the case of the contains string
     pub fn contains_ignore_case<O: Into<Option<bool>>>(mut self, contains_ignore_case: O) -> Self {
         self.contains_ignore_case = contains_ignore_case.into();
         self
     }
 
+    /// Sort the facets by the given sort
     pub fn sort<S: Into<FieldFacetSort>, O: Into<Option<S>>>(mut self, sort: O) -> Self {
         self.sort = sort.into().map(|s| s.into());
         self
     }
 
+    /// Limit the number of facets returned
     pub fn limit<O: Into<Option<usize>>>(mut self, limit: O) -> Self {
         self.limit = limit.into();
         self
     }
 
+    /// Offset the facets by the given offset
     pub fn offset<O: Into<Option<usize>>>(mut self, offset: O) -> Self {
         self.offset = offset.into();
         self
     }
 
+    /// Only include facets that have a count greater than or equal to the given min_count
     pub fn min_count<O: Into<Option<usize>>>(mut self, min_count: O) -> Self {
         self.min_count = min_count.into();
         self
     }
 
+    /// Include a facet for missing values
     pub fn missing<O: Into<Option<bool>>>(mut self, missing: O) -> Self {
         self.missing = missing.into();
         self
     }
 
+    /// Use the given method for calculating the facet counts
     pub fn method<S: Into<FieldFacetMethod>, O: Into<Option<S>>>(mut self, method: O) -> Self {
         self.method = method.into().map(|s| s.into());
         self
     }
 
+    /// If using the method `enum`, only include facets that have a document frequency greater than or equal to the given enum_cache_min_df
     pub fn enum_cache_min_df<O: Into<Option<usize>>>(mut self, enum_cache_min_df: O) -> Self {
         self.enum_cache_min_df = enum_cache_min_df.into();
         self
     }
 
+    /// Used to speed up the calculation of the facet counts
     pub fn exists<O: Into<Option<bool>>>(mut self, exists: O) -> Self {
         self.exists = exists.into();
         self

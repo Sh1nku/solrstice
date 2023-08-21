@@ -72,7 +72,7 @@ class SolrJsonFacetResponse:
     A response from a json facet query
     """
 
-    def get_buckets(self) -> List["SolrJsonFacetBucketResponse"]:
+    def get_buckets(self) -> List["SolrJsonFacetResponse"]:
         """
         Get the buckets for this facet
         :return: A list of buckets
@@ -87,24 +87,13 @@ class SolrJsonFacetResponse:
         Get the nested facets for this facet
         :return: A dictionary of nested facets
         """
-    def get_count(self) -> int:
+    def get_count(self) -> Optional[int]:
         """
         Get the count for this facet
         :return: The count for this facet
         """
-
-class SolrJsonFacetBucketResponse:
-    """
-    A bucket response from a json facet query
-    """
-
-    def get_value(self) -> Any:
+    def get_val(self) -> Optional[Any]:
         """
-        Get the value for this bucket
-        :return: The value for this bucket
-        """
-    def get_count(self) -> int:
-        """
-        Get the count for this bucket
-        :return: The count for this bucket
+        If a bucket facet, this value will be set
+        :return: The value for this facet
         """

@@ -3,6 +3,8 @@
 /// Grouping component
 pub mod grouping;
 
-/// Facetset
+/// Facet count component
 pub mod facet_set;
+
+/// Json facet component
 pub mod json_facet;

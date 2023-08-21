@@ -30,7 +30,7 @@ async fn group_fields() -> Result<(), SolrError> {
             *correct_data
                 .get(&group.get_group_value::<usize>().unwrap())
                 .unwrap(),
-            group.doc_list.get_num_found()
+            group.get_doc_list().get_num_found()
         )
     }
     let _ = config.tear_down().await;

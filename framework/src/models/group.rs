@@ -143,10 +143,10 @@ impl SolrGroupResult {
 pub struct SolrGroupFieldResult {
     /// The key of the field result
     #[serde(rename = "groupValue")]
-    pub group_value: Box<RawValue>,
+    group_value: Box<RawValue>,
     /// A list of documents
     #[serde(rename = "doclist")]
-    pub doc_list: SolrDocsResponse,
+    doc_list: SolrDocsResponse,
 }
 
 impl SolrGroupFieldResult {

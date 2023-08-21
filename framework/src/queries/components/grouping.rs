@@ -46,25 +46,25 @@ pub struct GroupingComponent {
     #[serde(skip_serializing_if = "Option::is_none")]
     group: Option<bool>,
     #[serde(rename = "group.field", skip_serializing_if = "Option::is_none")]
-    pub field: Option<Vec<String>>,
+    field: Option<Vec<String>>,
     #[serde(rename = "group.query", skip_serializing_if = "Option::is_none")]
-    pub queries: Option<Vec<String>>,
+    queries: Option<Vec<String>>,
     #[serde(rename = "group.limit", skip_serializing_if = "Option::is_none")]
-    pub limit: Option<usize>,
+    limit: Option<usize>,
     #[serde(rename = "group.offset", skip_serializing_if = "Option::is_none")]
-    pub offset: Option<usize>,
+    offset: Option<usize>,
     #[serde(rename = "group.sort", skip_serializing_if = "Option::is_none")]
-    pub sort: Option<Vec<String>>,
+    sort: Option<Vec<String>>,
     #[serde(rename = "group.format", skip_serializing_if = "Option::is_none")]
-    pub format: Option<GroupFormatting>,
+    format: Option<GroupFormatting>,
     #[serde(rename = "group.main", skip_serializing_if = "Option::is_none")]
-    pub main: Option<bool>,
+    main: Option<bool>,
     #[serde(rename = "group.ngroups", skip_serializing_if = "Option::is_none")]
-    pub n_groups: Option<bool>,
+    n_groups: Option<bool>,
     #[serde(rename = "group.truncate", skip_serializing_if = "Option::is_none")]
-    pub truncate: Option<bool>,
+    truncate: Option<bool>,
     #[serde(rename = "group.facet", skip_serializing_if = "Option::is_none")]
-    pub facet: Option<bool>,
+    facet: Option<bool>,
 }
 
 impl GroupingComponent {

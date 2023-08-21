@@ -1,47 +1,70 @@
-use crate::models::error::SolrError;
-use serde::de::{DeserializeOwned, Error};
 use serde::{Deserialize, Deserializer, Serialize};
+use serde_json::Value;
 use std::collections::HashMap;
 
+/// Get self defined facets.
+/// # Examples
+/// ```no_run
+/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
+/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+/// # use solrstice::models::auth::SolrBasicAuth;
+/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::queries::components::facet_set::FacetSetComponent;
+/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet};
+/// # use solrstice::queries::select::SelectQuery;
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+/// let client = AsyncSolrCloudClient::new(context);
+///  let query = SelectQuery::new().json_facet(
+///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+/// );
+/// let response = client
+///     .select(&query, "collection_name")
+///     .await?;
+/// let facets = response.get_json_facets().ok_or("No facets")?;
+/// let below_60 = facets
+///     .get_nested_facets()
+///     .get("below_60")
+///     .ok_or("No below_60 facet")?;
+/// assert_eq!(below_60.get_count().ok_or("No count")?, 4);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug, Serialize, PartialEq)]
 pub struct SolrJsonFacetResponse {
-    count: usize,
-    buckets: Vec<SolrJsonFacetBucketResponse>,
+    val: Option<Value>,
+    count: Option<usize>,
+    #[serde(default)]
+    buckets: Vec<SolrJsonFacetResponse>,
     #[serde(flatten)]
-    flat_facets: HashMap<String, serde_json::Value>,
+    flat_facets: HashMap<String, Value>,
+    #[serde(default)]
     nested_facets: HashMap<String, SolrJsonFacetResponse>,
 }
 
 impl SolrJsonFacetResponse {
-    pub fn get_buckets(&self) -> impl Iterator<Item = &SolrJsonFacetBucketResponse> {
+    /// Returned if the facet is a bucket.
+    pub fn get_val(&self) -> Option<&Value> {
+        self.val.as_ref()
+    }
+
+    /// Get buckets of the facet.
+    pub fn get_buckets(&self) -> impl Iterator<Item = &SolrJsonFacetResponse> {
         self.buckets.iter()
     }
 
-    pub fn get_flat_facets(&self) -> &HashMap<String, serde_json::Value> {
+    /// Get flat facets.
+    pub fn get_flat_facets(&self) -> &HashMap<String, Value> {
         &self.flat_facets
     }
 
+    /// Get nested facets.
     pub fn get_nested_facets(&self) -> &HashMap<String, SolrJsonFacetResponse> {
         &self.nested_facets
     }
 
-    pub fn get_count(&self) -> usize {
-        self.count
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct SolrJsonFacetBucketResponse {
-    val: serde_json::Value,
-    count: usize,
-}
-
-impl SolrJsonFacetBucketResponse {
-    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
-        serde_json::from_value::<T>(self.val.clone()).map_err(SolrError::from)
-    }
-
-    pub fn get_count(&self) -> usize {
+    /// Get count of the facet.
+    pub fn get_count(&self) -> Option<usize> {
         self.count
     }
 }
@@ -51,16 +74,17 @@ impl<'de> Deserialize<'de> for SolrJsonFacetResponse {
     where
         D: Deserializer<'de>,
     {
-        let mut map = HashMap::<String, serde_json::Value>::deserialize(deserializer)?;
+        let mut map = HashMap::<String, Value>::deserialize(deserializer)?;
 
         let count = map
             .remove("count")
-            .and_then(|v| v.as_u64().map(|u| u as usize))
-            .ok_or_else(|| D::Error::missing_field("count"))?;
+            .and_then(|v| v.as_u64().map(|u| u as usize));
+
+        let val = map.remove("val");
 
         let buckets = map
             .remove("buckets")
-            .and_then(|b| serde_json::from_value::<Vec<SolrJsonFacetBucketResponse>>(b).ok())
+            .and_then(|b| serde_json::from_value::<Vec<SolrJsonFacetResponse>>(b).ok())
             .unwrap_or_default();
 
         let mut flat_facets = HashMap::new();
@@ -78,6 +102,7 @@ impl<'de> Deserialize<'de> for SolrJsonFacetResponse {
             .collect();
 
         Ok(Self {
+            val,
             count,
             buckets,
             flat_facets,

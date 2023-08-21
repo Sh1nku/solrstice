@@ -12,7 +12,7 @@ It also provides a wrapper to python.
   * Grouping Component Query
   * DefTypes (lucene, dismax, edismax)
   * Facet Counts (Query, Field, Pivot)
-  * Json Facet
+  * Json Facet (Query, Stat, Terms, Nested)
 * Indexing Documents
 * Deleting Documents
 ## Examples

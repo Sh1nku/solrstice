@@ -8,10 +8,10 @@ Documentation can be found at [sh1nku.github.io/solrstice/python](https://sh1nku
 * Collection API
 * Alias API
 * Select Documents
-    * Grouping Component Query
-    * DefTypes (lucene, dismax, edismax)
-    * Facet Counts (Query, Field, Pivot)
-    * Json Facet
+  * Grouping Component Query
+  * DefTypes (lucene, dismax, edismax)
+  * Facet Counts (Query, Field, Pivot)
+  * Json Facet (Query, Stat, Terms, Nested)
 * Indexing Documents
 * Deleting Documents
 ## Installation
@@ -78,6 +78,7 @@ client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
 
 ## Notes
 * Multiprocessing does not work, and will block forever. Normal multithreading works fine.
+
 ## Grouping component
 ### Field grouping
 ```python
@@ -131,7 +132,7 @@ interests_age = pivot.get("interests,age")
 ```python
 facet_set = FacetSetComponent(fields=FieldFacetComponent(fields=[FieldFacetEntry("age")]))
 select_builder = SelectQuery(facet_set=facet_set)
-response = await client.select(select_builder, name)
+response = await client.select(select_builder, "example_collection")
 facets = response.get_facet_set()
 fields = facets.get_fields()
 age = fields.get("age")
@@ -139,23 +140,45 @@ age = fields.get("age")
 ### Query facet
 ```python
 select_builder = SelectQuery(facet_set=FacetSetComponent(queries=["age:[0 TO 59]"]))
-response = await config.async_client.select(select_builder, name)
+response = await client.select(select_builder, name)
 facets = response.get_facet_set()
 queries = facets.get_queries()
 query = queries.get("age:[0 TO 59]")
 ```
 ## Json Facet Component
-### Basic
+### Query
 ```python
 select_builder = SelectQuery(
-    json_facet=JsonFacetComponent(
-        facets={"below_60": JsonQueryFacet("age:[0 TO 59]")}
-    )
+  json_facet=JsonFacetComponent(
+    facets={"below_60": JsonQueryFacet("age:[0 TO 59]")}
+  )
 )
-response = await client.select(select_builder, name)
+response = await client.select(select_builder, "example_collection"")
 facets = response.get_json_facets()
 below_60 = facets.get_nested_facets().get("below_60")
 assert below_60.get_count() == 4
+```
+### Stat
+```python
+select_builder = SelectQuery(
+    json_facet=JsonFacetComponent(
+        facets={"total_people": JsonStatFacet("sum(count)")}
+    )
+)
+response = await client.select(select_builder, "example_collection")
+facets = response.get_json_facets()
+total_people = facets.get_flat_facets().get("total_people")
+assert total_people == 1000
+```
+### Terms
+```python
+select_builder = SelectQuery(
+    json_facet=JsonFacetComponent(facets={"age": JsonTermsFacet("age")})
+)
+response = await config.async_client.select(select_builder, name)
+facets = response.get_json_facets()
+age_buckets = facets.get_nested_facets().get("age").get_buckets()
+assert len(age_buckets) == 3
 ```
 ### Nested
 ```python
@@ -169,7 +192,7 @@ select_builder = SelectQuery(
         }
     )
 )
-response = await client.select(select_builder, name)
+response = await client.select(select_builder, "example_collection")
 facets = response.get_json_facets()
 total_people = (
     facets.get_nested_facets()

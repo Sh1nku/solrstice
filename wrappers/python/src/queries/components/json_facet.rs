@@ -1,6 +1,6 @@
 use pyo3::prelude::*;
 use solrstice::queries::components::json_facet::{
-    JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonTermsFacet,
+    JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonStatFacet, JsonTermsFacet,
 };
 use std::collections::HashMap;
 
@@ -146,13 +146,16 @@ impl JsonQueryFacetWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(extends = JsonFacetTypeWrapper, module = "solrstice.json_facet")]
-pub struct JsonStatFacet {}
+#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice.json_facet")]
+pub struct JsonStatFacetWrapper {}
 
 #[pymethods]
-impl JsonStatFacet {
+impl JsonStatFacetWrapper {
     #[new]
     fn new(query: String) -> (Self, JsonFacetTypeWrapper) {
-        (Self {}, JsonFacetTypeWrapper(JsonFacetType::Stat(query)))
+        (
+            Self {},
+            JsonFacetTypeWrapper(JsonFacetType::Stat(JsonStatFacet::new(query))),
+        )
     }
 }
