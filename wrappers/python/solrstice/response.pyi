@@ -11,7 +11,7 @@ class SolrDocsResponse:
     def get_start(self) -> int:
         """Get the start index of the query"""
     def get_num_found_exact(self) -> bool:
-        """Get whether the number of documents found is exact"""
+        """Get whether the number of documents found is exact. This field only exists on Solr 8.6+. On older versions, this will always be true."""
     def get_docs(self) -> List[Dict[str, Any]]:
         """Get the documents from the query"""
 
