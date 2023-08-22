@@ -31,6 +31,10 @@ pub struct SolrResponseError {
     pub code: usize,
 }
 
+fn default_true() -> bool {
+    true
+}
+
 /// Documentation response from Solr. The docs are not immediately deserialized to allow for reading the other fields first.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SolrDocsResponse {
@@ -40,7 +44,8 @@ pub struct SolrDocsResponse {
     /// The start index of the documents.
     pub(crate) start: usize,
     #[serde(rename = "numFoundExact")]
-    /// Whether or not the number of documents found is exact.
+    /// Whether or not the number of documents found is exact. This field only exists on Solr 8.6+. On older versions, this will always be true.
+    #[serde(default = "default_true")]
     pub(crate) num_found_exact: bool,
     /// The documents returned by the query. Use [`SolrDocsResponse::get_docs`] to deserialize.
     docs: Box<RawValue>,

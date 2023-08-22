@@ -1,0 +1,35 @@
+version: '3'
+services:
+  zoo1:
+    image: zookeeper:3.4
+    hostname: zoo1
+    volumes:
+      - 'zoo1_data:/data'
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: 'server.1=0.0.0.0:2888:3888'
+    ports:
+      - "2181:2181"
+    restart: unless-stopped
+  solr1:
+    build:
+      context: .
+    hostname: solr1
+    ports:
+      - "8983:8983"
+    volumes:
+      - 'solr1_varsolr:/var/solr'
+    environment:
+      ZK_HOST: 'zoo1'
+      SOLR_JAVA_MEM: "-Xms1g -Xmx1g"
+    restart: unless-stopped
+  speedbump:
+    image: kffl/speedbump:latest
+    ports:
+      - "8984:8984"
+    command: --latency 2s --port 8984 solr1:8983
+    restart: unless-stopped
+volumes:
+  zoo1_data:
+  solr1_varsolr:

@@ -1,5 +1,10 @@
+# v0.3.2
+* `num_found_exact` was introduced in Solr 8.6. This caused deserialization to fail on older versions.
+  Changed so that it will be emulated as `true` for older versions.
+
 # v0.3.1
 * Fix error in python documentation
+* 
 # v0.3.0
 * Add Facet sets
 * Add Json facets

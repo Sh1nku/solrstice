@@ -33,7 +33,6 @@
     <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
     <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
     <fieldType name="binary" class="solr.BinaryField"/>
-    <fieldType name="rank" class="solr.RankField"/>
     <fieldType name="point" class="solr.PointType" dimension="2" subFieldSuffix="_d"/>
     <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
 
