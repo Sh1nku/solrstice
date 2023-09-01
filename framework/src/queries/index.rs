@@ -1,7 +1,8 @@
 use crate::models::commit_type::CommitType;
 use crate::models::context::SolrServerContext;
-use crate::models::error::{try_solr_error, SolrError};
+use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
+use crate::queries::request_builder::SolrRequestBuilder;
 use serde::{Deserialize, Serialize};
 
 /// A builder for the update handler.
@@ -100,30 +101,19 @@ impl UpdateQuery {
         collection: S,
         data: &[D],
     ) -> Result<SolrResponse, SolrError> {
-        let solr_url = format!(
-            "{}/solr/{}/{}",
-            context.as_ref().host.get_solr_node().await?,
-            collection.as_ref(),
-            &self.handler
-        );
-
-        let mut request = context
-            .as_ref()
-            .client
-            .post(solr_url)
-            .query(&[("overwrite", "true"), ("wt", "json")])
-            .json(data);
-        if let Some(auth) = &context.as_ref().auth {
-            request = auth.add_auth_to_request(request)
-        }
-
+        let mut query_params = vec![("overwrite", "true")];
         match self.commit_type {
-            CommitType::Hard => request = request.query(&[("commit", "true")]),
-            CommitType::Soft => request = request.query(&[("softCommit", "true")]),
+            CommitType::Hard => query_params.push(("commit", "true")),
+            CommitType::Soft => query_params.push(("softCommit", "true")),
         }
-        let json = request.send().await?.json::<SolrResponse>().await?;
-        try_solr_error(&json)?;
-        Ok(json)
+
+        SolrRequestBuilder::new(
+            context.as_ref(),
+            format!("/solr/{}/{}", collection.as_ref(), self.handler.as_str()).as_str(),
+        )
+        .with_query_params(query_params.as_ref())
+        .send_post_with_json(data)
+        .await
     }
 }
 
@@ -264,12 +254,6 @@ impl DeleteQuery {
         context: C,
         collection: S,
     ) -> Result<SolrResponse, SolrError> {
-        let solr_url = format!(
-            "{}/solr/{}/{}",
-            &context.as_ref().host.get_solr_node().await?,
-            &collection.as_ref(),
-            &self.handler
-        );
         let ids = self.ids.as_ref().map(|ids| {
             ids.iter()
                 .map(|id| format!("<id>{}</id>", id))
@@ -284,28 +268,24 @@ impl DeleteQuery {
                 .join("")
         });
 
-        let mut request = context
-            .as_ref()
-            .client
-            .post(solr_url)
-            .query(&[("overwrite", "true"), ("wt", "json")])
-            .header("Content-Type", "application/xml")
-            .body(format!(
-                "<delete>{}{}</delete>",
-                ids.unwrap_or_default(),
-                queries.unwrap_or_default()
-            ));
-        if let Some(auth) = &context.as_ref().auth {
-            request = auth.add_auth_to_request(request)
+        let mut query_params = vec![("overwrite", "true")];
+        match self.commit_type {
+            CommitType::Hard => query_params.push(("commit", "true")),
+            CommitType::Soft => query_params.push(("softCommit", "true")),
         }
 
-        match self.commit_type {
-            CommitType::Hard => request = request.query(&[("commit", "true")]),
-            CommitType::Soft => request = request.query(&[("softCommit", "true")]),
-        }
-        let json = request.send().await?.json::<SolrResponse>().await?;
-        try_solr_error(&json)?;
-        Ok(json)
+        SolrRequestBuilder::new(
+            context.as_ref(),
+            format!("/solr/{}/{}", &collection.as_ref(), &self.handler).as_str(),
+        )
+        .with_query_params(query_params.as_ref())
+        .with_headers(vec![("Content-Type", "application/xml")])
+        .send_post_with_body(format!(
+            "<delete>{}{}</delete>",
+            ids.unwrap_or_default(),
+            queries.unwrap_or_default()
+        ))
+        .await
     }
 }
 

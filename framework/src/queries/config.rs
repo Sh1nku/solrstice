@@ -1,7 +1,6 @@
 use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
-use crate::models::response::SolrResponse;
-use crate::queries::helpers::basic_solr_request;
+use crate::queries::request_builder::SolrRequestBuilder;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
 use std::path::Path;
@@ -46,18 +45,6 @@ pub async fn upload_config<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<
     path: P,
 ) -> Result<(), SolrError> {
     let query_params = [("action", "UPLOAD"), ("name", name.as_ref())];
-    let mut request = context
-        .as_ref()
-        .client
-        .post(format!(
-            "{}/solr/admin/configs",
-            context.as_ref().host.get_solr_node().await?
-        ))
-        .header("Content-Type", "application/octet-stream")
-        .query(&query_params);
-    if let Some(auth) = &context.as_ref().auth {
-        request = auth.add_auth_to_request(request)
-    }
     let mut outfile = tempfile()?;
     path.as_ref().try_exists()?;
     if path.as_ref().is_dir() {
@@ -75,8 +62,13 @@ pub async fn upload_config<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<
     }
     let mut vec = Vec::new();
     outfile.read_to_end(&mut vec)?;
-    request = request.body(vec);
-    let json = request.send().await?.json::<SolrResponse>().await?;
+
+    let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+        .with_query_params(query_params.as_ref())
+        .with_headers(vec![("Content-Type", "application/octet-stream")])
+        .send_post_with_body(vec)
+        .await?;
+
     try_solr_error(&json)?;
     Ok(())
 }
@@ -85,7 +77,10 @@ pub async fn get_configs<C: AsRef<SolrServerContext>>(
     context: C,
 ) -> Result<Vec<String>, SolrError> {
     let query_params = [("action", "LIST"), ("wt", "json")];
-    let json = basic_solr_request(context, "/solr/admin/configs", query_params.as_ref()).await?;
+    let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+        .with_query_params(query_params.as_ref())
+        .send_get()
+        .await?;
     match json.config_sets {
         None => Err(SolrError::Unknown("Could not get configsets".to_string())),
         Some(config_sets) => Ok(config_sets),
@@ -105,7 +100,10 @@ pub async fn delete_config<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     name: S,
 ) -> Result<(), SolrError> {
     let query_params = [("action", "DELETE"), ("name", name.as_ref())];
-    basic_solr_request(context, "/solr/admin/configs", query_params.as_ref()).await?;
+    SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+        .with_query_params(query_params.as_ref())
+        .send_get()
+        .await?;
     Ok(())
 }
 

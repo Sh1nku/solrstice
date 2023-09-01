@@ -4,21 +4,23 @@ use thiserror::Error;
 /// Main error type for Solrstice
 #[derive(Error, Debug)]
 pub enum SolrError {
-    #[error("HTTP Request failed: {}", .0)]
+    #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
-    #[error("IO Error: {}", .0)]
+    #[error(transparent)]
     IOError(#[from] std::io::Error),
-    #[error("Zip Error: {}", .0)]
+    #[error(transparent)]
     ZipError(#[from] zip::result::ZipError),
 
-    #[error("Serde failed: {}", .0)]
+    #[error(transparent)]
     SerdeJsonError(#[from] serde_json::Error),
     #[error("Error from Solr {code:?}: {msg:?}")]
     SolrResponseError { code: usize, msg: String },
-    #[error("Zookeeper error: {}", .0)]
+    #[error("Authentication error: {0}")]
+    SolrAuthError(String),
+    #[error(transparent)]
     ZkError(#[from] zookeeper_async::ZkError),
 
-    #[error("Strip prefix error: {}", .0)]
+    #[error(transparent)]
     StripPrefixError(#[from] std::path::StripPrefixError),
 
     #[error("Solr Connection error: {0}")]
