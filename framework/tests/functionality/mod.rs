@@ -11,5 +11,7 @@ pub mod readme_test;
 pub mod select_test;
 pub mod zk_test;
 
+pub mod auth_test;
+
 #[cfg(feature = "blocking")]
 pub mod blocking_tests;

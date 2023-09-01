@@ -76,9 +76,6 @@ docs = response.get_docs_response().get_docs()
 client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
 ```
 
-## Notes
-* Multiprocessing does not work, and will block forever. Normal multithreading works fine.
-
 ## Grouping component
 ### Field grouping
 ```python
@@ -202,3 +199,29 @@ total_people = (
 )
 assert total_people == 750.0
 ```
+## Hosts
+### Single Server
+```python
+context = SolrServerContext(SolrSingleServerHost('localhost:8983'), SolrBasicAuth('solr', 'SolrRocks'))
+client = AsyncSolrCloudClient(context)
+```
+### Multiple servers
+```python
+# The client will randomly select a server to send requests to. It will wait 5 seconds for a response, before trying another server.
+context = SolrServerContext(
+  SolrMultipleServerHost(["localhost:8983", "localhost:8984"], 5),
+  SolrBasicAuth('solr', 'SolrRocks'),
+)
+client = AsyncSolrCloudClient(context)
+```
+### Zookeeper
+```python
+context = SolrServerContext(
+    await ZookeeperEnsembleHostConnector(["localhost:2181"], 30).connect(),
+    SolrBasicAuth('solr', 'SolrRocks'),
+)
+client = AsyncSolrCloudClient(context)
+```
+
+## Notes
+* Multiprocessing does not work, and will block forever. Normal multithreading works fine.

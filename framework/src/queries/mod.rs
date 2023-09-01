@@ -10,9 +10,9 @@ pub mod components;
 pub mod config;
 /// Def types for select queries. Eg: `luscene`, `edismax`
 pub mod def_type;
-/// Helper functions
-pub mod helpers;
 /// Index and Delete API
 pub mod index;
+/// Request builder for queries
+pub mod request_builder;
 /// Select query API
 pub mod select;

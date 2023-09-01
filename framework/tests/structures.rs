@@ -6,7 +6,7 @@ use solrstice::models::context::{SolrServerContext, SolrServerContextBuilder};
 use solrstice::models::error::SolrError;
 use solrstice::queries::collection::{create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
-use solrstice::queries::helpers::basic_solr_request;
+use solrstice::queries::request_builder::SolrRequestBuilder;
 use std::path::Path;
 use std::string::ToString;
 use std::time::Duration;
@@ -14,6 +14,8 @@ use std::time::Duration;
 pub struct BaseTestsBuildup {
     pub context: SolrServerContext,
     pub config_path: String,
+    pub host: SolrSingleServerHost,
+    pub auth: Option<SolrBasicAuth>,
 }
 
 impl BaseTestsBuildup {
@@ -28,10 +30,9 @@ impl BaseTestsBuildup {
                 Some(password.as_str()),
             )),
         };
-        let builder = SolrServerContextBuilder::new(SolrSingleServerHost::new(
-            std::env::var("SOLR_HOST").unwrap().as_str(),
-        ));
-        let context = if let Some(auth) = auth {
+        let host = SolrSingleServerHost::new(std::env::var("SOLR_HOST").unwrap().as_str());
+        let builder = SolrServerContextBuilder::new(host.clone());
+        let context = if let Some(auth) = auth.clone() {
             builder.with_auth(auth).build()
         } else {
             builder.build()
@@ -40,6 +41,8 @@ impl BaseTestsBuildup {
         BaseTestsBuildup {
             context,
             config_path: "../test_setup/test_collection".to_string(),
+            host,
+            auth,
         }
     }
 }
@@ -133,12 +136,10 @@ pub fn get_test_data() -> Vec<City> {
 pub async fn wait_for_solr(context: &SolrServerContext, max_time: Duration) {
     let end: std::time::Instant = std::time::Instant::now() + max_time;
     while std::time::Instant::now() < end {
-        let response = basic_solr_request(
-            context,
-            "/solr/admin/collections",
-            &[("action", "CLUSTERSTATUS")],
-        )
-        .await;
+        let response = SolrRequestBuilder::new(context, "/solr/admin/collections")
+            .with_query_params(&[("action", "CLUSTERSTATUS")])
+            .send_get()
+            .await;
         if response.is_ok() {
             return;
         }
