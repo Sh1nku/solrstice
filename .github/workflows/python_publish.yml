@@ -9,6 +9,9 @@ on:
   push:
     tags:
       - '*'
+  pull_request:
+    branches:
+      - master
 
 permissions:
   contents: read
@@ -33,6 +36,7 @@ jobs:
           manylinux: auto
       - name: Upload wheels
         uses: actions/upload-artifact@v3
+        if: "startsWith(github.ref, 'refs/tags/')"
         with:
           name: wheels
           path: dist
@@ -55,6 +59,7 @@ jobs:
           args: --release --out dist --find-interpreter --manifest-path ./wrappers/python/Cargo.toml
           sccache: 'true'
       - name: Upload wheels
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -77,6 +82,7 @@ jobs:
           args: --release --out dist --find-interpreter --manifest-path ./wrappers/python/Cargo.toml
           sccache: 'true'
       - name: Upload wheels
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: actions/upload-artifact@v3
         with:
           name: wheels
@@ -92,6 +98,7 @@ jobs:
           command: sdist
           args: --out dist --manifest-path ./wrappers/python/Cargo.toml
       - name: Upload sdist
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: actions/upload-artifact@v3
         with:
           name: wheels

@@ -1,6 +1,11 @@
+# v0.4.2
+* Switch out openssl for rustls
+* Run publish CI when creating PRs
+
 # v0.4.1
 * Relax version requirements. 
 * Add Python 3.12 to CI
+* Note: Not released to PyPi due to relying on openssl which could not run in manylinux
 
 # v0.4.0
 * Make authentication error into its own error, instead of Json decode error

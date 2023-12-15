@@ -1,6 +1,6 @@
 [package]
 name = "solrstice-py"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -15,7 +15,5 @@ pythonize = "0.20.0"
 solrstice = { path = "../../framework", features = ["blocking"] }
 serde = "1.0"
 serde_json = "1.0"
-reqwest = "0.11"
+reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"]}
 async-trait = "0.1"
-# Needed for manylinux
-openssl = {version = "0.10", features = ["vendored"]}
