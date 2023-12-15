@@ -1,7 +1,7 @@
 [package]
 name = "solrstice"
 description = "A Solr 8+ client"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["solr", "search"]
@@ -14,7 +14,7 @@ repository = "https://github.com/Sh1nku/solrstice"
 [dependencies]
 serde_json = { version = "1", features = ["raw_value"]}
 serde = { version = "1", features = ["derive"]}
-reqwest = { version = "0.11", features = ["serde_json", "json"]}
+reqwest = { version = "0.11", default-features = false, features = ["serde_json", "json", "rustls-tls"]}
 async-trait = "0.1"
 thiserror = { version = "1", features = []}
 zookeeper-async = "4.2"
