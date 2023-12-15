@@ -1,6 +1,6 @@
 [package]
 name = "solrstice-py"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,9 +9,9 @@ name = "solrstice"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.19", features = ["extension-module", "serde", "abi3-py38"] }
-pyo3-asyncio = { version = "0.19", features = ["attributes", "tokio-runtime"] }
-pythonize = "0.19"
+pyo3 = { version = "0.20.0", features = ["extension-module", "serde", "abi3-py38"] }
+pyo3-asyncio = { version = "0.20.0", features = ["attributes", "tokio-runtime"] }
+pythonize = "0.20.0"
 solrstice = { path = "../../framework", features = ["blocking"] }
 serde = "1.0"
 serde_json = "1.0"
