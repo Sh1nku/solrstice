@@ -1,3 +1,7 @@
+# v0.4.1
+* Relax version requirements. 
+* Add Python 3.12 to CI
+
 # v0.4.0
 * Make authentication error into its own error, instead of Json decode error
 * Make inherited error types transparently pass through parent error
