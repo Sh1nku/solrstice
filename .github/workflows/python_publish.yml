@@ -32,7 +32,6 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter --manifest-path ./wrappers/python/Cargo.toml
-          sccache: 'true'
           manylinux: 2_28
       - name: Upload wheels
         uses: actions/upload-artifact@v3
