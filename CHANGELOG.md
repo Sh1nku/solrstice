@@ -1,3 +1,7 @@
+# v0.4.3
+* Fix mypy not recognizing .pyi files
+* Add static type checking test for mypy and pyright
+
 # v0.4.2
 * Switch out openssl for rustls
 * Run publish CI when creating PRs
