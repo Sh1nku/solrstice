@@ -7,3 +7,5 @@ pdoc
 autoflake
 isort
 black
+mypy
+pyright
