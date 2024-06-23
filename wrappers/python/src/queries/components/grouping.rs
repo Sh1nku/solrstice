@@ -47,11 +47,11 @@ impl From<GroupFormatting> for GroupFormattingWrapper {
 impl GroupingComponentWrapper {
     #[new]
     pub fn new(
-        fields: Option<Vec<&str>>,
-        queries: Option<Vec<&str>>,
+        fields: Option<Vec<String>>,
+        queries: Option<Vec<String>>,
         limit: Option<usize>,
         offset: Option<usize>,
-        sort: Option<Vec<&str>>,
+        sort: Option<Vec<String>>,
         format: Option<GroupFormattingWrapper>,
         main: Option<bool>,
         n_groups: Option<bool>,

@@ -11,7 +11,7 @@ use solrstice::models::facet_set::{
 use std::collections::HashMap;
 
 #[pymodule]
-pub fn facet_set(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn facet_set(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrFacetSetResultWrapper>()?;
     m.add_class::<SolrPivotFacetResultWrapper>()?;
     m.add_class::<FacetSetComponentWrapper>()?;

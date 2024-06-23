@@ -15,7 +15,7 @@ use solrstice::queries::config::{
 use std::path::PathBuf;
 
 #[pymodule]
-pub fn config(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn config(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(upload_config, m)?)?;
     m.add_function(wrap_pyfunction!(get_configs, m)?)?;
     m.add_function(wrap_pyfunction!(config_exists, m)?)?;

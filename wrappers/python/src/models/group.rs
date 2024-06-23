@@ -6,7 +6,7 @@ use pythonize::pythonize;
 use solrstice::models::group::{SolrGroupFieldResult, SolrGroupResult};
 
 #[pymodule]
-pub fn group(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn group(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrGroupResultWrapper>()?;
     m.add_class::<SolrGroupFieldResultWrapper>()?;
     m.add_class::<GroupFormattingWrapper>()?;

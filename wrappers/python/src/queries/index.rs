@@ -93,7 +93,7 @@ impl UpdateQueryWrapper {
     }
 
     pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new(
+        Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
                 .map_err(SolrError::from)
@@ -198,7 +198,7 @@ impl DeleteQueryWrapper {
     }
 
     pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new(
+        Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
                 .map_err(SolrError::from)

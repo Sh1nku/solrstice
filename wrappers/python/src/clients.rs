@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 #[pymodule]
-pub fn clients(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn clients(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<AsyncSolrCloudClientWrapper>()?;
     m.add_class::<BlockingSolrCloudClientWrapper>()?;
     Ok(())

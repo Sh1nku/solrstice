@@ -14,7 +14,7 @@ use solrstice::queries::collection::{
 };
 
 #[pymodule]
-pub fn collection(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn collection(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(create_collection, m)?)?;
     m.add_function(wrap_pyfunction!(get_collections, m)?)?;
     m.add_function(wrap_pyfunction!(collection_exists, m)?)?;

@@ -15,7 +15,7 @@ use solrstice::queries::alias::{
 use std::collections::HashMap;
 
 #[pymodule]
-pub fn alias(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn alias(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_aliases, m)?)?;
     m.add_function(wrap_pyfunction!(create_alias, m)?)?;
     m.add_function(wrap_pyfunction!(alias_exists, m)?)?;

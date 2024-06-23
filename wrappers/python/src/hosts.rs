@@ -11,7 +11,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 #[pymodule]
-pub fn hosts(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn hosts(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrHostWrapper>()?;
     m.add_class::<SolrSingleServerHostWrapper>()?;
     m.add_class::<SolrMultipleServerHostWrapper>()?;
