@@ -6,7 +6,7 @@ use std::io::{Read, Seek, Write};
 use std::path::Path;
 use tempfile::tempfile;
 use walkdir::{DirEntry, WalkDir};
-use zip::write::FileOptions;
+use zip::write::SimpleFileOptions;
 
 // https://github.com/zip-rs/zip/blob/e32db515a2a4c7d04b0bf5851912a399a4cbff68/examples/write_dir.rs
 fn zip_dir<T>(
@@ -19,7 +19,7 @@ where
     T: Write + Seek,
 {
     let mut zip = zip::ZipWriter::new(writer);
-    let options = FileOptions::default().compression_method(method);
+    let options = SimpleFileOptions::default().compression_method(method);
 
     let mut buffer = Vec::new();
     for entry in it {

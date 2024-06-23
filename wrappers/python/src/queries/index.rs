@@ -3,7 +3,7 @@ use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pythonize::depythonize;
+use pythonize::depythonize_bound;
 use serde::{Deserialize, Serialize};
 use solrstice::models::commit_type::CommitType;
 use solrstice::models::context::SolrServerContext;
@@ -35,20 +35,17 @@ impl UpdateQueryWrapper {
         Self(builder)
     }
 
-    pub fn execute<'a>(
+    pub fn execute<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
         data: Vec<PyObject>,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| {
-                let as_any = x.downcast::<PyAny>(py).map_err(PyErrWrapper::from)?;
-                depythonize::<serde_json::Value>(as_any).map_err(PyErrWrapper::from)
-            })
+            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
         pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
@@ -70,10 +67,7 @@ impl UpdateQueryWrapper {
     ) -> PyResult<SolrResponseWrapper> {
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| {
-                let as_any = x.downcast::<PyAny>(py).map_err(PyErrWrapper::from)?;
-                depythonize::<serde_json::Value>(as_any).map_err(PyErrWrapper::from)
-            })
+            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
         let builder = self.0.clone();
@@ -158,12 +152,12 @@ impl DeleteQueryWrapper {
         Self(builder)
     }
 
-    pub fn execute<'a>(
+    pub fn execute<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
         pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
             let context: SolrServerContext = context.into();

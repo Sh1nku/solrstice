@@ -35,7 +35,7 @@ pub fn create_collection(
     config: String,
     shards: Option<usize>,
     replication_factor: Option<usize>,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = create_collection_rs(
@@ -75,7 +75,7 @@ pub fn create_collection_blocking(
 }
 
 #[pyfunction]
-pub fn get_collections(py: Python, context: SolrServerContextWrapper) -> PyResult<&PyAny> {
+pub fn get_collections(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = get_collections_rs(&context)
@@ -102,7 +102,7 @@ pub fn collection_exists(
     py: Python,
     context: SolrServerContextWrapper,
     name: String,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = collection_exists_rs(&context, name.as_str())
@@ -131,7 +131,7 @@ pub fn delete_collection(
     py: Python,
     context: SolrServerContextWrapper,
     name: String,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         delete_collection_rs(&context, name.as_str())
