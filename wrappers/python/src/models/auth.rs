@@ -3,7 +3,7 @@ use solrstice::models::auth::{SolrAuth, SolrBasicAuth};
 use std::sync::Arc;
 
 #[pymodule]
-pub fn auth(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn auth(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrAuthWrapper>()?;
     m.add_class::<SolrBasicAuthWrapper>()?;
     Ok(())

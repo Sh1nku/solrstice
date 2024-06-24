@@ -65,12 +65,12 @@ impl SelectQueryWrapper {
         Self(builder)
     }
 
-    pub fn execute<'a>(
+    pub fn execute<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
         pyo3_asyncio::tokio::future_into_py(py, async move {
             let context: SolrServerContext = context.into();
@@ -113,7 +113,7 @@ impl SelectQueryWrapper {
     }
 
     pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new(
+        Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
                 .map_err(SolrError::from)

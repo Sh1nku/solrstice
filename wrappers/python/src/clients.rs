@@ -19,7 +19,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 
 #[pymodule]
-pub fn clients(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn clients(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<AsyncSolrCloudClientWrapper>()?;
     m.add_class::<BlockingSolrCloudClientWrapper>()?;
     Ok(())
@@ -36,105 +36,113 @@ impl AsyncSolrCloudClientWrapper {
         AsyncSolrCloudClientWrapper(context)
     }
 
-    pub fn upload_config<'a>(
+    pub fn upload_config<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         name: String,
         path: PathBuf,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         upload_config(py, context, name, path)
     }
 
-    pub fn get_configs<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn get_configs<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         get_configs(py, context)
     }
 
-    pub fn config_exists<'a>(&self, py: Python<'a>, name: String) -> PyResult<&'a PyAny> {
+    pub fn config_exists<'py>(&self, py: Python<'py>, name: String) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         config_exists(py, context, name)
     }
 
-    pub fn delete_config<'a>(&self, py: Python<'a>, name: String) -> PyResult<&'a PyAny> {
+    pub fn delete_config<'py>(&self, py: Python<'py>, name: String) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         delete_config(py, context, name)
     }
 
-    pub fn create_collection<'a>(
+    pub fn create_collection<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         name: String,
         config: String,
         shards: Option<usize>,
         replication_factor: Option<usize>,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         create_collection(py, context, name, config, shards, replication_factor)
     }
 
-    pub fn get_collections<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn get_collections<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         get_collections(py, context)
     }
 
-    pub fn collection_exists<'a>(&self, py: Python<'a>, name: String) -> PyResult<&'a PyAny> {
+    pub fn collection_exists<'py>(
+        &self,
+        py: Python<'py>,
+        name: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         collection_exists(py, context, name)
     }
 
-    pub fn delete_collection<'a>(&self, py: Python<'a>, name: String) -> PyResult<&'a PyAny> {
+    pub fn delete_collection<'py>(
+        &self,
+        py: Python<'py>,
+        name: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         delete_collection(py, context, name)
     }
 
-    pub fn get_aliases<'a>(&self, py: Python<'a>) -> PyResult<&'a PyAny> {
+    pub fn get_aliases<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         get_aliases(py, context)
     }
 
-    pub fn create_alias<'a>(
+    pub fn create_alias<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         name: String,
         collections: Vec<String>,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         create_alias(py, context, name, collections)
     }
 
-    pub fn alias_exists<'a>(&self, py: Python<'a>, name: String) -> PyResult<&'a PyAny> {
+    pub fn alias_exists<'py>(&self, py: Python<'py>, name: String) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         alias_exists(py, context, name)
     }
 
-    pub fn index<'a>(
+    pub fn index<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         builder: UpdateQueryWrapper,
         collection: String,
         data: Vec<PyObject>,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         builder.execute(py, context, collection, data)
     }
 
-    pub fn select<'a>(
+    pub fn select<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         builder: &SelectQueryWrapper,
         collection: String,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         builder.execute(py, context, collection)
     }
 
-    pub fn delete<'a>(
+    pub fn delete<'py>(
         &self,
-        py: Python<'a>,
+        py: Python<'py>,
         builder: &DeleteQueryWrapper,
         collection: String,
-    ) -> PyResult<&'a PyAny> {
+    ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         builder.execute(py, context, collection)
     }

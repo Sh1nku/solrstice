@@ -8,7 +8,7 @@ use solrstice::models::response::{SolrDocsResponse, SolrResponse};
 use std::collections::HashMap;
 
 #[pymodule]
-pub fn response(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn response(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrResponseWrapper>()?;
     m.add_class::<SolrDocsResponseWrapper>()?;
     m.add_class::<SolrGroupResultWrapper>()?;

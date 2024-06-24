@@ -9,7 +9,7 @@ use solrstice::models::json_facet::SolrJsonFacetResponse;
 use std::collections::HashMap;
 
 #[pymodule]
-pub fn json_facet(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn json_facet(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrJsonFacetResponseWrapper>()?;
     m.add_class::<JsonFacetComponentWrapper>()?;
     m.add_class::<JsonFacetTypeWrapper>()?;

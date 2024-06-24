@@ -5,7 +5,7 @@ use solrstice::queries::def_type::{
 };
 
 #[pymodule]
-pub fn def_type(_py: Python, m: &PyModule) -> PyResult<()> {
+pub fn def_type(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<QueryOperatorWrapper>()?;
     m.add_class::<DefTypeWrapper>()?;
     m.add_class::<LuceneQueryWrapper>()?;

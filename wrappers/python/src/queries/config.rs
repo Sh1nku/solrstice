@@ -15,7 +15,7 @@ use solrstice::queries::config::{
 use std::path::PathBuf;
 
 #[pymodule]
-pub fn config(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub fn config(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(upload_config, m)?)?;
     m.add_function(wrap_pyfunction!(get_configs, m)?)?;
     m.add_function(wrap_pyfunction!(config_exists, m)?)?;
@@ -34,7 +34,7 @@ pub fn upload_config(
     context: SolrServerContextWrapper,
     name: String,
     path: PathBuf,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = upload_config_rs(&context, name.as_str(), path.as_path())
@@ -60,7 +60,7 @@ pub fn upload_config_blocking(
 }
 
 #[pyfunction]
-pub fn get_configs(py: Python, context: SolrServerContextWrapper) -> PyResult<&PyAny> {
+pub fn get_configs(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = get_configs_rs(&context).await.map_err(PyErrWrapper::from)?;
@@ -85,7 +85,7 @@ pub fn config_exists(
     py: Python,
     context: SolrServerContextWrapper,
     name: String,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = config_exists_rs(&context, name.as_str())
@@ -114,7 +114,7 @@ pub fn delete_config(
     py: Python,
     context: SolrServerContextWrapper,
     name: String,
-) -> PyResult<&PyAny> {
+) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = delete_config_rs(&context, name.as_str())
