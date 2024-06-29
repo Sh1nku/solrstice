@@ -15,7 +15,7 @@ pub fn group(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupResult", module = "solrstice.group")]
+#[pyclass(name = "SolrGroupResult", module = "solrstice.group", subclass)]
 pub struct SolrGroupResultWrapper(SolrGroupResult);
 
 #[pymethods]
@@ -62,7 +62,7 @@ impl From<SolrGroupResultWrapper> for SolrGroupResult {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.group")]
+#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.group", subclass)]
 pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
 
 #[pymethods]

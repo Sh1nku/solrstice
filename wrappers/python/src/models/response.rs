@@ -17,7 +17,7 @@ pub fn response(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrDocsResponse", module = "solrstice.response")]
+#[pyclass(name = "SolrDocsResponse", module = "solrstice.response", subclass)]
 pub struct SolrDocsResponseWrapper(SolrDocsResponse);
 
 impl From<SolrDocsResponse> for SolrDocsResponseWrapper {
@@ -75,7 +75,7 @@ impl SolrDocsResponseWrapper {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrResponse", module = "solrstice.response")]
+#[pyclass(name = "SolrResponse", module = "solrstice.response", subclass)]
 pub struct SolrResponseWrapper(SolrResponse);
 
 impl From<SolrResponse> for SolrResponseWrapper {

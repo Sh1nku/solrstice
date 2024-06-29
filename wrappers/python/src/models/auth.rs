@@ -9,7 +9,7 @@ pub fn auth(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[pyclass(name = "SolrAuth", subclass, module = "solrstice.auth")]
+#[pyclass(name = "SolrAuth", module = "solrstice.auth", subclass)]
 #[derive(Clone)]
 pub struct SolrAuthWrapper {
     pub solr_auth: Arc<dyn SolrAuth + Send + Sync>,
@@ -21,7 +21,7 @@ impl SolrAuth for SolrAuthWrapper {
     }
 }
 
-#[pyclass(name = "SolrBasicAuth", extends=SolrAuthWrapper, module = "solrstice.auth")]
+#[pyclass(name = "SolrBasicAuth", extends=SolrAuthWrapper, module = "solrstice.auth", subclass)]
 #[derive(Clone)]
 pub struct SolrBasicAuthWrapper {}
 

@@ -24,7 +24,7 @@ pub fn facet_set(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[derive(Clone, Debug, PartialEq, Default)]
-#[pyclass(name = "SolrFacetSetResult", module = "solrstice.facet_set")]
+#[pyclass(name = "SolrFacetSetResult", module = "solrstice.facet_set", subclass)]
 pub struct SolrFacetSetResultWrapper(SolrFacetSetResult);
 
 #[pymethods]
@@ -75,7 +75,11 @@ impl From<&SolrFacetSetResult> for SolrFacetSetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrPivotFacetResult", module = "solrstice.facet_set")]
+#[pyclass(
+    name = "SolrPivotFacetResult",
+    module = "solrstice.facet_set",
+    subclass
+)]
 pub struct SolrPivotFacetResultWrapper(SolrPivotFacetResult);
 
 #[pymethods]
@@ -128,7 +132,11 @@ impl From<&SolrPivotFacetResult> for SolrPivotFacetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrFieldFacetResult", module = "solrstice.facet_set")]
+#[pyclass(
+    name = "SolrFieldFacetResult",
+    module = "solrstice.facet_set",
+    subclass
+)]
 pub struct SolrFieldFacetResultWrapper(SolrFieldFacetResult);
 
 #[pymethods]

@@ -16,7 +16,7 @@ use solrstice::queries::components::json_facet::JsonFacetComponent;
 use solrstice::queries::def_type::DefType;
 use solrstice::queries::select::SelectQuery;
 
-#[pyclass(name = "SelectQuery", module = "solrstice.queries")]
+#[pyclass(name = "SelectQuery", module = "solrstice.queries", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SelectQueryWrapper(SelectQuery);
 

@@ -25,7 +25,7 @@ pub fn clients(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[pyclass(name = "AsyncSolrCloudClient", module = "solrstice.clients")]
+#[pyclass(name = "AsyncSolrCloudClient", module = "solrstice.clients", subclass)]
 #[derive(Clone)]
 pub struct AsyncSolrCloudClientWrapper(SolrServerContextWrapper);
 
@@ -148,7 +148,11 @@ impl AsyncSolrCloudClientWrapper {
     }
 }
 
-#[pyclass(name = "BlockingSolrCloudClient", module = "solrstice.clients")]
+#[pyclass(
+    name = "BlockingSolrCloudClient",
+    module = "solrstice.clients",
+    subclass
+)]
 #[derive(Clone)]
 pub struct BlockingSolrCloudClientWrapper(SolrServerContextWrapper);
 
