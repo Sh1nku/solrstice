@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from helpers import Config, create_config
 
@@ -67,3 +69,27 @@ def test_blocking_client_works(config: Config):
 
     client.delete_collection(name)
     client.delete_config(name)
+
+
+@pytest.mark.asyncio
+async def test_multiple_clients_works():
+    name = "MultipleClientWorks"
+
+    config_1 = create_config()
+    config_2 = create_config()
+
+    client = AsyncSolrCloudClient(config_1.context)
+    client_2 = AsyncSolrCloudClient(config_2.context)
+
+    try:
+        await client.delete_config(name)
+    except:
+        pass
+
+    await client.upload_config(name, config_1.config_path)
+
+    results = await asyncio.gather(*[client.get_configs(), client_2.get_configs()])
+    assert name in results[0]
+    assert name in results[1]
+
+    await client.delete_config(name)
