@@ -20,7 +20,11 @@ pub fn json_facet(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrJsonFacetResponse", module = "solrstice.json_facet")]
+#[pyclass(
+    name = "SolrJsonFacetResponse",
+    module = "solrstice.json_facet",
+    subclass
+)]
 pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]

@@ -39,7 +39,7 @@ impl From<QueryOperator> for QueryOperatorWrapper {
     }
 }
 
-#[pyclass(name = "DefType", subclass, module = "solrstice.def_type")]
+#[pyclass(name = "DefType", module = "solrstice.def_type", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DefTypeWrapper(DefType);
 
@@ -65,7 +65,7 @@ impl DefTypeWrapper {
     }
 }
 
-#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LuceneQueryWrapper {}
 
@@ -85,7 +85,7 @@ impl LuceneQueryWrapper {
     }
 }
 
-#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DismaxQueryWrapper {}
 
@@ -117,7 +117,7 @@ impl DismaxQueryWrapper {
     }
 }
 
-#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type")]
+#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EdismaxQueryWrapper {}
 

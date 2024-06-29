@@ -3,7 +3,7 @@ use crate::models::auth::SolrAuthWrapper;
 use pyo3::prelude::*;
 use solrstice::models::context::{SolrServerContext, SolrServerContextBuilder};
 
-#[pyclass(name = "SolrServerContext", subclass, module = "solrstice.hosts")]
+#[pyclass(name = "SolrServerContext", module = "solrstice.hosts", subclass)]
 #[derive(Clone)]
 pub struct SolrServerContextWrapper(SolrServerContext);
 

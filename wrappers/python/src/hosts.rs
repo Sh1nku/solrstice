@@ -21,7 +21,7 @@ pub fn hosts(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[pyclass(name = "SolrHost", subclass, module = "solrstice.hosts")]
+#[pyclass(name = "SolrHost", module = "solrstice.hosts", subclass)]
 #[derive(Clone)]
 pub struct SolrHostWrapper {
     pub solr_host: Arc<dyn SolrHost + Send + Sync>,
@@ -34,7 +34,7 @@ impl SolrHost for SolrHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts")]
+#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
 #[derive(Clone)]
 pub struct SolrSingleServerHostWrapper;
 
@@ -51,7 +51,7 @@ impl SolrSingleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts")]
+#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
 #[derive(Clone)]
 pub struct SolrMultipleServerHostWrapper;
 
@@ -71,11 +71,11 @@ impl SolrMultipleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module= "solrstice.hosts")]
+#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostWrapper;
 
-#[pyclass(name = "ZookeeperEnsembleHostConnector")]
+#[pyclass(name = "ZookeeperEnsembleHostConnector", subclass)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostConnectorWrapper(ZookeeperEnsembleHostConnector);
 

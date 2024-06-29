@@ -18,7 +18,7 @@ pub enum CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "UpdateQuery", module = "solrstice.queries")]
+#[pyclass(name = "UpdateQuery", module = "solrstice.queries", subclass)]
 pub struct UpdateQueryWrapper(UpdateQuery);
 
 #[pymethods]
@@ -123,7 +123,7 @@ impl From<CommitType> for CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "DeleteQuery", module = "solrstice.queries")]
+#[pyclass(name = "DeleteQuery", module = "solrstice.queries", subclass)]
 pub struct DeleteQueryWrapper(DeleteQuery);
 
 #[pymethods]

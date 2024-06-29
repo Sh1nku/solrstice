@@ -5,7 +5,7 @@ use solrstice::queries::components::facet_set::{
 };
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FacetSetComponent", module = "solrstice.facet_set")]
+#[pyclass(name = "FacetSetComponent", module = "solrstice.facet_set", subclass)]
 pub struct FacetSetComponentWrapper(FacetSetComponent);
 
 #[pymethods]
@@ -55,7 +55,7 @@ impl From<&FacetSetComponent> for FacetSetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "PivotFacetComponent", module = "solrstice.facet_set")]
+#[pyclass(name = "PivotFacetComponent", module = "solrstice.facet_set", subclass)]
 pub struct PivotFacetComponentWrapper(PivotFacetComponent);
 
 #[pymethods]
@@ -95,7 +95,7 @@ impl From<&PivotFacetComponent> for PivotFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetComponent", module = "solrstice.facet_set")]
+#[pyclass(name = "FieldFacetComponent", module = "solrstice.facet_set", subclass)]
 pub struct FieldFacetComponentWrapper(FieldFacetComponent);
 
 #[pymethods]
@@ -188,7 +188,7 @@ impl From<FieldFacetMethod> for FieldFacetMethodWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetEntry", module = "solrstice.facet_set")]
+#[pyclass(name = "FieldFacetEntry", module = "solrstice.facet_set", subclass)]
 pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 
 #[pymethods]
