@@ -4,6 +4,7 @@ use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 use solrstice::queries::index::{DeleteQuery, UpdateQuery};
 use solrstice::queries::select::SelectQuery;
 use std::path::Path;
+use tokio::join;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct TestData {
@@ -57,4 +58,30 @@ pub async fn client_example_test() {
     client.delete_collection(name).await.unwrap();
     // Delete config
     client.delete_config(name).await.unwrap();
+}
+
+#[tokio::test]
+pub async fn multiple_clients_test() {
+    let name = "multiple_clients_test".to_string();
+    let config_1 = BaseTestsBuildup::new().await;
+    let config_2 = BaseTestsBuildup::new().await;
+    let client_1 = AsyncSolrCloudClient::new(config_1.context);
+    let client_2 = AsyncSolrCloudClient::new(config_2.context);
+
+    let _ = client_1.delete_config(&name).await;
+
+    client_1
+        .upload_config(&name, Path::new(&config_1.config_path))
+        .await
+        .unwrap();
+
+    let configs_1_future = client_1.get_configs();
+    let configs_2_future = client_2.get_configs();
+
+    let configs_tup = join!(configs_1_future, configs_2_future);
+
+    assert!(configs_tup.0.unwrap().contains(&name));
+    assert!(configs_tup.1.unwrap().contains(&name));
+
+    client_1.delete_config(&name).await.unwrap();
 }

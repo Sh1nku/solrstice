@@ -28,7 +28,11 @@ class Config:
 
 
 def create_config() -> Config:
-    path = "../../test_setup/.env"
+    path_prefix = "../../"
+    if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
+        path_prefix = "../../../"
+
+    path = os.path.join(path_prefix, "test_setup/.env")
     load_dotenv(path)
     solr_auth = None
     solr_username = os.getenv("SOLR_USERNAME")
@@ -46,7 +50,7 @@ def create_config() -> Config:
         solr_username,
         solr_password,
         context,
-        "../../test_setup/test_collection",
+        os.path.join(path_prefix, "test_setup/test_collection"),
         AsyncSolrCloudClient(context),
     )
 
@@ -56,7 +60,7 @@ def wait_for_solr(host: str, max_time: int):
     while time.time() < end:
         try:
             with urlopen(
-                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -98,7 +102,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-    context: SolrServerContext, name: str, config_path: str
+        context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)
