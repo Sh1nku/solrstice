@@ -1,11 +1,15 @@
+use serde::{Deserialize, Serialize};
+
 use crate::models::context::SolrServerContext;
-use crate::models::error::{try_solr_error, SolrError};
+use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
 use crate::queries::components::facet_set::FacetSetComponent;
 use crate::queries::components::grouping::GroupingComponent;
 use crate::queries::components::json_facet::JsonFacetComponent;
 use crate::queries::def_type::DefType;
-use serde::{Deserialize, Serialize};
+use crate::queries::request_builder::SolrRequestBuilder;
+#[cfg(feature = "blocking")]
+use crate::runtime::RUNTIME;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 struct PostQueryWrapper {
@@ -256,31 +260,17 @@ impl SelectQuery {
         context: C,
         collection: T,
     ) -> Result<SolrResponse, SolrError> {
-        let solr_url = format!(
-            "{}/solr/{}/{}",
-            context.as_ref().host.get_solr_node().await?,
-            collection.as_ref(),
-            &self.handle
-        );
+        let solr_url = format!("/solr/{}/{}", collection.as_ref(), &self.handle);
         let wrapper = PostQueryWrapper {
             params: self.clone(),
         };
-        let mut request = context
-            .as_ref()
-            .client
-            .post(&solr_url)
-            .json::<PostQueryWrapper>(&wrapper);
-        if let Some(auth) = &context.as_ref().auth {
-            request = auth.add_auth_to_request(request);
-        }
-        let data = request.send().await?.json::<SolrResponse>().await?;
-        try_solr_error(&data)?;
+        let data = SolrRequestBuilder::new(context.as_ref(), solr_url.as_str())
+            .send_post_with_json::<PostQueryWrapper>(&wrapper)
+            .await?;
         Ok(data)
     }
 }
 
-#[cfg(feature = "blocking")]
-use crate::runtime::RUNTIME;
 #[cfg(feature = "blocking")]
 impl SelectQuery {
     pub fn execute_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(

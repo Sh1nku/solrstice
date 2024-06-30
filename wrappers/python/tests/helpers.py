@@ -27,12 +27,15 @@ class Config:
     async_client: AsyncSolrCloudClient
 
 
-def create_config() -> Config:
+def get_path_prefix() -> str:
     path_prefix = "../../"
     if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
         path_prefix = "../../../"
+    return path_prefix
 
-    path = os.path.join(path_prefix, "test_setup/.env")
+
+def create_config() -> Config:
+    path = os.path.join(get_path_prefix(), "test_setup/.env")
     load_dotenv(path)
     solr_auth = None
     solr_username = os.getenv("SOLR_USERNAME")
@@ -50,7 +53,7 @@ def create_config() -> Config:
         solr_username,
         solr_password,
         context,
-        os.path.join(path_prefix, "test_setup/test_collection"),
+        os.path.join(get_path_prefix(), "test_setup/test_collection"),
         AsyncSolrCloudClient(context),
     )
 
@@ -91,7 +94,7 @@ class City(DataClassJsonMixin):
 
 
 def load_test_data() -> List[City]:
-    with open("../../test_setup/test_data.json") as f:
+    with open(os.path.join(get_path_prefix(), "test_setup/test_data.json")) as f:
         return City.schema().loads(f.read(), many=True)
 
 

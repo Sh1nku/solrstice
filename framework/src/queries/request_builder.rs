@@ -61,9 +61,9 @@ impl<'a> SolrRequestBuilder<'a> {
         Ok(solr_response)
     }
 
-    pub async fn send_post_with_json<T: Serialize + 'a>(
+    pub async fn send_post_with_json<T: Serialize + 'a + ?Sized>(
         self,
-        json: T,
+        json: &T,
     ) -> Result<SolrResponse, SolrError> {
         let mut request = create_standard_request(
             self.context,

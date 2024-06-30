@@ -31,4 +31,5 @@ regex = "1"
 dotenv = "0.15"
 pyo3 = "0.21"
 pyo3-asyncio = { package = "pyo3-asyncio-0-21", version = "0.21" }
+pyo3-log = "0.10.0"
 pythonize = "0.21"
