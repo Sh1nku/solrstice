@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 enum SolrRequestType {
-    GET,
-    POST,
+    Get,
+    Post,
 }
 
 pub struct SolrRequestBuilder<'a> {
@@ -49,7 +49,7 @@ impl<'a> SolrRequestBuilder<'a> {
         let request = create_standard_request(
             self.context,
             self.url,
-            SolrRequestType::GET,
+            SolrRequestType::Get,
             self.query_params,
             self.headers.as_ref(),
         )
@@ -68,7 +68,7 @@ impl<'a> SolrRequestBuilder<'a> {
         let mut request = create_standard_request(
             self.context,
             self.url,
-            SolrRequestType::POST,
+            SolrRequestType::Post,
             self.query_params,
             self.headers.as_ref(),
         )
@@ -88,7 +88,7 @@ impl<'a> SolrRequestBuilder<'a> {
         let mut request = create_standard_request(
             self.context,
             self.url,
-            SolrRequestType::POST,
+            SolrRequestType::Post,
             self.query_params,
             self.headers.as_ref(),
         )
@@ -110,12 +110,12 @@ async fn create_standard_request<'a>(
     headers: Option<&Vec<(String, String)>>,
 ) -> Result<RequestBuilder, SolrError> {
     let mut request = match request_type {
-        SolrRequestType::GET => {
+        SolrRequestType::Get => {
             context
                 .client
                 .get(format!("{}{}", context.host.get_solr_node().await?, url))
         }
-        SolrRequestType::POST => {
+        SolrRequestType::Post => {
             context
                 .client
                 .post(format!("{}{}", context.host.get_solr_node().await?, url))

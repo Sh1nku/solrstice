@@ -95,7 +95,7 @@ impl SolrPivotFacetResultWrapper {
     }
 
     pub fn get_pivots(&self) -> Vec<SolrPivotFacetResultWrapper> {
-        self.0.get_pivots().into_iter().map(|x| x.into()).collect()
+        self.0.get_pivots().iter().map(|x| x.into()).collect()
     }
 
     pub fn get_queries(&self) -> HashMap<String, usize> {

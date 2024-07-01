@@ -92,6 +92,7 @@ pub struct DismaxQueryWrapper {}
 #[pymethods]
 impl DismaxQueryWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,
@@ -124,6 +125,7 @@ pub struct EdismaxQueryWrapper {}
 #[pymethods]
 impl EdismaxQueryWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,

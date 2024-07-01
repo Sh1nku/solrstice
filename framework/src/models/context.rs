@@ -106,7 +106,7 @@ impl From<SolrServerContextBuilder> for SolrServerContext {
         Self {
             host: builder.host,
             auth: builder.auth,
-            client: builder.client.unwrap_or_else(reqwest::Client::new),
+            client: builder.client.unwrap_or_default(),
         }
     }
 }

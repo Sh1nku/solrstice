@@ -188,8 +188,8 @@ where
         Some(value_map) => {
             let mut return_map: HashMap<String, Vec<String>> = HashMap::new();
             for (key, values) in value_map {
-                if values.len() > 0 {
-                    return_map.insert(key, values.split(",").map(|x| x.to_string()).collect());
+                if !values.is_empty() {
+                    return_map.insert(key, values.split(',').map(|x| x.to_string()).collect());
                 } else {
                     return_map.insert(key, vec![]);
                 }

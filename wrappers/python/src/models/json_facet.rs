@@ -32,7 +32,7 @@ impl SolrJsonFacetResponseWrapper {
     pub fn get_buckets(&self) -> Vec<SolrJsonFacetResponseWrapper> {
         self.0
             .get_buckets()
-            .map(|bucket| SolrJsonFacetResponseWrapper::from(bucket))
+            .map(SolrJsonFacetResponseWrapper::from)
             .collect()
     }
 

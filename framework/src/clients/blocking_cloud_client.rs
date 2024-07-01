@@ -180,7 +180,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub fn collection_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
         collection_exists_blocking(&self.context, name)
     }
 

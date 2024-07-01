@@ -113,6 +113,7 @@ pub struct JsonQueryFacetWrapper {}
 #[pymethods]
 impl JsonQueryFacetWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         q: String,
         limit: Option<usize>,

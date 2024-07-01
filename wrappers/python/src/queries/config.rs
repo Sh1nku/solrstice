@@ -37,10 +37,10 @@ pub fn upload_config(
 ) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
-        let result = upload_config_rs(&context, name.as_str(), path.as_path())
+        upload_config_rs(&context, name.as_str(), path.as_path())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(())
     })
 }
 
@@ -117,10 +117,10 @@ pub fn delete_config(
 ) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
-        let result = delete_config_rs(&context, name.as_str())
+        delete_config_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(())
     })
 }
 

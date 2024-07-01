@@ -58,7 +58,7 @@ pub fn create_alias(
 ) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
-        let result = create_alias_rs(
+        Ok(create_alias_rs(
             &context,
             name.as_str(),
             collections
@@ -68,8 +68,7 @@ pub fn create_alias(
                 .as_slice(),
         )
         .await
-        .map_err(PyErrWrapper::from)?;
-        Ok(result)
+        .map_err(PyErrWrapper::from)?)
     })
 }
 
@@ -82,7 +81,7 @@ pub fn create_alias_blocking(
 ) -> PyResult<()> {
     py.allow_threads(move || {
         let context: SolrServerContext = context.into();
-        let result = create_alias_blocking_rs(
+        Ok(create_alias_blocking_rs(
             &context,
             name.as_str(),
             collections
@@ -91,8 +90,7 @@ pub fn create_alias_blocking(
                 .collect::<Vec<_>>()
                 .as_slice(),
         )
-        .map_err(PyErrWrapper::from)?;
-        Ok(result)
+        .map_err(PyErrWrapper::from)?)
     })
 }
 
@@ -136,7 +134,7 @@ pub fn delete_alias(
         delete_alias_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| ()))
+        Ok(())
     })
 }
 

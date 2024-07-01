@@ -23,6 +23,7 @@ pub struct SelectQueryWrapper(SelectQuery);
 #[pymethods]
 impl SelectQueryWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     fn new(
         q: Option<String>,
         fl: Option<Vec<String>>,

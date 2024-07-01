@@ -31,19 +31,19 @@ impl SolrGroupResultWrapper {
     pub fn get_field_result(&self) -> Option<Vec<SolrGroupFieldResultWrapper>> {
         self.0
             .get_field_result()
-            .map(|v| v.into_iter().map(|v| v.to_owned().into()).collect())
+            .map(|v| v.iter().map(|v| v.to_owned().into()).collect())
     }
 
     pub fn get_query_result(&self) -> PyResult<Option<SolrDocsResponseWrapper>> {
         match self.0.get_query_result() {
-            Some(v) => Ok(Some(SolrDocsResponseWrapper::try_from(v.to_owned())?)),
+            Some(v) => Ok(Some(SolrDocsResponseWrapper::from(v.to_owned()))),
             None => Ok(None),
         }
     }
 
     pub fn get_simple_result(&self) -> PyResult<Option<SolrDocsResponseWrapper>> {
         match self.0.get_simple_result() {
-            Some(v) => Ok(Some(SolrDocsResponseWrapper::try_from(v.to_owned())?)),
+            Some(v) => Ok(Some(SolrDocsResponseWrapper::from(v.to_owned()))),
             None => Ok(None),
         }
     }
