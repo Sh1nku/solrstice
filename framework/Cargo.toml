@@ -33,3 +33,4 @@ blocking = ["tokio"]
 [dev-dependencies]
 tokio = { features = ["macros", "rt", "rt-multi-thread"], workspace = true }
 dotenv.workspace = true
+env_logger.workspace = true
