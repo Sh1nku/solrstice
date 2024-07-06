@@ -81,7 +81,7 @@ impl SolrServerContextBuilder {
     /// use solrstice::models::auth::SolrBasicAuth;
     /// use solrstice::queries::request_builder::LoggingPolicy;
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
-    ///   .with_logging(LoggingPolicy::Fast(4096))
+    ///   .with_logging_policy(LoggingPolicy::Fast(4096))
     ///   .build();
     pub fn with_logging_policy(mut self, logging_policy: LoggingPolicy) -> Self {
         self.logging_policy = logging_policy;

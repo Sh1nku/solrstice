@@ -1,9 +1,11 @@
 use crate::structures::BaseTestsBuildup;
+use serial_test::parallel;
 use solrstice::models::error::SolrError;
 use solrstice::queries::config::{config_exists, delete_config, get_configs, upload_config};
 use std::path::Path;
 
 #[tokio::test]
+#[parallel]
 async fn upload_config_uploads_config() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     let _ = delete_config(&config.context, "UploadConfig").await;
@@ -27,6 +29,7 @@ async fn upload_config_uploads_config() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn get_configs_gets_configs() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     let configs = get_configs(&config.context).await.unwrap();
@@ -35,6 +38,7 @@ async fn get_configs_gets_configs() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn delete_config_deletes_config() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     let _ = delete_config(&config.context, "DeleteConfig").await;
@@ -58,6 +62,7 @@ async fn delete_config_deletes_config() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn config_exists_works_when_config_exists() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     assert!(config_exists(&config.context, "_default").await.unwrap());
@@ -65,6 +70,7 @@ async fn config_exists_works_when_config_exists() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn config_exists_works_when_config_doesent_exist() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     assert!(!config_exists(&config.context, "_this_does_not_exist")

@@ -1,4 +1,5 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
+use serial_test::parallel;
 use solrstice::models::error::SolrError;
 use solrstice::queries::components::facet_set::{
     FacetSetComponent, FieldFacetComponent, FieldFacetEntry, PivotFacetComponent,
@@ -7,6 +8,7 @@ use solrstice::queries::index::UpdateQuery;
 use solrstice::queries::select::SelectQuery;
 
 #[tokio::test]
+#[parallel]
 pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetPivot")
         .await
@@ -45,6 +47,7 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn test_facet_query_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetQuery")
         .await
@@ -69,6 +72,7 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn test_facet_field_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetField")
         .await
@@ -95,6 +99,7 @@ pub async fn test_facet_field_works() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetFieldExclude")
         .await
@@ -124,6 +129,7 @@ pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn test_facet_field_exclude_works_missing() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("FacetFieldMissing")
         .await

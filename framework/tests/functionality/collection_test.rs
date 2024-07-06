@@ -1,9 +1,11 @@
 use crate::structures::BaseTestsBuildup;
+use serial_test::parallel;
 use solrstice::queries::collection::{collection_exists, create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
 use std::path::Path;
 
 #[tokio::test]
+#[parallel]
 async fn create_collection_creates_collection() {
     let config_name = "CreateCollectionConfig".to_string();
     let collection_name = "CreateCollectionCollection".to_string();

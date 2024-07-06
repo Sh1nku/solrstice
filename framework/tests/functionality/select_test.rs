@@ -1,9 +1,11 @@
 use crate::structures::{get_test_data, City, FunctionalityTestsBuildup};
+use serial_test::parallel;
 use solrstice::models::error::SolrError;
 use solrstice::queries::index::UpdateQuery;
 use solrstice::queries::select::SelectQuery;
 
 #[tokio::test]
+#[parallel]
 async fn select_works_when_no_result() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("SelectNoResult")
         .await
@@ -27,6 +29,7 @@ async fn select_works_when_no_result() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn select_works_when_no_result_serde_value() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("SelectNoResultSerdeValue")
         .await
@@ -50,6 +53,7 @@ async fn select_works_when_no_result_serde_value() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn select_works_using_cursor_mark() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("SelectCursorMark")
         .await

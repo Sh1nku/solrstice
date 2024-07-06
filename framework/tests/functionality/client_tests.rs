@@ -1,5 +1,6 @@
 use crate::structures::BaseTestsBuildup;
 use serde::{Deserialize, Serialize};
+use serial_test::parallel;
 use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 use solrstice::queries::index::{DeleteQuery, UpdateQuery};
 use solrstice::queries::select::SelectQuery;
@@ -12,6 +13,7 @@ struct TestData {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn client_example_test() {
     let name = "example_test";
     let config = BaseTestsBuildup::new().await;
@@ -61,6 +63,7 @@ pub async fn client_example_test() {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn multiple_clients_test() {
     let name = "multiple_clients_test".to_string();
     let config_1 = BaseTestsBuildup::new().await;
