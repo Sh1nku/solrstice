@@ -22,6 +22,7 @@ class Config:
     speedbump_host: Optional[str]
     solr_username: Optional[str]
     solr_password: Optional[str]
+    solr_auth: Optional[SolrBasicAuth]
     context: SolrServerContext
     config_path: str
     async_client: AsyncSolrCloudClient
@@ -52,6 +53,7 @@ def create_config() -> Config:
         speedbump_host,
         solr_username,
         solr_password,
+        solr_auth,
         context,
         os.path.join(get_path_prefix(), "test_setup/test_collection"),
         AsyncSolrCloudClient(context),
@@ -63,7 +65,7 @@ def wait_for_solr(host: str, max_time: int):
     while time.time() < end:
         try:
             with urlopen(
-                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -105,7 +107,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-        context: SolrServerContext, name: str, config_path: str
+    context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)

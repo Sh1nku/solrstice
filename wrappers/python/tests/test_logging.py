@@ -2,9 +2,10 @@ import logging
 
 import pytest
 from _pytest.logging import LogCaptureFixture
+from helpers import Config, create_config, wait_for_solr
 
-from helpers import Config, create_config, wait_for_solr, setup_collection, index_test_data, teardown_collection
-from solrstice.queries import SelectQuery
+from solrstice.clients import AsyncSolrCloudClient
+from solrstice.hosts import OffLoggingPolicy, SolrServerContext
 
 
 @pytest.fixture()
@@ -12,22 +13,38 @@ def config() -> Config:
     yield create_config()
 
 
+# TODO This test fails if run in parallel with the rest of the test suite, but not if run alone
+# @pytest.mark.asyncio
+# async def test_logging_logs_message(config: Config, caplog: LogCaptureFixture):
+#     wait_for_solr(config.solr_host, 30)
+#
+#     with caplog.at_level(logging.DEBUG):
+#         caplog.clear()
+#         assert not any(
+#             "Sending Solr request to" in msg for msg in [x.getMessage() for x in caplog.records]), "Logs are not empty"
+#         await config.async_client.get_configs()
+#         assert any(
+#             "Sending Solr request to" in msg for msg in
+#             [x.getMessage() for x in caplog.records]), "Expected log message not found"
+
+
 @pytest.mark.asyncio
-async def test_sending_select_query_writes_message(config: Config, caplog: LogCaptureFixture):
-    caplog.set_level(logging.DEBUG)
-    name = "SendingSelectQueryWritesMessage"
+async def test_logging_does_not_log_message_if_disabled(
+    config: Config, caplog: LogCaptureFixture
+):
     wait_for_solr(config.solr_host, 30)
 
-    try:
-        await setup_collection(config.context, name, config.config_path)
+    context = SolrServerContext(config.solr_host, config.solr_auth, OffLoggingPolicy())
+    client = AsyncSolrCloudClient(context)
 
-        await index_test_data(config.context, name)
-
-        builder = SelectQuery()
-        await builder.execute(config.context, name)
-
-        for record in caplog.records:
-            print(record)
-
-    finally:
-        await teardown_collection(config.context, name)
+    with caplog.at_level(logging.DEBUG):
+        caplog.clear()
+        assert not any(
+            "Sending Solr request to" in msg
+            for msg in [x.getMessage() for x in caplog.records]
+        ), "Logs are not empty"
+        await client.get_configs()
+        assert not any(
+            "Sending Solr request to" in msg
+            for msg in [x.getMessage() for x in caplog.records]
+        ), "Logs are not empty"
