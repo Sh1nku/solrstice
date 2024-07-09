@@ -2,8 +2,10 @@ use crate::models::context::SolrServerContext;
 use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
 use log::debug;
-use reqwest::{Body, Request, RequestBuilder, Response};
+use reqwest::header::HeaderMap;
+use reqwest::{Body, Request, RequestBuilder, Response, Url};
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 enum SolrRequestType {
@@ -175,7 +177,16 @@ async fn try_request_auth_error(response: &Response) -> Result<(), SolrError> {
 
 static NO_BODY: &[u8] = "No body".as_bytes();
 static ERROR_BODY: &str = "Error while getting body";
-static TOO_BIG_BODY: &str = "Body too big to log";
+fn body_too_long(actual: usize, max: usize) -> String {
+    format!("Too long {actual} > {max}")
+}
+
+fn log_request_message(url: &Url, headers: &HeaderMap, body: Cow<'_, str>) {
+    debug!(
+        "Sending Solr request to {}\nHeaders: {:?}\nBody: {}",
+        url, headers, body
+    );
+}
 
 fn log_request_info(request: &Request, logging: LoggingPolicy) {
     if logging == LoggingPolicy::Off {
@@ -184,38 +195,36 @@ fn log_request_info(request: &Request, logging: LoggingPolicy) {
     let url = request.url();
     let headers = request.headers();
     let body = request.body().map(|b| b.as_bytes().unwrap_or_default());
-    let body = body.unwrap_or(NO_BODY);
+    let body = match body {
+        None => {
+            log_request_message(url, headers, String::from_utf8_lossy(NO_BODY));
+            return;
+        }
+        Some(b) => b,
+    };
+
     match logging {
         LoggingPolicy::Fast(max) => {
-            let body = if body.len() > max {
-                TOO_BIG_BODY.as_bytes()
-            } else {
-                body
+            let body: Cow<'_, str> = match body.len() > max {
+                true => body_too_long(body.len(), max).into(),
+                false => String::from_utf8_lossy(body),
             };
-            debug!(
-                "Sending Solr request to {}\nHeaders: {:?}\nBody: {}",
-                url,
-                headers,
-                String::from_utf8_lossy(body)
-            );
+            log_request_message(url, headers, body);
         }
         LoggingPolicy::Pretty(max) => {
-            let body = match body.len() > max {
-                true => TOO_BIG_BODY.to_string(),
+            let body: Cow<'_, str> = match body.len() > max {
+                true => body_too_long(body.len(), max).into(),
                 false => {
                     let body = serde_json::from_slice::<serde_json::Value>(body);
                     match body {
-                        Ok(body) => {
-                            serde_json::to_string_pretty(&body).unwrap_or(ERROR_BODY.to_string())
-                        }
-                        Err(_) => ERROR_BODY.to_string(),
+                        Ok(body) => serde_json::to_string_pretty(&body)
+                            .unwrap_or(ERROR_BODY.to_string())
+                            .into(),
+                        Err(_) => ERROR_BODY.into(),
                     }
                 }
             };
-            debug!(
-                "Sending Solr request to {}\nHeaders: {:?}\nBody:\n{}",
-                url, headers, body
-            );
+            log_request_message(url, headers, body)
         }
         _ => {}
     }
