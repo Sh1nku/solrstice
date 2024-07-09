@@ -3,7 +3,6 @@ use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
 use log::debug;
 use reqwest::{Body, Request, RequestBuilder, Response};
-use serde::__private::from_utf8_lossy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
@@ -197,7 +196,7 @@ fn log_request_info(request: &Request, logging: LoggingPolicy) {
                 "Sending Solr request to {}\nHeaders: {:?}\nBody: {}",
                 url,
                 headers,
-                from_utf8_lossy(body)
+                String::from_utf8_lossy(body)
             );
         }
         LoggingPolicy::Pretty(max) => {
