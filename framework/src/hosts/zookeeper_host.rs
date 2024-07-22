@@ -1,7 +1,7 @@
 use crate::hosts::solr_host::SolrHost;
 use crate::models::error::SolrError;
 use async_trait::async_trait;
-use log::info;
+use log::debug;
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
@@ -142,7 +142,7 @@ impl SolrHost for ZookeeperEnsembleHost {
 pub struct LoggingWatcher;
 impl Watcher for LoggingWatcher {
     fn handle(&self, e: WatchedEvent) {
-        info!("{:?}", e)
+        debug!("{:?}", e)
     }
 }
 

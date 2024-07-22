@@ -73,7 +73,7 @@ impl SolrServerContextBuilder {
     /// Set a logging policy
     /// The accepted values are `Logging::Off`, `Logging::Fast(usize)`, `Logging::Pretty(usize)`
     /// `usize` is the maximum length of the body that will be logged in bytes
-    /// `Pretty` is an expensive
+    /// `Pretty` is expensive as it needs deserialize and reserialize the body a second time.
     /// # Examples
     /// ```
     /// use solrstice::models::context::SolrServerContextBuilder;
