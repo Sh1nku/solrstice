@@ -38,7 +38,7 @@ pub fn create_collection(
 ) -> PyResult<Bound<PyAny>> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
-        let result = create_collection_rs(
+        create_collection_rs(
             &context,
             name.as_str(),
             config.as_str(),
@@ -47,7 +47,7 @@ pub fn create_collection(
         )
         .await
         .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(())
     })
 }
 

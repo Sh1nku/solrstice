@@ -33,6 +33,8 @@ fn queries_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    pyo3_log::init();
+
     let sys = PyModule::import_bound(_py, "sys")?;
     let sys_modules = sys.getattr("modules")?;
     let sys_modules: &Bound<'_, PyDict> = sys_modules.downcast()?;

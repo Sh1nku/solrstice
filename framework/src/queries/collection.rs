@@ -84,7 +84,7 @@ pub fn get_collections_blocking<C: AsRef<SolrServerContext>>(
 }
 
 #[cfg(feature = "blocking")]
-pub fn collection_exists_blocking<'a, C: AsRef<SolrServerContext>, S: AsRef<str>>(
+pub fn collection_exists_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
 ) -> Result<bool, SolrError> {

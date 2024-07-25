@@ -15,3 +15,4 @@ pub mod auth_test;
 
 #[cfg(feature = "blocking")]
 pub mod blocking_tests;
+mod logging_test;

@@ -80,3 +80,6 @@ pub mod queries;
 #[cfg(feature = "blocking")]
 /// Tokio Runtime for blocking usage
 pub mod runtime;
+
+#[cfg(doctest)]
+pub mod docs;

@@ -46,6 +46,7 @@ impl From<GroupFormatting> for GroupFormattingWrapper {
 #[pymethods]
 impl GroupingComponentWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         fields: Option<Vec<String>>,
         queries: Option<Vec<String>>,

@@ -1,10 +1,12 @@
 use crate::structures::BaseTestsBuildup;
+use serial_test::parallel;
 use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 use solrstice::models::auth::SolrBasicAuth;
 use solrstice::models::context::SolrServerContextBuilder;
 use solrstice::models::error::SolrError;
 
 #[tokio::test]
+#[parallel]
 async fn auth_gives_sensible_error_when_not_provided() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     if config.auth.is_none() {
@@ -25,6 +27,7 @@ async fn auth_gives_sensible_error_when_not_provided() -> Result<(), SolrError> 
 }
 
 #[tokio::test]
+#[parallel]
 async fn auth_gives_sensible_error_when_wrong() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
     if config.auth.is_none() {

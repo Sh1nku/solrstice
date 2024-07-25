@@ -22,17 +22,21 @@ class Config:
     speedbump_host: Optional[str]
     solr_username: Optional[str]
     solr_password: Optional[str]
+    solr_auth: Optional[SolrBasicAuth]
     context: SolrServerContext
     config_path: str
     async_client: AsyncSolrCloudClient
 
 
-def create_config() -> Config:
+def get_path_prefix() -> str:
     path_prefix = "../../"
     if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
         path_prefix = "../../../"
+    return path_prefix
 
-    path = os.path.join(path_prefix, "test_setup/.env")
+
+def create_config() -> Config:
+    path = os.path.join(get_path_prefix(), "test_setup/.env")
     load_dotenv(path)
     solr_auth = None
     solr_username = os.getenv("SOLR_USERNAME")
@@ -49,8 +53,9 @@ def create_config() -> Config:
         speedbump_host,
         solr_username,
         solr_password,
+        solr_auth,
         context,
-        os.path.join(path_prefix, "test_setup/test_collection"),
+        os.path.join(get_path_prefix(), "test_setup/test_collection"),
         AsyncSolrCloudClient(context),
     )
 
@@ -60,7 +65,7 @@ def wait_for_solr(host: str, max_time: int):
     while time.time() < end:
         try:
             with urlopen(
-                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -91,7 +96,7 @@ class City(DataClassJsonMixin):
 
 
 def load_test_data() -> List[City]:
-    with open("../../test_setup/test_data.json") as f:
+    with open(os.path.join(get_path_prefix(), "test_setup/test_data.json")) as f:
         return City.schema().loads(f.read(), many=True)
 
 
@@ -102,7 +107,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-        context: SolrServerContext, name: str, config_path: str
+    context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)

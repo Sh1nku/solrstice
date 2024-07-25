@@ -1,4 +1,7 @@
-use crate::models::context::SolrServerContextWrapper;
+use crate::models::context::{
+    FastLoggingPolicyWrapper, LoggingPolicyWrapper, OffLoggingPolicyWrapper,
+    PrettyLoggingPolicyWrapper, SolrServerContextWrapper,
+};
 use crate::models::error::PyErrWrapper;
 use async_trait::async_trait;
 use pyo3::prelude::*;
@@ -18,6 +21,11 @@ pub fn hosts(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ZookeeperEnsembleHostWrapper>()?;
     m.add_class::<ZookeeperEnsembleHostConnectorWrapper>()?;
     m.add_class::<SolrServerContextWrapper>()?;
+
+    m.add_class::<LoggingPolicyWrapper>()?;
+    m.add_class::<FastLoggingPolicyWrapper>()?;
+    m.add_class::<PrettyLoggingPolicyWrapper>()?;
+    m.add_class::<OffLoggingPolicyWrapper>()?;
     Ok(())
 }
 

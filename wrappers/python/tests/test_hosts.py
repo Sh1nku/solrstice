@@ -66,6 +66,13 @@ async def test_solr_single_server_works(config: Config):
 
 
 @pytest.mark.asyncio
+async def test_solr_single_server_works_with_string(config: Config):
+    wait_for_solr(config.host, 30)
+    context = SolrServerContext(config.host, config.auth)
+    await get_configs(context)
+
+
+@pytest.mark.asyncio
 async def test_multiple_server_works(config: Config):
     wait_for_solr(config.host, 30)
     context = SolrServerContext(SolrMultipleServerHost([config.host], 5), config.auth)

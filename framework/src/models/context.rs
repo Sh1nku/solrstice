@@ -1,5 +1,6 @@
 use crate::hosts::solr_host::SolrHost;
 use crate::models::auth::SolrAuth;
+use crate::queries::request_builder::LoggingPolicy;
 use std::sync::Arc;
 
 /// A SolrServerContext specifies how to connect to a solr server, and how to authenticate.
@@ -19,6 +20,7 @@ pub struct SolrServerContextBuilder {
     pub(crate) host: Arc<dyn SolrHost + Send + Sync>,
     pub(crate) auth: Option<Arc<dyn SolrAuth + Send + Sync>>,
     pub(crate) client: Option<reqwest::Client>,
+    pub(crate) logging_policy: LoggingPolicy,
 }
 
 impl SolrServerContextBuilder {
@@ -34,6 +36,7 @@ impl SolrServerContextBuilder {
             host: Arc::new(host),
             auth: None,
             client: None,
+            logging_policy: LoggingPolicy::Fast(512),
         }
     }
 
@@ -64,6 +67,24 @@ impl SolrServerContextBuilder {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_client(client).build();
     pub fn with_client(mut self, client: reqwest::Client) -> Self {
         self.client = Some(client);
+        self
+    }
+
+    /// Set a logging policy
+    /// The accepted values are `Logging::Off`, `Logging::Fast(usize)`, `Logging::Pretty(usize)`
+    /// `usize` is the maximum length of the body that will be logged in bytes
+    /// `Pretty` is expensive as it needs deserialize and reserialize the body a second time.
+    /// # Examples
+    /// ```
+    /// use solrstice::models::context::SolrServerContextBuilder;
+    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// use solrstice::models::auth::SolrBasicAuth;
+    /// use solrstice::queries::request_builder::LoggingPolicy;
+    /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
+    ///   .with_logging_policy(LoggingPolicy::Fast(4096))
+    ///   .build();
+    pub fn with_logging_policy(mut self, logging_policy: LoggingPolicy) -> Self {
+        self.logging_policy = logging_policy;
         self
     }
 
@@ -99,6 +120,7 @@ pub struct SolrServerContext {
     pub(crate) host: Arc<dyn SolrHost + Send + Sync>,
     pub(crate) auth: Option<Arc<dyn SolrAuth + Send + Sync>>,
     pub(crate) client: reqwest::Client,
+    pub(crate) logging_policy: LoggingPolicy,
 }
 
 impl From<SolrServerContextBuilder> for SolrServerContext {
@@ -106,7 +128,8 @@ impl From<SolrServerContextBuilder> for SolrServerContext {
         Self {
             host: builder.host,
             auth: builder.auth,
-            client: builder.client.unwrap_or_else(reqwest::Client::new),
+            client: builder.client.unwrap_or_default(),
+            logging_policy: builder.logging_policy,
         }
     }
 }

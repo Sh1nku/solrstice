@@ -24,10 +24,7 @@ class AsyncSolrCloudClient:
         """
         pass
     async def get_configs(self) -> List[str]:
-        """Gets a list of Solr configs on a Solr instance
-
-        :param context: SolrServerRequest context
-        """
+        """Gets a list of Solr configs on a Solr instance"""
     pass
 
     async def config_exists(self, config_name: str) -> bool:
@@ -75,8 +72,6 @@ class AsyncSolrCloudClient:
     async def delete_collection(self, name: str) -> None:
         """
         Delete a config from the Solr server.
-
-        :param context: The Solr server context.
         :param name: The name of the collection to delete.
         """
     async def create_alias(self, name: str, collections: List[str]) -> None:
@@ -144,10 +139,7 @@ class BlockingSolrCloudClient:
         """
         pass
     def get_configs(self) -> List[str]:
-        """Gets a list of Solr configs on a Solr instance
-
-        :param context: SolrServerRequest context
-        """
+        """Gets a list of Solr configs on a Solr instance"""
     pass
 
     def config_exists(self, config_name: str) -> bool:

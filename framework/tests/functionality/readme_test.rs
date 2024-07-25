@@ -4,6 +4,7 @@ use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
 // use solrstice::hosts::solr_server_host::SolrSingleServerHost;
 // use solrstice::models::auth::SolrBasicAuth;
 // use solrstice::models::context::SolrServerContextBuilder;
+use serial_test::parallel;
 use solrstice::models::error::SolrError;
 use solrstice::queries::index::{DeleteQuery, UpdateQuery};
 use solrstice::queries::select::SelectQuery;
@@ -15,6 +16,7 @@ struct TestData {
 }
 
 #[tokio::test]
+#[parallel]
 pub async fn example() -> Result<(), SolrError> {
     let config = BaseTestsBuildup::new().await;
 

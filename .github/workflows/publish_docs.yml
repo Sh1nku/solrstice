@@ -30,11 +30,11 @@ jobs:
           tar -xzf mdbook-v0.4.34-x86_64-unknown-linux-gnu.tar.gz
           mv mdbook /usr/local/bin
       - name: Build Rust documentation
-        working-directory: ./framework/docs
+        working-directory: ./docs
         run: |
           mdbook build
-          mkdir ../../docs
-          mv book/* ../../docs
+          mkdir docs_built
+          mv book/* docs_built
       - uses: actions/setup-python@v4
         with:
           python-version: 3.8
@@ -43,12 +43,12 @@ jobs:
         run: |
           pip install -r requirements-dev.txt
           ./generate_documentation.py
-          mkdir ../../docs/python
-          mv docs/* ../../docs/python
+          mkdir ../../docs/docs_built/python
+          mv docs/* ../../docs/docs_built/python
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'docs/'
+          path: 'docs/docs_built/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

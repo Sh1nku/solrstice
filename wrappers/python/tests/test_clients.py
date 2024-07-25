@@ -1,11 +1,10 @@
 import asyncio
 
 import pytest
+from helpers import Config, create_config
 from typing_extensions import Optional
 
-from helpers import Config, create_config
 from solrstice.auth import SolrAuth, SolrBasicAuth
-
 from solrstice.clients import AsyncSolrCloudClient, BlockingSolrCloudClient
 from solrstice.hosts import SolrServerContext, SolrSingleServerHost
 from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
@@ -107,13 +106,15 @@ async def test_subclassing_client_works():
             return super().__new__(cls, context=context)
 
         def test_method(self) -> str:
-            return 'test'
+            return "test"
 
     name = "SubclassingClientWorks"
 
     config = create_config()
 
-    client = SolrClient(config.solr_host, SolrBasicAuth(config.solr_username, config.solr_password))
+    client = SolrClient(
+        config.solr_host, SolrBasicAuth(config.solr_username, config.solr_password)
+    )
 
     try:
         await client.delete_config(name)
@@ -121,6 +122,6 @@ async def test_subclassing_client_works():
         pass
 
     await client.upload_config(name, config.config_path)
-    assert client.test_method() == 'test'
+    assert client.test_method() == "test"
 
     await client.delete_config(name)

@@ -1,8 +1,10 @@
 use crate::structures::FunctionalityTestsBuildup;
+use serial_test::parallel;
 use solrstice::queries::config::get_configs_blocking;
 use std::thread;
 
 #[test]
+#[parallel]
 fn blocking_works_when_simultaneous_connections_multiple_threads() {
     let runtime = tokio::runtime::Runtime::new().unwrap();
     let config = runtime.block_on(async {

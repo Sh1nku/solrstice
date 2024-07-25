@@ -1,5 +1,5 @@
 use crate::models::context::SolrServerContext;
-use crate::models::error::{try_solr_error, SolrError};
+use crate::models::error::SolrError;
 use crate::queries::request_builder::SolrRequestBuilder;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
@@ -63,13 +63,11 @@ pub async fn upload_config<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<
     let mut vec = Vec::new();
     outfile.read_to_end(&mut vec)?;
 
-    let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+    let _ = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
         .with_query_params(query_params.as_ref())
         .with_headers(vec![("Content-Type", "application/octet-stream")])
         .send_post_with_body(vec)
         .await?;
-
-    try_solr_error(&json)?;
     Ok(())
 }
 

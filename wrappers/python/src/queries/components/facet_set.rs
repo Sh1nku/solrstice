@@ -194,6 +194,7 @@ pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 #[pymethods]
 impl FieldFacetEntryWrapper {
     #[new]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         field: String,
         prefix: Option<String>,

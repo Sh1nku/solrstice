@@ -1,4 +1,5 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
+use serial_test::parallel;
 use solrstice::models::error::SolrError;
 use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponent};
 use solrstice::queries::index::UpdateQuery;
@@ -6,6 +7,7 @@ use solrstice::queries::select::SelectQuery;
 use std::collections::HashMap;
 
 #[tokio::test]
+#[parallel]
 async fn group_fields() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupBasic")
         .await
@@ -38,6 +40,7 @@ async fn group_fields() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn group_queries() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupQuery")
         .await
@@ -75,6 +78,7 @@ async fn group_queries() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn group_n_groups() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupNGroups")
         .await
@@ -107,6 +111,7 @@ async fn group_n_groups() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn group_main() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupMain")
         .await
@@ -134,6 +139,7 @@ async fn group_main() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn group_main_false() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupMainFalse")
         .await
@@ -159,6 +165,7 @@ async fn group_main_false() -> Result<(), SolrError> {
 }
 
 #[tokio::test]
+#[parallel]
 async fn group_simple() -> Result<(), SolrError> {
     let config = FunctionalityTestsBuildup::build_up("GroupSimple")
         .await
