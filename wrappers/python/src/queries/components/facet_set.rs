@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use solrstice::queries::components::facet_set::{
+use solrstice::{
     FacetSetComponent, FieldFacetComponent, FieldFacetEntry, FieldFacetMethod, FieldFacetSort,
     PivotFacetComponent,
 };

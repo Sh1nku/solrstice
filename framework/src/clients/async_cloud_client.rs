@@ -1,5 +1,5 @@
+use crate::error::Error;
 use crate::models::context::SolrServerContext;
-use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
 use crate::queries::alias::{alias_exists, create_alias, delete_alias, get_aliases};
 use crate::queries::collection::{
@@ -15,10 +15,7 @@ use std::path::Path;
 /// Async client for SolrCloud
 /// # Examples
 /// ```rust
-/// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::context::SolrServerContextBuilder;
-///
+/// use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
 /// ```
@@ -32,10 +29,7 @@ impl AsyncSolrCloudClient {
     /// Create a new instance of AsyncSolrCloudClient
     /// # Examples
     /// ```rust
-    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::context::SolrServerContextBuilder;
-    ///
+    /// use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
     /// ```
@@ -49,9 +43,7 @@ impl AsyncSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -63,7 +55,7 @@ impl AsyncSolrCloudClient {
         &self,
         name: N,
         path: P,
-    ) -> Result<(), SolrError> {
+    ) -> Result<(), Error> {
         upload_config(&self.context, name, path).await
     }
 
@@ -71,9 +63,9 @@ impl AsyncSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -81,7 +73,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_configs(&self) -> Result<Vec<String>, SolrError> {
+    pub async fn get_configs(&self) -> Result<Vec<String>, Error> {
         get_configs(&self.context).await
     }
 
@@ -89,9 +81,9 @@ impl AsyncSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -99,7 +91,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub async fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         config_exists(&self.context, name).await
     }
 
@@ -107,9 +99,9 @@ impl AsyncSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -117,16 +109,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_config<N: AsRef<str>>(&self, name: N) -> Result<(), SolrError> {
+    pub async fn delete_config<N: AsRef<str>>(&self, name: N) -> Result<(), Error> {
         delete_config(&self.context, name).await
     }
 
     /// Create a collection in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -140,16 +132,16 @@ impl AsyncSolrCloudClient {
         config: S,
         shards: usize,
         replication_factor: usize,
-    ) -> Result<(), SolrError> {
+    ) -> Result<(), Error> {
         create_collection(&self.context, name, config, shards, replication_factor).await
     }
 
     /// Get collections from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -157,16 +149,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_collections(&self) -> Result<Vec<String>, SolrError> {
+    pub async fn get_collections(&self) -> Result<Vec<String>, Error> {
         get_collections(&self.context).await
     }
 
     /// Check if a collection exists in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -174,16 +166,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub async fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         collection_exists(&self.context, name).await
     }
 
     /// Delete a collection from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -191,16 +183,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_collection<N: AsRef<str>>(&self, name: N) -> Result<(), SolrError> {
+    pub async fn delete_collection<N: AsRef<str>>(&self, name: N) -> Result<(), Error> {
         delete_collection(&self.context, name).await
     }
 
     /// Create an alias in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -212,7 +204,7 @@ impl AsyncSolrCloudClient {
         &self,
         alias: S,
         collections: &[S],
-    ) -> Result<(), SolrError> {
+    ) -> Result<(), Error> {
         create_alias(&self.context, alias, collections).await
     }
 
@@ -220,9 +212,9 @@ impl AsyncSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::collections::HashMap;
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -230,16 +222,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn get_aliases(&self) -> Result<HashMap<String, Vec<String>>, SolrError> {
+    pub async fn get_aliases(&self) -> Result<HashMap<String, Vec<String>>, Error> {
         get_aliases(&self.context).await
     }
 
     /// Check if an alias exists in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -247,16 +239,16 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn alias_exists<N: AsRef<str>>(&self, name: N) -> Result<bool, SolrError> {
+    pub async fn alias_exists<N: AsRef<str>>(&self, name: N) -> Result<bool, Error> {
         alias_exists(&self.context, name).await
     }
 
     /// Delete an alias from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -264,17 +256,17 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
+    pub async fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), Error> {
         delete_alias(&self.context, name).await
     }
 
     /// Index some data into SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQuery;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::UpdateQuery;
     /// # use serde::Serialize;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
@@ -291,7 +283,7 @@ impl AsyncSolrCloudClient {
         builder: B,
         collection: C,
         data: &[T],
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder
             .as_ref()
             .execute(&self.context, collection, data)
@@ -301,10 +293,10 @@ impl AsyncSolrCloudClient {
     /// Select some data from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -316,18 +308,18 @@ impl AsyncSolrCloudClient {
         &self,
         builder: B,
         collection: C,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute(&self.context, collection).await
     }
 
     /// Delete some data from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQuery;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::DeleteQuery;
+    /// # use solrstice::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -339,7 +331,7 @@ impl AsyncSolrCloudClient {
         &self,
         builder: B,
         collection: C,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute(&self.context, collection).await
     }
 }

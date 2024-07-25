@@ -19,13 +19,13 @@ It also provides a wrapper to python.
 Upload a config, create a collection, index a document, select it, and delete it.
 ```rust
 use serde::{Deserialize, Serialize};
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-use solrstice::models::auth::SolrBasicAuth;
-use solrstice::models::context::SolrServerContextBuilder;
+use solrstice::AsyncSolrCloudClient;
+use solrstice::SolrSingleServerHost;
+use solrstice::SolrBasicAuth;
+use solrstice::SolrServerContextBuilder;
 use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-use solrstice::queries::select::SelectQuery;
+use solrstice::{DeleteQuery, UpdateQuery};
+use solrstice::SelectQuery;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]

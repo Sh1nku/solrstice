@@ -1,15 +1,15 @@
 use crate::structures::{get_test_data, BaseTestsBuildup, City, FunctionalityTestsBuildup};
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
 use solrstice::queries::collection::{create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-use solrstice::queries::select::SelectQuery;
+use solrstice::Error;
+use solrstice::SelectQuery;
+use solrstice::{DeleteQuery, UpdateQuery};
 use std::path::Path;
 
 #[tokio::test]
 #[parallel]
-async fn index_indexes_documents() -> Result<(), SolrError> {
+async fn index_indexes_documents() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     let config_name = "IndexConfig".to_string();
     let collection_name = "IndexCollection".to_string();
@@ -42,7 +42,7 @@ async fn index_indexes_documents() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn index_indexes_correct_documents() -> Result<(), SolrError> {
+async fn index_indexes_correct_documents() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     let config_name = "IndexCorrectConfig".to_string();
     let collection_name = "IndexCorrectCollection".to_string();

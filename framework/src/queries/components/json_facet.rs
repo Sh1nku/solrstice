@@ -1,16 +1,12 @@
-use serde::{Deserialize, Serialize, Serializer};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize, Serializer};
 
 /// Get self defined facets.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet};
-/// # use solrstice::queries::select::SelectQuery;
+/// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -51,13 +47,8 @@ impl JsonFacetComponent {
     /// Create a new instance of [JsonFacetComponent].
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -126,14 +117,8 @@ pub enum JsonFacetType {
 /// A facet that counts the number of documents that match a query
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::models::json_facet::SolrJsonFacetResponse;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -149,7 +134,7 @@ pub enum JsonFacetType {
 ///     .ok_or("No age facet")?;
 /// let buckets = age
 ///     .get_buckets()
-///     .collect::<Vec<&SolrJsonFacetResponse>>();
+///     .collect::<Vec<_>>();
 /// assert_eq!(buckets.len(), 3);
 /// # Ok(())
 /// # }
@@ -180,14 +165,8 @@ impl JsonTermsFacet {
     /// A facet that counts the number of documents that match a query
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::models::json_facet::SolrJsonFacetResponse;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -203,7 +182,7 @@ impl JsonTermsFacet {
     ///     .ok_or("No age facet")?;
     /// let buckets = age
     ///     .get_buckets()
-    ///     .collect::<Vec<&SolrJsonFacetResponse>>();
+    ///     .collect::<Vec<_>>();
     /// assert_eq!(buckets.len(), 3);
     /// # Ok(())
     /// # }
@@ -260,13 +239,8 @@ impl JsonTermsFacet {
 /// A facet that does a query and returns the number of documents that match
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet};
-/// # use solrstice::queries::select::SelectQuery;
+/// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -313,13 +287,8 @@ impl JsonQueryFacet {
     /// Create a new query facet
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -402,13 +371,9 @@ impl JsonQueryFacet {
 /// A facet that does a query and gets the number of results
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet};
-/// # use solrstice::queries::select::SelectQuery;
+/// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
+///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -440,13 +405,8 @@ impl JsonStatFacet {
     /// Create a new JsonStatFacet
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, JsonStatFacet, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);

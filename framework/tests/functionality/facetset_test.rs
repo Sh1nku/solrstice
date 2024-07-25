@@ -1,15 +1,13 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
-use solrstice::queries::components::facet_set::{
-    FacetSetComponent, FieldFacetComponent, FieldFacetEntry, PivotFacetComponent,
-};
-use solrstice::queries::index::UpdateQuery;
-use solrstice::queries::select::SelectQuery;
+use solrstice::Error;
+use solrstice::SelectQuery;
+use solrstice::UpdateQuery;
+use solrstice::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry, PivotFacetComponent};
 
 #[tokio::test]
 #[parallel]
-pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
+pub async fn test_facet_pivot_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("FacetPivot")
         .await
         .unwrap();
@@ -48,7 +46,7 @@ pub async fn test_facet_pivot_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_facet_query_works() -> Result<(), SolrError> {
+pub async fn test_facet_query_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("FacetQuery")
         .await
         .unwrap();
@@ -73,7 +71,7 @@ pub async fn test_facet_query_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_facet_field_works() -> Result<(), SolrError> {
+pub async fn test_facet_field_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("FacetField")
         .await
         .unwrap();
@@ -100,7 +98,7 @@ pub async fn test_facet_field_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
+pub async fn test_facet_field_exclude_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("FacetFieldExclude")
         .await
         .unwrap();
@@ -130,7 +128,7 @@ pub async fn test_facet_field_exclude_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_facet_field_exclude_works_missing() -> Result<(), SolrError> {
+pub async fn test_facet_field_exclude_works_missing() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("FacetFieldMissing")
         .await
         .unwrap();

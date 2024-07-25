@@ -5,10 +5,10 @@ use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pythonize::depythonize_bound;
 use serde::{Deserialize, Serialize};
-use solrstice::models::commit_type::CommitType;
-use solrstice::models::context::SolrServerContext;
-use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+use solrstice::CommitType;
+use solrstice::Error;
+use solrstice::SolrServerContext;
+use solrstice::{DeleteQuery, UpdateQuery};
 
 #[pyclass(name = "CommitType")]
 #[derive(Clone, Copy, Serialize, Deserialize)]
@@ -84,7 +84,7 @@ impl UpdateQueryWrapper {
         match state.extract::<&PyBytes>(py) {
             Ok(s) => {
                 *self = serde_json::from_slice(s.as_bytes())
-                    .map_err(SolrError::from)
+                    .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
@@ -96,7 +96,7 @@ impl UpdateQueryWrapper {
         Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
-                .map_err(SolrError::from)
+                .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
         )
@@ -189,7 +189,7 @@ impl DeleteQueryWrapper {
         match state.extract::<&PyBytes>(py) {
             Ok(s) => {
                 *self = serde_json::from_slice(s.as_bytes())
-                    .map_err(SolrError::from)
+                    .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
@@ -201,7 +201,7 @@ impl DeleteQueryWrapper {
         Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
-                .map_err(SolrError::from)
+                .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
         )

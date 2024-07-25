@@ -1,13 +1,13 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup, Population};
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
-use solrstice::queries::def_type::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery};
-use solrstice::queries::index::UpdateQuery;
-use solrstice::queries::select::SelectQuery;
+use solrstice::Error;
+use solrstice::SelectQuery;
+use solrstice::UpdateQuery;
+use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery};
 
 #[tokio::test]
 #[parallel]
-pub async fn test_dismax_query_parser() -> Result<(), SolrError> {
+pub async fn test_dismax_query_parser() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("Dismax").await.unwrap();
     let update = UpdateQuery::new();
     update
@@ -33,7 +33,7 @@ pub async fn test_dismax_query_parser() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_edismax_query_parser() -> Result<(), SolrError> {
+pub async fn test_edismax_query_parser() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("Edismax")
         .await
         .unwrap();
@@ -62,7 +62,7 @@ pub async fn test_edismax_query_parser() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_lucene_query_parser() -> Result<(), SolrError> {
+pub async fn test_lucene_query_parser() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("Lucene").await.unwrap();
     let update = UpdateQuery::new();
     update

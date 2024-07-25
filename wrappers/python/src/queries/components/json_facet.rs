@@ -1,7 +1,5 @@
 use pyo3::prelude::*;
-use solrstice::queries::components::json_facet::{
-    JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonStatFacet, JsonTermsFacet,
-};
+use solrstice::{JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]

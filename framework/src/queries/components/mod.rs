@@ -1,10 +1,10 @@
 //! Components for queries.
 
 /// Grouping component
-pub mod grouping;
+pub(crate) mod grouping;
 
 /// Facet count component
-pub mod facet_set;
+pub(crate) mod facet_set;
 
 /// Json facet component
-pub mod json_facet;
+pub(crate) mod json_facet;

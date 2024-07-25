@@ -22,13 +22,13 @@ Upload a config, create a collection, index a document, select it, and delete it
 ### Rust
 ```rust
 use serde::{Deserialize, Serialize};
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-use solrstice::models::auth::SolrBasicAuth;
-use solrstice::models::context::SolrServerContextBuilder;
-use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-use solrstice::queries::select::SelectQuery;
+use solrstice::AsyncSolrCloudClient;
+use solrstice::SolrSingleServerHost;
+use solrstice::SolrBasicAuth;
+use solrstice::SolrServerContextBuilder;
+use solrstice::Error;
+use solrstice::{DeleteQuery, UpdateQuery};
+use solrstice::SelectQuery;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,7 +37,7 @@ struct TestData {
 }
 
 #[tokio::test]
-pub async fn example() -> Result<(), SolrError> {
+pub async fn example() -> Result<(), Error> {
   
     //Create a solr client. You can also use a list of zookeeper hosts instead of a single server.
     let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))

@@ -1,7 +1,7 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use pyo3::prelude::*;
-use solrstice::models::context::SolrServerContext;
+use solrstice::SolrServerContext;
 use solrstice::queries::alias::{
     alias_exists as alias_exists_rs, create_alias as create_alias_rs,
     delete_alias as delete_alias_rs, get_aliases as get_aliases_rs,

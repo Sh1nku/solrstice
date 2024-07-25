@@ -5,7 +5,7 @@ use crate::queries::components::json_facet::{
 };
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::json_facet::SolrJsonFacetResponse;
+use solrstice::models::SolrJsonFacetResponse;
 use std::collections::HashMap;
 
 #[pymodule]

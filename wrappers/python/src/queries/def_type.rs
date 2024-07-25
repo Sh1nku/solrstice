@@ -1,8 +1,6 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::queries::def_type::{
-    DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator,
-};
+use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator};
 
 #[pymodule]
 pub fn def_type(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {

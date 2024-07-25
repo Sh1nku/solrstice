@@ -5,10 +5,10 @@ use crate::models::context::{
 use crate::models::error::PyErrWrapper;
 use async_trait::async_trait;
 use pyo3::prelude::*;
-use solrstice::hosts::solr_host::SolrHost;
-use solrstice::hosts::solr_server_host::{SolrMultipleServerHost, SolrSingleServerHost};
-use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
-use solrstice::models::error::SolrError;
+use solrstice::Error;
+use solrstice::SolrHost;
+use solrstice::ZookeeperEnsembleHostConnector;
+use solrstice::{SolrMultipleServerHost, SolrSingleServerHost};
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
@@ -37,7 +37,7 @@ pub struct SolrHostWrapper {
 
 #[async_trait]
 impl SolrHost for SolrHostWrapper {
-    async fn get_solr_node(&self) -> Result<Cow<str>, SolrError> {
+    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         self.solr_host.get_solr_node().await
     }
 }

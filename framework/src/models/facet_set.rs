@@ -1,4 +1,4 @@
-use crate::models::error::SolrError;
+use crate::error::Error;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -17,7 +17,7 @@ pub struct SolrFacetSetResult {
     fields: HashMap<String, Vec<SolrFieldFacetResult>>,
 }
 
-pub fn fields_deserializer<'de, D>(
+fn fields_deserializer<'de, D>(
     deserializer: D,
 ) -> Result<HashMap<String, Vec<SolrFieldFacetResult>>, D::Error>
 where
@@ -94,7 +94,7 @@ pub struct SolrPivotFacetResult {
 }
 
 impl SolrPivotFacetResult {
-    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
+    pub fn get_value<T: DeserializeOwned>(&self) -> Result<T, Error> {
         Ok(serde_json::from_value::<T>(self.value.clone())?)
     }
 
@@ -122,7 +122,7 @@ pub struct SolrFieldFacetResult {
 }
 
 impl SolrFieldFacetResult {
-    pub fn get_key<T: DeserializeOwned>(&self) -> Result<T, SolrError> {
+    pub fn get_key<T: DeserializeOwned>(&self) -> Result<T, Error> {
         Ok(serde_json::from_value::<T>(self.key.clone())?)
     }
 

@@ -1,7 +1,7 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use pyo3::prelude::*;
-use solrstice::models::context::SolrServerContext;
+use solrstice::SolrServerContext;
 use solrstice::queries::collection::{
     collection_exists as collection_exists_rs, create_collection as create_collection_rs,
     delete_collection as delete_collection_rs, get_collections as get_collections_rs,

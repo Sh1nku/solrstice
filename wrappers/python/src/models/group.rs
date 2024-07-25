@@ -3,7 +3,7 @@ use crate::models::response::SolrDocsResponseWrapper;
 use crate::queries::components::grouping::{GroupFormattingWrapper, GroupingComponentWrapper};
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::group::{SolrGroupFieldResult, SolrGroupResult};
+use solrstice::models::{SolrGroupFieldResult, SolrGroupResult};
 
 #[pymodule]
 pub fn group(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {

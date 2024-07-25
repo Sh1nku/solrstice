@@ -3,7 +3,7 @@ use thiserror::Error;
 
 /// Main error type for Solrstice
 #[derive(Error, Debug)]
-pub enum SolrError {
+pub enum Error {
     #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
     #[error(transparent)]
@@ -30,14 +30,14 @@ pub enum SolrError {
     Unknown(String),
 }
 
-impl From<&str> for SolrError {
+impl From<&str> for Error {
     fn from(err: &str) -> Self {
-        SolrError::Unknown(err.to_string())
+        Error::Unknown(err.to_string())
     }
 }
 
 /// Helper function to check if a SolrResponse contains an error
-pub fn try_solr_error(response: &SolrResponse) -> Result<(), SolrError> {
+pub fn try_solr_error(response: &SolrResponse) -> Result<(), Error> {
     match &response.error {
         None => Ok(()),
         Some(err) => {
@@ -47,7 +47,7 @@ pub fn try_solr_error(response: &SolrResponse) -> Result<(), SolrError> {
             } else if err.trace.is_some() {
                 msg = err.trace.clone().unwrap();
             }
-            Err(SolrError::SolrResponseError {
+            Err(Error::SolrResponseError {
                 code: err.code,
                 msg,
             })

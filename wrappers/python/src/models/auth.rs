@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use solrstice::models::auth::{SolrAuth, SolrBasicAuth};
+use solrstice::{SolrAuth, SolrBasicAuth};
 use std::sync::Arc;
 
 #[pymodule]

@@ -1,7 +1,7 @@
 use crate::structures::BaseTestsBuildup;
 use serial_test::parallel;
-use solrstice::hosts::solr_host::SolrHost;
-use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
+use solrstice::SolrHost;
+use solrstice::ZookeeperEnsembleHostConnector;
 use std::time::Duration;
 use std::vec;
 

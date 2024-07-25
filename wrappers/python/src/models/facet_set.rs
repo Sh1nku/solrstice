@@ -5,9 +5,7 @@ use crate::queries::components::facet_set::{
 };
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::facet_set::{
-    SolrFacetSetResult, SolrFieldFacetResult, SolrPivotFacetResult,
-};
+use solrstice::models::{SolrFacetSetResult, SolrFieldFacetResult, SolrPivotFacetResult};
 use std::collections::HashMap;
 
 #[pymodule]

@@ -10,7 +10,7 @@ dyn_clone::clone_trait_object!(SolrAuth);
 /// Basic Authentication
 /// # Examples
 /// ```
-/// use solrstice::models::auth::SolrBasicAuth;
+/// use solrstice::SolrBasicAuth;
 /// let auth = SolrBasicAuth::new("solr", Some("SolrRocks"));
 #[derive(Clone)]
 pub struct SolrBasicAuth {
@@ -26,7 +26,7 @@ impl SolrAuth for SolrBasicAuth {
 
 impl SolrBasicAuth {
     /// Create a new Basic Authentication
-    /// use solrstice::models::auth::SolrBasicAuth;
+    /// use solrstice::SolrBasicAuth;
     /// let auth = SolrBasicAuth::new("solr", Some("SolrRocks"));
     pub fn new<S: Into<String>, O: Into<Option<S>>>(username: S, password: O) -> SolrBasicAuth {
         SolrBasicAuth {

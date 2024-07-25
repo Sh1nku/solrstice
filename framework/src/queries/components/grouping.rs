@@ -19,11 +19,8 @@ impl fmt::Display for GroupFormatting {
 /// Group documents by a field or query.
 /// # Examples
 /// ```no_run
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// use solrstice::queries::components::grouping::GroupingComponent;
-/// use solrstice::queries::select::SelectQuery;
+/// use solrstice::{GroupingComponent, SelectQuery, SolrBasicAuth, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let response = SelectQuery::new()
@@ -71,11 +68,8 @@ impl GroupingComponent {
     /// Create a new GroupingComponentBuilder.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{GroupingComponent, SelectQuery, SolrBasicAuth, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let response = SelectQuery::new()
@@ -112,7 +106,7 @@ impl GroupingComponent {
     /// Fields to group by.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().fields(["age"]);
     /// ```
     pub fn fields<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
@@ -128,7 +122,7 @@ impl GroupingComponent {
     /// Queries to group by.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().queries(["age:[0 TO 59]", "age:[60 TO *]"]);
     /// ```
     pub fn queries<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
@@ -144,7 +138,7 @@ impl GroupingComponent {
     /// Maximum number of documents per group.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().limit(10);
     /// ```
     pub fn limit<O: Into<Option<usize>>>(mut self, limit: O) -> Self {
@@ -155,7 +149,7 @@ impl GroupingComponent {
     /// Initial offset
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().limit(10).offset(10);
     /// ```
     pub fn offset<O: Into<Option<usize>>>(mut self, offset: O) -> Self {
@@ -166,7 +160,7 @@ impl GroupingComponent {
     /// How to sort the documents in the groups.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().sort(["age asc"]);
     /// ```
     pub fn sort<S: Into<String>, I: IntoIterator<Item = S>, O: Into<Option<I>>>(
@@ -182,7 +176,7 @@ impl GroupingComponent {
     /// How to format the groups.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::{GroupingComponent, GroupFormatting};
+    /// use solrstice::{GroupingComponent, GroupFormatting};
     /// GroupingComponent::new().format(GroupFormatting::Simple);
     /// ```
     pub fn format<O: Into<Option<GroupFormatting>>>(mut self, format: O) -> Self {
@@ -193,7 +187,7 @@ impl GroupingComponent {
     /// Put the results in the main result set.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().main(true);
     /// ```
     pub fn main<O: Into<Option<bool>>>(mut self, main: O) -> Self {
@@ -204,7 +198,7 @@ impl GroupingComponent {
     /// Include the number of groups that have matched the query.
     /// # Examples
     /// ```rust
-    /// use solrstice::queries::components::grouping::GroupingComponent;
+    /// use solrstice::GroupingComponent;
     /// GroupingComponent::new().n_groups(true);
     /// ```
     pub fn n_groups<O: Into<Option<bool>>>(mut self, n_groups: O) -> Self {

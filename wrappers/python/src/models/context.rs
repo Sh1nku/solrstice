@@ -2,8 +2,8 @@ use crate::hosts::{SolrHostWrapper, SolrSingleServerHostWrapper};
 use crate::models::auth::SolrAuthWrapper;
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::models::context::{SolrServerContext, SolrServerContextBuilder};
-use solrstice::queries::request_builder::LoggingPolicy;
+use solrstice::LoggingPolicy;
+use solrstice::{SolrServerContext, SolrServerContextBuilder};
 
 #[derive(FromPyObject)]
 pub enum SolrHostUnion {

@@ -3,13 +3,13 @@
 //! # Examples
 //! ```no_run
 //! use serde::{Deserialize, Serialize};
-//! use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-//! use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-//! use solrstice::models::auth::SolrBasicAuth;
-//! use solrstice::models::context::{SolrServerContextBuilder};
-//! use solrstice::models::error::SolrError;
-//! use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-//! use solrstice::queries::select::SelectQuery;
+//! use solrstice::AsyncSolrCloudClient;
+//! use solrstice::SolrSingleServerHost;
+//! use solrstice::SolrBasicAuth;
+//! use solrstice::{SolrServerContextBuilder};
+//! use solrstice::Error;
+//! use solrstice::{DeleteQuery, UpdateQuery};
+//! use solrstice::SelectQuery;
 //! use std::path::Path;
 //!
 //! #[derive(Serialize, Deserialize, Debug)]
@@ -18,7 +18,7 @@
 //! }
 //!
 //! #[tokio::test]
-//! pub async fn example() -> Result<(), SolrError> {
+//! pub async fn example() -> Result<(), Error> {
 //!
 //!     //Create a solr client. You can also use a list of zookeeper hosts instead of a single server.
 //!     let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
@@ -70,16 +70,36 @@
 //! ```
 
 /// Solr Clients
-pub mod clients;
+mod clients;
+pub use clients::async_cloud_client::*;
+#[cfg(feature = "blocking")]
+pub use clients::blocking_cloud_client::*;
+
 /// Host types
-pub mod hosts;
+mod hosts;
+pub use crate::hosts::solr_host::*;
+pub use crate::hosts::solr_server_host::*;
+pub use crate::hosts::zookeeper_host::*;
 /// Model structs
 pub mod models;
+pub use models::auth::*;
+pub use models::commit_type::*;
+pub use models::context::*;
 /// Query types
 pub mod queries;
+pub use queries::components::facet_set::*;
+pub use queries::components::grouping::*;
+pub use queries::components::json_facet::*;
+pub use queries::def_type::*;
+pub use queries::index::*;
+pub use queries::request_builder::*;
+pub use queries::select::*;
 #[cfg(feature = "blocking")]
 /// Tokio Runtime for blocking usage
-pub mod runtime;
+mod runtime;
 
 #[cfg(doctest)]
 pub mod docs;
+/// Error types for the library.
+pub(crate) mod error;
+pub use error::Error;

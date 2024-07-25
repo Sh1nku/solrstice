@@ -4,7 +4,7 @@ use crate::models::group::{SolrGroupFieldResultWrapper, SolrGroupResultWrapper};
 use crate::models::json_facet::SolrJsonFacetResponseWrapper;
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::response::{SolrDocsResponse, SolrResponse};
+use solrstice::models::{SolrDocsResponse, SolrResponse};
 use std::collections::HashMap;
 
 #[pymodule]

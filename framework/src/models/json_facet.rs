@@ -5,13 +5,7 @@ use std::collections::HashMap;
 /// Get self defined facets.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::components::json_facet::{JsonFacetComponent, JsonQueryFacet};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, JsonFacetComponent, JsonQueryFacet, SelectQuery, SolrServerContextBuilder, SolrSingleServerHost};
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
