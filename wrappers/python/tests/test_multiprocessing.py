@@ -6,10 +6,10 @@ from typing import Optional
 import pytest
 from helpers import Config, create_config
 
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import BlockingSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import UpdateQuery
+from solrstice import SolrBasicAuth
+from solrstice import BlockingSolrCloudClient
+from solrstice import SolrServerContext, SolrSingleServerHost
+from solrstice import UpdateQuery
 
 
 @pytest.fixture()

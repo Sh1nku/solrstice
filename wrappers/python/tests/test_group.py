@@ -8,8 +8,8 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.group import GroupingComponent
-from solrstice.queries import SelectQuery
+from solrstice import GroupingComponent
+from solrstice import SelectQuery
 
 
 @pytest.fixture()

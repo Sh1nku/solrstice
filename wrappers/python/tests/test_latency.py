@@ -7,9 +7,9 @@ from typing import Optional
 import pytest
 from helpers import Config, create_config
 
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient, BlockingSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
+from solrstice import SolrBasicAuth
+from solrstice import AsyncSolrCloudClient, BlockingSolrCloudClient
+from solrstice import SolrServerContext, SolrSingleServerHost
 
 
 @pytest.fixture()
@@ -67,7 +67,7 @@ def get_configs_blocking(host: str, username: Optional[str], password: Optional[
 
 
 async def get_configs_async(
-    host: str, username: Optional[str], password: Optional[str]
+        host: str, username: Optional[str], password: Optional[str]
 ):
     auth = None if not username else SolrBasicAuth(username, password)
     client = AsyncSolrCloudClient(SolrServerContext(SolrSingleServerHost(host), auth))

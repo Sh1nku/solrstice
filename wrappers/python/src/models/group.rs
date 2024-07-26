@@ -1,21 +1,11 @@
 use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrDocsResponseWrapper;
-use crate::queries::components::grouping::{GroupFormattingWrapper, GroupingComponentWrapper};
 use pyo3::prelude::*;
 use pythonize::pythonize;
 use solrstice::models::{SolrGroupFieldResult, SolrGroupResult};
 
-#[pymodule]
-pub fn group(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<SolrGroupResultWrapper>()?;
-    m.add_class::<SolrGroupFieldResultWrapper>()?;
-    m.add_class::<GroupFormattingWrapper>()?;
-    m.add_class::<GroupingComponentWrapper>()?;
-    Ok(())
-}
-
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupResult", module = "solrstice.group", subclass)]
+#[pyclass(name = "SolrGroupResult", module = "solrstice.models", subclass)]
 pub struct SolrGroupResultWrapper(SolrGroupResult);
 
 #[pymethods]
@@ -62,7 +52,7 @@ impl From<SolrGroupResultWrapper> for SolrGroupResult {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.group", subclass)]
+#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.models", subclass)]
 pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
 
 #[pymethods]

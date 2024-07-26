@@ -8,12 +8,9 @@ from urllib.request import urlopen
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient
-from solrstice.collection import create_collection, delete_collection
+from solrstice import SolrBasicAuth, SolrServerContext, AsyncSolrCloudClient, SolrSingleServerHost, UpdateQuery
+from solrstice.collection import delete_collection, create_collection
 from solrstice.config import delete_config, upload_config
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import UpdateQuery
 
 
 @dataclass
@@ -65,7 +62,7 @@ def wait_for_solr(host: str, max_time: int):
     while time.time() < end:
         try:
             with urlopen(
-                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -107,7 +104,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-    context: SolrServerContext, name: str, config_path: str
+        context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)

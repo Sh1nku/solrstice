@@ -1,7 +1,7 @@
 import pickle
 
-from solrstice.group import GroupingComponent
-from solrstice.queries import CommitType, DeleteQuery, SelectQuery, UpdateQuery
+from solrstice import GroupingComponent
+from solrstice import CommitType, DeleteQuery, SelectQuery, UpdateQuery
 
 
 def test_pickle_works_select_query_builder():

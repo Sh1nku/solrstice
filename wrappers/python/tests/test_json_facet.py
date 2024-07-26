@@ -8,13 +8,13 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.json_facet import (
+from solrstice import (
     JsonFacetComponent,
     JsonQueryFacet,
     JsonStatFacet,
     JsonTermsFacet,
 )
-from solrstice.queries import SelectQuery
+from solrstice import SelectQuery
 
 
 @pytest.fixture()

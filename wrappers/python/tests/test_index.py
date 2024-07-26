@@ -7,7 +7,7 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.queries import CommitType, UpdateQuery
+from solrstice import CommitType, UpdateQuery
 
 
 @pytest.fixture()

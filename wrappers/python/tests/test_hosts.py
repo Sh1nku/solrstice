@@ -7,9 +7,9 @@ import pytest
 from dotenv import load_dotenv
 from helpers import wait_for_solr
 
-from solrstice.auth import SolrBasicAuth
+from solrstice import SolrBasicAuth
 from solrstice.config import get_configs, get_configs_blocking
-from solrstice.hosts import (
+from solrstice import (
     SolrMultipleServerHost,
     SolrServerContext,
     SolrSingleServerHost,

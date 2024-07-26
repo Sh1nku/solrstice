@@ -31,10 +31,8 @@ pip install solrstice
 ```python
 import asyncio
 
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
+from solrstice import SolrBasicAuth, SolrServerContext, SolrSingleServerHost, AsyncSolrCloudClient, UpdateQuery,
+    SelectQuery, DeleteQuery
 
 # A SolrServerContext specifies how the library should interact with Solr
 context = SolrServerContext(SolrSingleServerHost('localhost:8983'), SolrBasicAuth('solr', 'SolrRocks'))
@@ -63,10 +61,8 @@ asyncio.run(main())
 ### Blocking
 
 ```python
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import BlockingSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
+from solrstice import SolrBasicAuth, BlockingSolrCloudClient, SolrServerContext, SolrSingleServerHost, DeleteQuery,
+    SelectQuery, UpdateQuery
 
 # A SolrServerContext specifies how the library should interact with Solr
 context = SolrServerContext(SolrSingleServerHost('localhost:8983'), SolrBasicAuth('solr', 'SolrRocks'))

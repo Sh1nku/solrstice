@@ -8,13 +8,13 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice.facet_set import (
+from solrstice import (
     FacetSetComponent,
     FieldFacetComponent,
     FieldFacetEntry,
     PivotFacetComponent,
 )
-from solrstice.queries import SelectQuery
+from solrstice import SelectQuery
 
 
 @pytest.fixture()

@@ -1,6 +1,8 @@
 # v0.5.0
 
 * Add logging of solr requests
+* Move most items into the top level module namespace in both Rust and Python
+* Rename `SolrError` to `Error`
 
 # v0.4.3
 

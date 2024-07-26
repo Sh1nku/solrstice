@@ -16,7 +16,7 @@ use solrstice::JsonFacetComponent;
 use solrstice::SelectQuery;
 use solrstice::SolrServerContext;
 
-#[pyclass(name = "SelectQuery", module = "solrstice.queries", subclass)]
+#[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SelectQueryWrapper(SelectQuery);
 

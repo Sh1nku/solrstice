@@ -4,10 +4,8 @@ import pytest
 from helpers import Config, create_config
 from typing_extensions import Optional
 
-from solrstice.auth import SolrAuth, SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient, BlockingSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
+from solrstice import AsyncSolrCloudClient, UpdateQuery, SelectQuery, DeleteQuery, BlockingSolrCloudClient, \
+    SolrServerContext, SolrSingleServerHost, SolrAuth, SolrBasicAuth
 
 
 @pytest.fixture()

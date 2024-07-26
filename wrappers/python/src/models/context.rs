@@ -11,7 +11,7 @@ pub enum SolrHostUnion {
     String(String),
 }
 
-#[pyclass(name = "SolrServerContext", module = "solrstice.hosts", subclass)]
+#[pyclass(name = "SolrServerContext", module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct SolrServerContextWrapper(SolrServerContext);
 
@@ -52,7 +52,7 @@ impl<'a> From<&'a SolrServerContextWrapper> for &'a SolrServerContext {
     }
 }
 
-#[pyclass(name = "LoggingPolicy", module = "solrstice.hosts", subclass)]
+#[pyclass(name = "LoggingPolicy", module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct LoggingPolicyWrapper(LoggingPolicy);
 
@@ -68,7 +68,7 @@ impl From<LoggingPolicy> for LoggingPolicyWrapper {
     }
 }
 
-#[pyclass(name = "OffLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice.hosts", subclass)]
+#[pyclass(name = "OffLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct OffLoggingPolicyWrapper {}
 
@@ -80,7 +80,7 @@ impl OffLoggingPolicyWrapper {
     }
 }
 
-#[pyclass(name = "FastLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice.hosts", subclass)]
+#[pyclass(name = "FastLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct FastLoggingPolicyWrapper {}
 
@@ -95,7 +95,7 @@ impl FastLoggingPolicyWrapper {
     }
 }
 
-#[pyclass(name = "PrettyLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice.hosts", subclass)]
+#[pyclass(name = "PrettyLoggingPolicy", extends=LoggingPolicyWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct PrettyLoggingPolicyWrapper {}
 
