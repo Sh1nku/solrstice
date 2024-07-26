@@ -29,10 +29,3 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Build Python documentation
-        working-directory: ./wrappers/python
-        run: |
-          pip install -r requirements-dev.txt
-          ./generate_documentation.py
-          mkdir ../../docs/docs_built/python
-          mv docs/* ../../docs/docs_built/python

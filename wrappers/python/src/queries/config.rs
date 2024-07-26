@@ -1,7 +1,6 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use pyo3::prelude::*;
-use solrstice::SolrServerContext;
 use solrstice::queries::config::{
     config_exists as config_exists_rs, delete_config as delete_config_rs,
     get_configs as get_configs_rs, upload_config as upload_config_rs,
@@ -12,6 +11,7 @@ use solrstice::queries::config::{
     get_configs_blocking as get_configs_blocking_rs,
     upload_config_blocking as upload_config_blocking_rs,
 };
+use solrstice::SolrServerContext;
 use std::path::PathBuf;
 
 #[pymodule]

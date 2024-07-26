@@ -85,7 +85,7 @@ class SolrGroupFieldResult:
         :return: Group value
         """
 
-    def get_doc_list(self) -> SolrDocsResponse:
+    def get_doc_list(self) -> "SolrDocsResponse":
         """
         Gets the document response from solr
         :return: Document response
@@ -102,13 +102,13 @@ class SolrGroupResult:
         :return: List of group field results
         """
 
-    def get_query_result(self) -> Optional[SolrDocsResponse]:
+    def get_query_result(self) -> Optional["SolrDocsResponse"]:
         """
         Gets the query result from a group query
         :return: Query result
         """
 
-    def get_simple_result(self) -> Optional[SolrDocsResponse]:
+    def get_simple_result(self) -> Optional["SolrDocsResponse"]:
         """
         Gets the result from a group query where `GroupFormatting.Simple` was used
         :return: Simple result
@@ -177,7 +177,7 @@ class SolrDocsResponse:
 class SolrResponse:
     """The response from a solr query"""
 
-    def get_docs_response(self) -> Optional[SolrDocsResponse]:
+    def get_docs_response(self) -> Optional["SolrDocsResponse"]:
         """Get the response from a solr query"""
 
     def get_groups(self) -> Dict[str, "SolrGroupResult"]:
@@ -191,3 +191,14 @@ class SolrResponse:
 
     def get_json_facets(self) -> Optional["SolrJsonFacetResponse"]:
         """Get json facets"""
+
+__all__ = [
+    "SolrFacetSetResult",
+    "SolrPivotFacetResult",
+    "SolrFieldFacetResult",
+    "SolrGroupFieldResult",
+    "SolrGroupResult",
+    "SolrJsonFacetResponse",
+    "SolrDocsResponse",
+    "SolrResponse",
+]

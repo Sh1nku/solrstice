@@ -3,7 +3,6 @@
 Solrstice is a solr client library written in rust. With this wrapper you can use it in python.
 
 Both asyncio and blocking clients are provided. All apis have type hints.
-Documentation can be found at [sh1nku.github.io/solrstice/python](https://sh1nku.github.io/solrstice/python)
 
 ## Features
 

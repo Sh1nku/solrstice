@@ -6,7 +6,7 @@ Solrstice is a SolrCloud aware client library written in rust.
 It also provides a wrapper to python.
 
 Use the [Rust documentation](https://docs.rs/solrstice) or
-the [Python documentation](https://sh1nku.github.io/solrstice/python) for more information.
+the [Python documentation](https://pypi.org/project/solrstice/) for more information.
 
 ## Features
 
