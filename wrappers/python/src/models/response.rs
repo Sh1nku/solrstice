@@ -1,23 +1,14 @@
 use crate::models::error::PyErrWrapper;
 use crate::models::facet_set::SolrFacetSetResultWrapper;
-use crate::models::group::{SolrGroupFieldResultWrapper, SolrGroupResultWrapper};
+use crate::models::group::SolrGroupResultWrapper;
 use crate::models::json_facet::SolrJsonFacetResponseWrapper;
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::response::{SolrDocsResponse, SolrResponse};
+use solrstice::models::{SolrDocsResponse, SolrResponse};
 use std::collections::HashMap;
 
-#[pymodule]
-pub fn response(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<SolrResponseWrapper>()?;
-    m.add_class::<SolrDocsResponseWrapper>()?;
-    m.add_class::<SolrGroupResultWrapper>()?;
-    m.add_class::<SolrGroupFieldResultWrapper>()?;
-    Ok(())
-}
-
 #[derive(Clone)]
-#[pyclass(name = "SolrDocsResponse", module = "solrstice.response", subclass)]
+#[pyclass(name = "SolrDocsResponse", module = "solrstice.models", subclass)]
 pub struct SolrDocsResponseWrapper(SolrDocsResponse);
 
 impl From<SolrDocsResponse> for SolrDocsResponseWrapper {
@@ -73,7 +64,7 @@ impl SolrDocsResponseWrapper {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrResponse", module = "solrstice.response", subclass)]
+#[pyclass(name = "SolrResponse", module = "solrstice.models", subclass)]
 pub struct SolrResponseWrapper(SolrResponse);
 
 impl From<SolrResponse> for SolrResponseWrapper {

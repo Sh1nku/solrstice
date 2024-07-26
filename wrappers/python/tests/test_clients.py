@@ -1,22 +1,31 @@
 import asyncio
+from typing import Generator
 
 import pytest
-from helpers import Config, create_config
 from typing_extensions import Optional
 
-from solrstice.auth import SolrAuth, SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient, BlockingSolrCloudClient
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import DeleteQuery, SelectQuery, UpdateQuery
+from solrstice import (
+    AsyncSolrCloudClient,
+    BlockingSolrCloudClient,
+    DeleteQuery,
+    SelectQuery,
+    SolrAuth,
+    SolrBasicAuth,
+    SolrServerContext,
+    SolrSingleServerHost,
+    UpdateQuery,
+)
+
+from .helpers import Config, create_config
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_async_client_works(config: Config):
+async def test_async_client_works(config: Config) -> None:
     name = "AsyncClientWorks"
 
     client = AsyncSolrCloudClient(config.context)
@@ -34,18 +43,20 @@ async def test_async_client_works(config: Config):
     await client.index(UpdateQuery(), name, [{"id": "example_document"}])
     response = await client.select(SelectQuery(fq=["id:example_document"]), name)
     docs = response.get_docs_response()
+    assert docs is not None
     assert docs.get_num_found() == 1
 
     await client.delete(DeleteQuery(ids=["example_document"]), name)
     response = await client.select(SelectQuery(fq=["id:example_document"]), name)
     docs = response.get_docs_response()
+    assert docs is not None
     assert docs.get_num_found() == 0
 
     await client.delete_collection(name)
     await client.delete_config(name)
 
 
-def test_blocking_client_works(config: Config):
+def test_blocking_client_works(config: Config) -> None:
     name = "BlockingClientWorks"
 
     client = BlockingSolrCloudClient(config.context)
@@ -63,11 +74,13 @@ def test_blocking_client_works(config: Config):
     client.index(UpdateQuery(), name, [{"id": "example_document"}])
     response = client.select(SelectQuery(fq=["id:example_document"]), name)
     docs = response.get_docs_response()
+    assert docs is not None
     assert docs.get_num_found() == 1
 
     client.delete(DeleteQuery(ids=["example_document"]), name)
     response = client.select(SelectQuery(fq=["id:example_document"]), name)
     docs = response.get_docs_response()
+    assert docs is not None
     assert docs.get_num_found() == 0
 
     client.delete_collection(name)
@@ -75,7 +88,7 @@ def test_blocking_client_works(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_multiple_clients_works():
+async def test_multiple_clients_works() -> None:
     name = "MultipleClientWorks"
 
     config_1 = create_config()
@@ -99,11 +112,11 @@ async def test_multiple_clients_works():
 
 
 @pytest.mark.asyncio
-async def test_subclassing_client_works():
+async def test_subclassing_client_works() -> None:
     class SolrClient(AsyncSolrCloudClient):
-        def __new__(cls, host: str, auth: Optional[SolrAuth] = None):
+        def __new__(cls, host: str, auth: Optional[SolrAuth] = None):  # type: ignore
             context = SolrServerContext(SolrSingleServerHost(host), auth)
-            return super().__new__(cls, context=context)
+            return super().__new__(cls, context=context)  # type: ignore
 
         def test_method(self) -> str:
             return "test"
@@ -113,8 +126,13 @@ async def test_subclassing_client_works():
     config = create_config()
 
     client = SolrClient(
-        config.solr_host, SolrBasicAuth(config.solr_username, config.solr_password)
-    )
+        config.solr_host,
+        (
+            SolrBasicAuth(config.solr_username, config.solr_password)
+            if (config.solr_username and config.solr_password)  # type: ignore
+            else None
+        ),
+    )  # type: ignore
 
     try:
         await client.delete_config(name)

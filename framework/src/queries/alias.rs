@@ -1,5 +1,5 @@
+use crate::error::Error;
 use crate::models::context::SolrServerContext;
-use crate::models::error::SolrError;
 use crate::queries::request_builder::SolrRequestBuilder;
 use std::collections::HashMap;
 
@@ -9,13 +9,13 @@ use std::collections::HashMap;
 /// Example usage can be found at [AsyncSolrCloudClient::get_aliases](crate::clients::async_cloud_client::AsyncSolrCloudClient::get_aliases)
 pub async fn get_aliases<C: AsRef<SolrServerContext>>(
     context: C,
-) -> Result<HashMap<String, Vec<String>>, SolrError> {
+) -> Result<HashMap<String, Vec<String>>, Error> {
     let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(&[("action", "LISTALIASES")])
         .send_get()
         .await?;
     match json.aliases {
-        None => Err(SolrError::Unknown(
+        None => Err(Error::Unknown(
             "Could not find alias key in map".to_string(),
         )),
         Some(aliases) => Ok(aliases),
@@ -30,7 +30,7 @@ pub async fn create_alias<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
     collections: &[S],
-) -> Result<(), SolrError> {
+) -> Result<(), Error> {
     let collections = collections
         .iter()
         .map(|x| x.as_ref())
@@ -55,7 +55,7 @@ pub async fn create_alias<C: AsRef<SolrServerContext>, S: AsRef<str>>(
 pub async fn alias_exists<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
-) -> Result<bool, SolrError> {
+) -> Result<bool, Error> {
     let aliases = get_aliases(context).await?;
     Ok(aliases.contains_key(name.as_ref()))
 }
@@ -67,7 +67,7 @@ pub async fn alias_exists<C: AsRef<SolrServerContext>, S: AsRef<str>>(
 pub async fn delete_alias<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
-) -> Result<(), SolrError> {
+) -> Result<(), Error> {
     let query_params = [("action", "DELETEALIAS"), ("name", name.as_ref())];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
@@ -85,7 +85,7 @@ use crate::runtime::RUNTIME;
 /// Example usage can be found at [BlockingSolrCloudClient::get_aliases](crate::clients::blocking_cloud_client::BlockingSolrCloudClient::get_aliases)
 pub fn get_aliases_blocking<C: AsRef<SolrServerContext>>(
     context: C,
-) -> Result<HashMap<String, Vec<String>>, SolrError> {
+) -> Result<HashMap<String, Vec<String>>, Error> {
     RUNTIME.handle().block_on(get_aliases(context))
 }
 
@@ -98,7 +98,7 @@ pub fn create_alias_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
     collections: &[S],
-) -> Result<(), SolrError> {
+) -> Result<(), Error> {
     RUNTIME
         .handle()
         .block_on(create_alias(context, name, collections))
@@ -112,7 +112,7 @@ pub fn create_alias_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
 pub fn alias_exists_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
-) -> Result<bool, SolrError> {
+) -> Result<bool, Error> {
     RUNTIME.handle().block_on(alias_exists(context, name))
 }
 
@@ -124,6 +124,6 @@ pub fn alias_exists_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
 pub fn delete_alias_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     context: C,
     name: S,
-) -> Result<(), SolrError> {
+) -> Result<(), Error> {
     RUNTIME.handle().block_on(delete_alias(context, name))
 }

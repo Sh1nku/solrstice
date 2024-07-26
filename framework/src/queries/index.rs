@@ -1,6 +1,6 @@
+use crate::error::Error;
 use crate::models::commit_type::CommitType;
 use crate::models::context::SolrServerContext;
-use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
 use crate::queries::request_builder::SolrRequestBuilder;
 use serde::{Deserialize, Serialize};
@@ -8,13 +8,10 @@ use serde::{Deserialize, Serialize};
 /// A builder for the update handler.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::index::UpdateQuery;
-/// # use serde::Serialize;
-/// # use solrstice::models::commit_type::CommitType;
-/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// use serde::Serialize;
+/// use solrstice::{AsyncSolrCloudClient, CommitType, SolrServerContextBuilder, SolrSingleServerHost, UpdateQuery};
+///
+///  async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #[derive(Serialize)]
 /// struct Data {id: String}
 ///
@@ -46,13 +43,11 @@ impl UpdateQuery {
     /// Create a new instance of UpdateQuery.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQuery;
-    /// # use serde::Serialize;
-    /// # use solrstice::models::commit_type::CommitType;
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use serde::Serialize;    ///
+    ///
+    /// use solrstice::{AsyncSolrCloudClient, CommitType, SolrServerContextBuilder, SolrSingleServerHost, UpdateQuery};
+    ///
+    ///  async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
     /// struct Data {id: String}
     ///
@@ -72,7 +67,7 @@ impl UpdateQuery {
     /// Set the handler for the query. Default is "update".
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::UpdateQuery;
+    /// use solrstice::UpdateQuery;
     /// let builder = UpdateQuery::new().handler("custom_handler");
     /// ```
     pub fn handler<S: Into<String>>(mut self, handler: S) -> Self {
@@ -83,8 +78,8 @@ impl UpdateQuery {
     /// Set the commit type for the query. Default is CommitType::Hard.
     /// # Examples
     /// ```no_run
-    /// use solrstice::models::commit_type::CommitType;
-    /// use solrstice::queries::index::UpdateQuery;
+    /// use solrstice::CommitType;
+    /// use solrstice::UpdateQuery;
     /// let builder = UpdateQuery::new().commit_type(CommitType::Soft);
     /// ```
     pub fn commit_type(mut self, commit_type: CommitType) -> Self {
@@ -100,7 +95,7 @@ impl UpdateQuery {
         context: C,
         collection: S,
         data: &[D],
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         let mut query_params = vec![("overwrite", "true")];
         match self.commit_type {
             CommitType::Hard => query_params.push(("commit", "true")),
@@ -122,13 +117,10 @@ impl UpdateQuery {
 /// Since there is no way to delete properly with JSON, it uses XML.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::index::DeleteQuery;
-/// # use serde::Serialize;
-/// # use solrstice::models::commit_type::CommitType;
-/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// use serde::Serialize;
+/// use solrstice::{AsyncSolrCloudClient, DeleteQuery, SolrServerContextBuilder, SolrSingleServerHost};
+///
+///  async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #[derive(Serialize)]
 /// struct Data {id: String}
 ///
@@ -166,13 +158,10 @@ impl DeleteQuery {
     /// Create a new instance of DeleteQuery.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQuery;
-    /// # use serde::Serialize;
-    /// # use solrstice::models::commit_type::CommitType;
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// use serde::Serialize;
+    /// use solrstice::{AsyncSolrCloudClient, DeleteQuery, SolrServerContextBuilder, SolrSingleServerHost};
+    ///
+    ///  async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
     /// struct Data {id: String}
     ///
@@ -194,7 +183,7 @@ impl DeleteQuery {
     /// Set the handler for the query. Default is "update".
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQuery;
+    /// use solrstice::DeleteQuery;
     /// let builder = DeleteQuery::new().handler("custom_handler");
     /// ```
     pub fn handler<S: Into<String>>(mut self, handler: S) -> Self {
@@ -205,8 +194,8 @@ impl DeleteQuery {
     /// Set the commit_type for the query. Default is CommitType::Hard.
     /// # Examples
     /// ```no_run
-    /// use solrstice::models::commit_type::CommitType;
-    /// use solrstice::queries::index::DeleteQuery;
+    /// use solrstice::CommitType;
+    /// use solrstice::DeleteQuery;
     /// let builder = DeleteQuery::new().commit_type(CommitType::Soft);
     /// ```
     pub fn commit_type(mut self, commit_type: CommitType) -> Self {
@@ -217,7 +206,7 @@ impl DeleteQuery {
     /// Set the ids to delete
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQuery;
+    /// use solrstice::DeleteQuery;
     /// let builder = DeleteQuery::new().ids(["document1", "document2"]);
     /// ```
     pub fn ids<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
@@ -233,7 +222,7 @@ impl DeleteQuery {
     /// Set the queries to delete
     /// # Examples
     /// ```no_run
-    /// use solrstice::queries::index::DeleteQuery;
+    /// use solrstice::DeleteQuery;
     /// let builder = DeleteQuery::new().queries(["age:[* TO *]"]);
     /// ```
     pub fn queries<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
@@ -253,7 +242,7 @@ impl DeleteQuery {
         &self,
         context: C,
         collection: S,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         let ids = self.ids.as_ref().map(|ids| {
             ids.iter()
                 .map(|id| format!("<id>{}</id>", id))
@@ -301,7 +290,7 @@ impl UpdateQuery {
         context: C,
         collection: S,
         data: &[D],
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         RUNTIME
             .handle()
             .block_on(self.execute(context, collection, data))
@@ -316,7 +305,7 @@ impl DeleteQuery {
         &self,
         context: C,
         collection: S,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         RUNTIME.handle().block_on(self.execute(context, collection))
     }
 }

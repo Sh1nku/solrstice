@@ -1,13 +1,13 @@
 use crate::structures::BaseTestsBuildup;
 use serde::{Deserialize, Serialize};
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-// use solrstice::models::auth::SolrBasicAuth;
-// use solrstice::models::context::SolrServerContextBuilder;
+use solrstice::AsyncSolrCloudClient;
+// use solrstice::SolrSingleServerHost;
+// use solrstice::SolrBasicAuth;
+// use solrstice::SolrServerContextBuilder;
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-use solrstice::queries::select::SelectQuery;
+use solrstice::Error;
+use solrstice::SelectQuery;
+use solrstice::{DeleteQuery, UpdateQuery};
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,7 +17,7 @@ struct TestData {
 
 #[tokio::test]
 #[parallel]
-pub async fn example() -> Result<(), SolrError> {
+pub async fn example() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
 
     //Create a solr client. You can also use a list of zookeeper hosts instead of a single server.

@@ -1,30 +1,11 @@
 use crate::models::error::PyErrWrapper;
-use crate::queries::components::json_facet::{
-    JsonFacetComponentWrapper, JsonFacetTypeWrapper, JsonQueryFacetWrapper, JsonStatFacetWrapper,
-    JsonTermsFacetWrapper,
-};
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::json_facet::SolrJsonFacetResponse;
+use solrstice::models::SolrJsonFacetResponse;
 use std::collections::HashMap;
 
-#[pymodule]
-pub fn json_facet(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<SolrJsonFacetResponseWrapper>()?;
-    m.add_class::<JsonFacetComponentWrapper>()?;
-    m.add_class::<JsonFacetTypeWrapper>()?;
-    m.add_class::<JsonQueryFacetWrapper>()?;
-    m.add_class::<JsonTermsFacetWrapper>()?;
-    m.add_class::<JsonStatFacetWrapper>()?;
-    Ok(())
-}
-
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(
-    name = "SolrJsonFacetResponse",
-    module = "solrstice.json_facet",
-    subclass
-)]
+#[pyclass(name = "SolrJsonFacetResponse", module = "solrstice.models", subclass)]
 pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]

@@ -1,5 +1,6 @@
+from typing import Generator
+
 import pytest
-from helpers import Config, create_config
 
 from solrstice.config import (
     config_exists,
@@ -10,14 +11,16 @@ from solrstice.config import (
     upload_config_blocking,
 )
 
+from .helpers import Config, create_config
+
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_config_all_async_functions_exported(config: Config):
+async def test_config_all_async_functions_exported(config: Config) -> None:
     try:
         await delete_config(config.context, "UploadConfig")
     except RuntimeError:
@@ -32,7 +35,7 @@ async def test_config_all_async_functions_exported(config: Config):
     await delete_config(config.context, "UploadConfig")
 
 
-def test_config_all_blocking_functions_exported(config: Config):
+def test_config_all_blocking_functions_exported(config: Config) -> None:
     try:
         delete_config_blocking(config.context, "UploadConfig")
     except RuntimeError:

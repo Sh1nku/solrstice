@@ -6,10 +6,7 @@ use std::sync::Arc;
 /// A SolrServerContext specifies how to connect to a solr server, and how to authenticate.
 /// # Examples
 /// ```
-/// use solrstice::models::context::SolrServerContextBuilder;
-/// use solrstice::hosts::solr_host::SolrHost;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::auth::SolrBasicAuth;
+/// use solrstice::{SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
 ///    .with_auth(SolrBasicAuth::new("solr", Some("SolrRocks")))
@@ -27,8 +24,8 @@ impl SolrServerContextBuilder {
     /// Create a new SolrServerContextBuilder
     /// # Examples
     /// ```no_run
-    /// use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// use solrstice::{SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// ```
     pub fn new<A: SolrHost + Send + Sync + 'static>(host: A) -> Self {
@@ -43,10 +40,7 @@ impl SolrServerContextBuilder {
     /// Create a new SolrServerContextBuilder
     /// # Examples
     /// ```no_run
-    /// use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::auth::SolrBasicAuth;
-    ///
+    /// use solrstice::{SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
     ///     .with_auth(SolrBasicAuth::new("username", Some("password"))).build();
     /// ```
@@ -59,9 +53,8 @@ impl SolrServerContextBuilder {
     /// # Examples
     /// ```
     /// use std::time::Duration;
-    /// use solrstice::models::context::SolrServerContextBuilder;
     /// use reqwest::Client;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// use solrstice::{SolrServerContextBuilder, SolrSingleServerHost};
     ///
     /// let client = Client::builder().timeout(Duration::from_secs(10)).build().unwrap();
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_client(client).build();
@@ -76,10 +69,8 @@ impl SolrServerContextBuilder {
     /// `Pretty` is expensive as it needs deserialize and reserialize the body a second time.
     /// # Examples
     /// ```
-    /// use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::auth::SolrBasicAuth;
-    /// use solrstice::queries::request_builder::LoggingPolicy;
+    /// use solrstice::{LoggingPolicy, SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
     ///   .with_logging_policy(LoggingPolicy::Fast(4096))
     ///   .build();
@@ -91,8 +82,8 @@ impl SolrServerContextBuilder {
     /// Build a SolrServerContext
     /// # Examples
     /// ```no_run
-    /// use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// use solrstice::{SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// ```
     pub fn build(self) -> SolrServerContext {
@@ -103,10 +94,7 @@ impl SolrServerContextBuilder {
 /// A SolrServerContext specifies how to connect to a solr server, and how to authenticate.
 /// # Examples
 /// ```
-/// use solrstice::models::context::SolrServerContextBuilder;
-/// use solrstice::hosts::solr_host::SolrHost;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::auth::SolrBasicAuth;
+/// use solrstice::{SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983"))
 ///    .with_auth(SolrBasicAuth::new("solr", Some("SolrRocks")))

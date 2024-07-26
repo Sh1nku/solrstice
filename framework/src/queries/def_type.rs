@@ -25,11 +25,10 @@ pub enum QueryOperator {
 /// Documentation can be found at [SolrDocs](https://solr.apache.org/guide/8_11/the-standard-query-parser.html)
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, LuceneQuery};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
+/// # use solrstice::{DefType, LuceneQuery};
+/// # use solrstice::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
@@ -75,11 +74,10 @@ impl LuceneQuery {
     /// Create a new lucene query
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, LuceneQuery};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::{AsyncSolrCloudClient, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::{DefType, LuceneQuery};
+    /// # use solrstice::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);
@@ -120,11 +118,10 @@ impl LuceneQuery {
 /// Documentation can be found at [SolrDocs](https://solr.apache.org/guide/8_11/the-dismax-query-parser.html)
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::def_type::{DefType, DismaxQuery};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
+/// # use solrstice::{DefType, DismaxQuery};
+/// # use solrstice::SelectQuery;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// # let client = AsyncSolrCloudClient::new(context);
@@ -188,11 +185,10 @@ impl DismaxQuery {
     /// Create a new dismax query
     ///
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::def_type::{DefType, DismaxQuery};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::{AsyncSolrCloudClient, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::{DefType, DismaxQuery};
+    /// # use solrstice::SelectQuery;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// # let client = AsyncSolrCloudClient::new(context);

@@ -8,15 +8,15 @@ use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
-use solrstice::models::context::SolrServerContext;
-use solrstice::models::error::SolrError;
-use solrstice::queries::components::facet_set::FacetSetComponent;
-use solrstice::queries::components::grouping::GroupingComponent;
-use solrstice::queries::components::json_facet::JsonFacetComponent;
-use solrstice::queries::def_type::DefType;
-use solrstice::queries::select::SelectQuery;
+use solrstice::DefType;
+use solrstice::Error;
+use solrstice::FacetSetComponent;
+use solrstice::GroupingComponent;
+use solrstice::JsonFacetComponent;
+use solrstice::SelectQuery;
+use solrstice::SolrServerContext;
 
-#[pyclass(name = "SelectQuery", module = "solrstice.queries", subclass)]
+#[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SelectQueryWrapper(SelectQuery);
 
@@ -105,7 +105,7 @@ impl SelectQueryWrapper {
         match state.extract::<&PyBytes>(py) {
             Ok(s) => {
                 *self = serde_json::from_slice(s.as_bytes())
-                    .map_err(SolrError::from)
+                    .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
@@ -117,7 +117,7 @@ impl SelectQueryWrapper {
         Ok(PyBytes::new_bound(
             py,
             serde_json::to_string(&self)
-                .map_err(SolrError::from)
+                .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
         )

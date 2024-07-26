@@ -1,7 +1,6 @@
 use crate::models::context::SolrServerContextWrapper;
 use crate::models::error::PyErrWrapper;
 use pyo3::prelude::*;
-use solrstice::models::context::SolrServerContext;
 use solrstice::queries::collection::{
     collection_exists as collection_exists_rs, create_collection as create_collection_rs,
     delete_collection as delete_collection_rs, get_collections as get_collections_rs,
@@ -12,6 +11,7 @@ use solrstice::queries::collection::{
     delete_collection_blocking as delete_collection_blocking_rs,
     get_collections_blocking as get_collections_blocking_rs,
 };
+use solrstice::SolrServerContext;
 
 #[pymodule]
 pub fn collection(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {

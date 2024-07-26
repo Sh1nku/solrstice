@@ -8,12 +8,15 @@ from urllib.request import urlopen
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
-from solrstice.auth import SolrBasicAuth
-from solrstice.clients import AsyncSolrCloudClient
+from solrstice import (
+    AsyncSolrCloudClient,
+    SolrBasicAuth,
+    SolrServerContext,
+    SolrSingleServerHost,
+    UpdateQuery,
+)
 from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
-from solrstice.hosts import SolrServerContext, SolrSingleServerHost
-from solrstice.queries import UpdateQuery
 
 
 @dataclass
@@ -44,6 +47,7 @@ def create_config() -> Config:
     if solr_username:
         solr_auth = SolrBasicAuth(solr_username, solr_password)
     host = os.getenv("SOLR_HOST")
+    assert host is not None
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
     solr_host = SolrSingleServerHost(host)
     context = SolrServerContext(solr_host, solr_auth)
@@ -60,7 +64,7 @@ def create_config() -> Config:
     )
 
 
-def wait_for_solr(host: str, max_time: int):
+def wait_for_solr(host: str, max_time: int) -> None:
     end = time.time() + max_time
     while time.time() < end:
         try:

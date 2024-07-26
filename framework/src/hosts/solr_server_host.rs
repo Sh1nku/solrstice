@@ -1,5 +1,5 @@
+use crate::error::Error;
 use crate::hosts::solr_host::SolrHost;
-use crate::models::error::SolrError;
 use async_trait::async_trait;
 use std::borrow::Cow;
 use std::time::Duration;
@@ -7,9 +7,7 @@ use std::time::Duration;
 /// Connect to a single solr host
 /// Good for if you have an external load balancer
 /// ```rust
-/// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::context::{SolrServerContextBuilder};
+/// use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
 ///
 /// let host = SolrSingleServerHost::new("localhost:8983");
 /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
@@ -21,7 +19,7 @@ pub struct SolrSingleServerHost {
 
 #[async_trait]
 impl SolrHost for SolrSingleServerHost {
-    async fn get_solr_node(&self) -> Result<Cow<str>, SolrError> {
+    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         Ok(Cow::Borrowed(&self.host))
     }
 }
@@ -30,9 +28,7 @@ impl SolrSingleServerHost {
     /// Connect to a single solr host
     /// Good for if you have an external load balancer
     /// ```rust
-    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::context::{SolrServerContextBuilder};
+    /// use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
     ///
     /// let host = SolrSingleServerHost::new("localhost:8983");
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
@@ -47,9 +43,7 @@ impl SolrSingleServerHost {
 /// It would be better to use [ZookeeperEnsembleHostConnector](crate::hosts::zookeeper_host::ZookeeperEnsembleHostConnector) instead.
 /// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
 /// ```rust
-/// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::{SolrMultipleServerHost};
-/// use solrstice::models::context::{SolrServerContextBuilder};
+/// use solrstice::{AsyncSolrCloudClient, SolrMultipleServerHost, SolrServerContextBuilder};
 ///
 /// let host = SolrMultipleServerHost::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
 /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());
@@ -62,10 +56,10 @@ pub struct SolrMultipleServerHost {
 
 #[async_trait]
 impl SolrHost for SolrMultipleServerHost {
-    async fn get_solr_node(&self) -> Result<Cow<str>, SolrError> {
+    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         let mut server_indices: Vec<usize> = (0..self.hosts.len()).collect();
         if server_indices.is_empty() {
-            return Err(SolrError::SolrConnectionError(
+            return Err(Error::SolrConnectionError(
                 "No Solr Host Specified".to_string(),
             ));
         }
@@ -88,7 +82,7 @@ impl SolrHost for SolrMultipleServerHost {
                 }
             }
         }
-        Err(SolrError::SolrConnectionError(
+        Err(Error::SolrConnectionError(
             "No Solr Host answered".to_string(),
         ))
     }
@@ -100,9 +94,7 @@ impl SolrMultipleServerHost {
     /// It would be better to use [ZookeeperEnsembleHostConnector](crate::hosts::zookeeper_host::ZookeeperEnsembleHostConnector) instead.
     /// The timeout is used to determine how long to wait for a response from a solr host before trying the next one
     /// ```rust
-    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::{SolrMultipleServerHost};
-    /// use solrstice::models::context::{SolrServerContextBuilder};
+    /// use solrstice::{AsyncSolrCloudClient, SolrMultipleServerHost, SolrServerContextBuilder};
     ///
     /// let host = SolrMultipleServerHost::new(["localhost:8983", "localhost:8984"], std::time::Duration::from_secs(3));
     /// let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(host).build());

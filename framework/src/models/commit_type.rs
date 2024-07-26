@@ -6,8 +6,7 @@ use serde::{Deserialize, Serialize};
 /// Conversely, a `Soft` commit corresponds to `softCommit=true`.
 /// # Examples
 /// ```
-/// use solrstice::models::commit_type::CommitType;
-/// use solrstice::queries::index::{DeleteQuery, UpdateQuery};
+/// use solrstice::{CommitType, DeleteQuery, UpdateQuery};
 ///
 /// let update_query = UpdateQuery::new().commit_type(CommitType::Soft);
 /// let delete_query = DeleteQuery::new().commit_type(CommitType::Soft);

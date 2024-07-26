@@ -1,11 +1,11 @@
 use pyo3::prelude::*;
-use solrstice::queries::components::facet_set::{
+use solrstice::{
     FacetSetComponent, FieldFacetComponent, FieldFacetEntry, FieldFacetMethod, FieldFacetSort,
     PivotFacetComponent,
 };
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FacetSetComponent", module = "solrstice.facet_set", subclass)]
+#[pyclass(name = "FacetSetComponent", module = "solrstice", subclass)]
 pub struct FacetSetComponentWrapper(FacetSetComponent);
 
 #[pymethods]
@@ -55,7 +55,7 @@ impl From<&FacetSetComponent> for FacetSetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "PivotFacetComponent", module = "solrstice.facet_set", subclass)]
+#[pyclass(name = "PivotFacetComponent", module = "solrstice", subclass)]
 pub struct PivotFacetComponentWrapper(PivotFacetComponent);
 
 #[pymethods]
@@ -95,7 +95,7 @@ impl From<&PivotFacetComponent> for PivotFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetComponent", module = "solrstice.facet_set", subclass)]
+#[pyclass(name = "FieldFacetComponent", module = "solrstice", subclass)]
 pub struct FieldFacetComponentWrapper(FieldFacetComponent);
 
 #[pymethods]
@@ -135,7 +135,7 @@ impl From<&FieldFacetComponent> for FieldFacetComponentWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetSort", module = "solrstice.facet_set")]
+#[pyclass(name = "FieldFacetSort")]
 pub enum FieldFacetSortWrapper {
     Count,
     Index,
@@ -160,7 +160,7 @@ impl From<FieldFacetSort> for FieldFacetSortWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetMethod", module = "solrstice.facet_set")]
+#[pyclass(name = "FieldFacetMethod")]
 pub enum FieldFacetMethodWrapper {
     Enum,
     Fc,
@@ -188,7 +188,7 @@ impl From<FieldFacetMethod> for FieldFacetMethodWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetEntry", module = "solrstice.facet_set", subclass)]
+#[pyclass(name = "FieldFacetEntry", module = "solrstice", subclass)]
 pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 
 #[pymethods]

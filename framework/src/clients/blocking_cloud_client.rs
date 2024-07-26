@@ -1,5 +1,5 @@
+use crate::error::Error;
 use crate::models::context::SolrServerContext;
-use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
 use crate::queries::alias::{
     alias_exists_blocking, create_alias_blocking, delete_alias_blocking, get_aliases_blocking,
@@ -20,9 +20,7 @@ use std::path::Path;
 /// A blocking client for SolrCloud.
 /// # Examples
 /// ```rust
-/// use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// use solrstice::models::context::SolrServerContextBuilder;
+/// use solrstice::{BlockingSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
 ///
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = BlockingSolrCloudClient::new(context);
@@ -37,9 +35,7 @@ impl BlockingSolrCloudClient {
     /// Create a new instance of BlockingSolrCloudClient
     /// # Examples
     /// ```rust
-    /// use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// use solrstice::models::context::SolrServerContextBuilder;
+    /// use solrstice::{BlockingSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
     ///
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -54,9 +50,9 @@ impl BlockingSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -68,7 +64,7 @@ impl BlockingSolrCloudClient {
         &self,
         name: S,
         path: P,
-    ) -> Result<(), SolrError> {
+    ) -> Result<(), Error> {
         upload_config_blocking(&self.context, name, path)
     }
 
@@ -76,9 +72,9 @@ impl BlockingSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -86,7 +82,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn get_configs(&self) -> Result<Vec<String>, SolrError> {
+    pub fn get_configs(&self) -> Result<Vec<String>, Error> {
         get_configs_blocking(&self.context)
     }
 
@@ -94,9 +90,9 @@ impl BlockingSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -104,7 +100,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub fn config_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         config_exists_blocking(&self.context, name)
     }
 
@@ -112,9 +108,9 @@ impl BlockingSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::path::Path;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -122,16 +118,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_config<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
+    pub fn delete_config<S: AsRef<str>>(&self, name: S) -> Result<(), Error> {
         delete_config_blocking(&self.context, name)
     }
 
     /// Create a collection in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -145,17 +141,17 @@ impl BlockingSolrCloudClient {
         config: S,
         shards: usize,
         replication_factor: usize,
-    ) -> Result<(), SolrError> {
+    ) -> Result<(), Error> {
         create_collection_blocking(&self.context, name, config, shards, replication_factor)
     }
 
     /// Get collections from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -163,16 +159,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn get_collections(&self) -> Result<Vec<String>, SolrError> {
+    pub fn get_collections(&self) -> Result<Vec<String>, Error> {
         get_collections_blocking(&self.context)
     }
 
     /// Check if a collection exists in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -180,16 +176,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn collection_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub fn collection_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         collection_exists_blocking(&self.context, name)
     }
 
     /// Delete a collection from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -197,16 +193,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_collection<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
+    pub fn delete_collection<S: AsRef<str>>(&self, name: S) -> Result<(), Error> {
         delete_collection_blocking(&self.context, name)
     }
 
     /// Create an alias in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -214,11 +210,7 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn create_alias<S: AsRef<str>>(
-        &self,
-        alias: S,
-        collections: &[S],
-    ) -> Result<(), SolrError> {
+    pub fn create_alias<S: AsRef<str>>(&self, alias: S, collections: &[S]) -> Result<(), Error> {
         create_alias_blocking(&self.context, alias, collections)
     }
 
@@ -226,9 +218,9 @@ impl BlockingSolrCloudClient {
     /// # Examples
     /// ```no_run
     /// # use std::collections::HashMap;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -236,16 +228,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn get_aliases(&self) -> Result<HashMap<String, Vec<String>>, SolrError> {
+    pub fn get_aliases(&self) -> Result<HashMap<String, Vec<String>>, Error> {
         get_aliases_blocking(&self.context)
     }
 
     /// Check if an alias exists in SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -253,16 +245,16 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn alias_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, SolrError> {
+    pub fn alias_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         alias_exists_blocking(&self.context, name)
     }
 
     /// Delete an alias from SolrCloud
     /// # Examples
     /// ```no_run
-    /// use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
+    /// use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -270,18 +262,18 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), SolrError> {
+    pub fn delete_alias<S: AsRef<str>>(&self, name: S) -> Result<(), Error> {
         delete_alias_blocking(&self.context, name)
     }
 
     /// Index some data into SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::UpdateQuery;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::UpdateQuery;
     /// # use serde::Serialize;
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
+    /// # use solrstice::BlockingSolrCloudClient;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #[derive(Serialize)]
     /// struct Data {id: String}
@@ -297,7 +289,7 @@ impl BlockingSolrCloudClient {
         builder: B,
         collection: S,
         data: &[T],
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder
             .as_ref()
             .execute_blocking(&self.context, collection, data)
@@ -306,10 +298,10 @@ impl BlockingSolrCloudClient {
     /// Select some data from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::SelectQuery;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -321,18 +313,18 @@ impl BlockingSolrCloudClient {
         &self,
         builder: B,
         collection: S,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute_blocking(&self.context, collection)
     }
 
     /// Delete some data from SolrCloud
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::index::DeleteQuery;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::DeleteQuery;
+    /// # use solrstice::SelectQuery;
     /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = BlockingSolrCloudClient::new(context);
@@ -344,7 +336,7 @@ impl BlockingSolrCloudClient {
         &self,
         builder: B,
         collection: S,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute_blocking(&self.context, collection)
     }
 }

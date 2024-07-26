@@ -1,30 +1,11 @@
 use crate::models::error::PyErrWrapper;
-use crate::queries::components::facet_set::{
-    FacetSetComponentWrapper, FieldFacetComponentWrapper, FieldFacetEntryWrapper,
-    FieldFacetMethodWrapper, FieldFacetSortWrapper, PivotFacetComponentWrapper,
-};
 use pyo3::prelude::*;
 use pythonize::pythonize;
-use solrstice::models::facet_set::{
-    SolrFacetSetResult, SolrFieldFacetResult, SolrPivotFacetResult,
-};
+use solrstice::models::{SolrFacetSetResult, SolrFieldFacetResult, SolrPivotFacetResult};
 use std::collections::HashMap;
 
-#[pymodule]
-pub fn facet_set(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<SolrFacetSetResultWrapper>()?;
-    m.add_class::<SolrPivotFacetResultWrapper>()?;
-    m.add_class::<FacetSetComponentWrapper>()?;
-    m.add_class::<PivotFacetComponentWrapper>()?;
-    m.add_class::<FieldFacetComponentWrapper>()?;
-    m.add_class::<FieldFacetSortWrapper>()?;
-    m.add_class::<FieldFacetMethodWrapper>()?;
-    m.add_class::<FieldFacetEntryWrapper>()?;
-    Ok(())
-}
-
 #[derive(Clone, Debug, PartialEq, Default)]
-#[pyclass(name = "SolrFacetSetResult", module = "solrstice.facet_set", subclass)]
+#[pyclass(name = "SolrFacetSetResult", module = "solrstice.models", subclass)]
 pub struct SolrFacetSetResultWrapper(SolrFacetSetResult);
 
 #[pymethods]
@@ -75,11 +56,7 @@ impl From<&SolrFacetSetResult> for SolrFacetSetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(
-    name = "SolrPivotFacetResult",
-    module = "solrstice.facet_set",
-    subclass
-)]
+#[pyclass(name = "SolrPivotFacetResult", module = "solrstice.models", subclass)]
 pub struct SolrPivotFacetResultWrapper(SolrPivotFacetResult);
 
 #[pymethods]
@@ -132,11 +109,7 @@ impl From<&SolrPivotFacetResult> for SolrPivotFacetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(
-    name = "SolrFieldFacetResult",
-    module = "solrstice.facet_set",
-    subclass
-)]
+#[pyclass(name = "SolrFieldFacetResult", module = "solrstice.models", subclass)]
 pub struct SolrFieldFacetResultWrapper(SolrFieldFacetResult);
 
 #[pymethods]

@@ -1,0 +1,47 @@
+{
+  "include": [
+    "solrstice/**/*.py",
+    "solrstice/**/*.pyi",
+    "tests/**/*.py"
+  ],
+  "exclude": [
+    "**/__pycache__"
+  ],
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "reportMissingModuleSource": false,
+  "reportPrivateImportUsage": false,
+  "reportRedeclaration": false,
+  "disableBytesTypePromotions": true,
+  "strictListInference": true,
+  "strictDictionaryInference": true,
+  "strictSetInference": true,
+  "reportConstantRedefinition": true,
+  "reportDeprecated": true,
+  "reportIncompleteStub": true,
+  "reportInconsistentConstructor": true,
+  "reportInvalidStubStatement": true,
+  "reportMatchNotExhaustive": true,
+  "reportMissingParameterType": true,
+  "reportMissingTypeArgument": true,
+  "reportTypeCommentUsage": true,
+  "reportUnnecessaryCast": true,
+  "reportUnnecessaryComparison": true,
+  "reportUnnecessaryContains": true,
+  "reportUnnecessaryIsInstance": true,
+  "reportUnusedClass": true,
+  "reportUnusedFunction": true,
+  "reportUnusedVariable": true,
+  "reportUntypedBaseClass": true,
+  "reportUntypedClassDecorator": true,
+  "reportUntypedFunctionDecorator": true,
+  "reportUntypedNamedTuple": true,
+  "pythonVersion": "3.8",
+  "pythonPlatform": "Linux",
+  "executionEnvironments": [
+    {
+      "root": "."
+    }
+  ]
+}

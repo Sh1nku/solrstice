@@ -1,11 +1,9 @@
 use pyo3::prelude::*;
-use solrstice::queries::components::json_facet::{
-    JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonStatFacet, JsonTermsFacet,
-};
+use solrstice::{JsonFacetComponent, JsonFacetType, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetComponent", module = "solrstice.json_facet", subclass)]
+#[pyclass(name = "JsonFacetComponent", module = "solrstice", subclass)]
 pub struct JsonFacetComponentWrapper(JsonFacetComponent);
 
 #[pymethods]
@@ -45,7 +43,7 @@ impl From<&JsonFacetComponent> for JsonFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetType", module = "solrstice.json_facet", subclass)]
+#[pyclass(name = "JsonFacetType", module = "solrstice", subclass)]
 pub struct JsonFacetTypeWrapper(JsonFacetType);
 
 impl From<JsonFacetTypeWrapper> for JsonFacetType {
@@ -73,7 +71,7 @@ impl From<&JsonFacetType> for JsonFacetTypeWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice.json_facet", subclass)]
+#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
 pub struct JsonTermsFacetWrapper {}
 
 #[pymethods]
@@ -107,7 +105,7 @@ impl JsonTermsFacetWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper ,module = "solrstice.json_facet", subclass)]
+#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
 pub struct JsonQueryFacetWrapper {}
 
 #[pymethods]
@@ -147,7 +145,7 @@ impl JsonQueryFacetWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice.json_facet", subclass)]
+#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
 pub struct JsonStatFacetWrapper {}
 
 #[pymethods]

@@ -9,10 +9,10 @@ pub mod components;
 /// Config API
 pub mod config;
 /// Def types for select queries. Eg: `luscene`, `edismax`
-pub mod def_type;
+pub(crate) mod def_type;
 /// Index and Delete API
-pub mod index;
+pub(crate) mod index;
 /// Request builder for queries
-pub mod request_builder;
+pub(crate) mod request_builder;
 /// Select query API
-pub mod select;
+pub(crate) mod select;

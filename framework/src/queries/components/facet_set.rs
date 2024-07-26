@@ -7,12 +7,8 @@ use std::collections::HashMap;
 /// Get facet counts for different types of faceting.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::FacetSetComponent;
-/// # use solrstice::queries::select::SelectQuery;
+/// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, SelectQuery, SolrServerContextBuilder, SolrSingleServerHost};
+///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -42,12 +38,9 @@ impl FacetSetComponent {
     /// Get facet counts for different types of faceting.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -73,15 +66,11 @@ impl FacetSetComponent {
     /// Set pivot facets
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{SolrBasicAuth, FacetSetComponent, PivotFacetComponent, AsyncSolrCloudClient, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
-    /// let client = AsyncSolrCloudClient::new(context);
+    ///     let client = AsyncSolrCloudClient::new(context);
     ///     let query = SelectQuery::new()
     ///        .facet_set(&FacetSetComponent::new().pivots(PivotFacetComponent::new(["interests,age"])));
     ///    let response = client
@@ -115,12 +104,9 @@ impl FacetSetComponent {
     /// Set query facets
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::FacetSetComponent;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::{SolrServerContextBuilder, SolrSingleServerHost};
+    /// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, SelectQuery};
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -142,12 +128,8 @@ impl FacetSetComponent {
     /// Set field facets
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::{SolrServerContextBuilder, SolrSingleServerHost};
+    /// use solrstice::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry, AsyncSolrCloudClient, SelectQuery};
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -191,12 +173,8 @@ impl From<&FacetSetComponent> for FacetSetComponent {
 /// A facet component for pivot facets.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
-/// # use solrstice::queries::select::SelectQuery;
+/// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, PivotFacetComponent, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -239,12 +217,9 @@ impl PivotFacetComponent {
     /// Create a new pivot facet component.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, PivotFacetComponent};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, PivotFacetComponent, SelectQuery, SolrSingleServerHost};
+    ///
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -302,12 +277,8 @@ impl From<&PivotFacetComponent> for PivotFacetComponent {
 /// Component for field facets
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -524,12 +495,8 @@ impl FieldFacetComponent {
     /// Create a new field facet component.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -592,12 +559,8 @@ pub enum FieldFacetMethod {
 /// A field facet entry represents a single field facet.
 /// # Examples
 /// ```no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::auth::SolrBasicAuth;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::{AsyncSolrCloudClient, FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrSingleServerHost};
+/// # use solrstice::SolrServerContextBuilder;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
@@ -645,12 +608,8 @@ impl FieldFacetEntry {
     /// Create a new field facet entry
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent, FieldFacetEntry};
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -764,7 +723,7 @@ impl From<&FieldFacetEntry> for FieldFacetEntry {
 }
 
 #[cfg(test)]
-pub mod tests {
+mod tests {
     use crate::queries::components::facet_set::{FacetSetComponent, FieldFacetComponent};
 
     #[test]

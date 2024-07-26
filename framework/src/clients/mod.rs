@@ -2,19 +2,15 @@
 //! # Examples
 //! ## Async client for SolrCloud
 //! ```rust
-//! use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-//! use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-//! use solrstice::models::context::SolrServerContextBuilder;
 //!
+//! use solrstice::{AsyncSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
 //! let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 //! let client = AsyncSolrCloudClient::new(context);
 //! ```
 //! ## Blocking client for SolrCloud
 //! ```rust
-//! use solrstice::clients::blocking_cloud_client::BlockingSolrCloudClient;
-//! use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-//! use solrstice::models::context::SolrServerContextBuilder;
 //!
+//! use solrstice::{BlockingSolrCloudClient, SolrServerContextBuilder, SolrSingleServerHost};
 //! let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 //! let client = BlockingSolrCloudClient::new(context);
 //! ```

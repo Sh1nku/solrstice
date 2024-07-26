@@ -1,35 +1,15 @@
-use crate::models::context::{
-    FastLoggingPolicyWrapper, LoggingPolicyWrapper, OffLoggingPolicyWrapper,
-    PrettyLoggingPolicyWrapper, SolrServerContextWrapper,
-};
 use crate::models::error::PyErrWrapper;
 use async_trait::async_trait;
 use pyo3::prelude::*;
-use solrstice::hosts::solr_host::SolrHost;
-use solrstice::hosts::solr_server_host::{SolrMultipleServerHost, SolrSingleServerHost};
-use solrstice::hosts::zookeeper_host::ZookeeperEnsembleHostConnector;
-use solrstice::models::error::SolrError;
+use solrstice::Error;
+use solrstice::SolrHost;
+use solrstice::ZookeeperEnsembleHostConnector;
+use solrstice::{SolrMultipleServerHost, SolrSingleServerHost};
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 
-#[pymodule]
-pub fn hosts(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<SolrHostWrapper>()?;
-    m.add_class::<SolrSingleServerHostWrapper>()?;
-    m.add_class::<SolrMultipleServerHostWrapper>()?;
-    m.add_class::<ZookeeperEnsembleHostWrapper>()?;
-    m.add_class::<ZookeeperEnsembleHostConnectorWrapper>()?;
-    m.add_class::<SolrServerContextWrapper>()?;
-
-    m.add_class::<LoggingPolicyWrapper>()?;
-    m.add_class::<FastLoggingPolicyWrapper>()?;
-    m.add_class::<PrettyLoggingPolicyWrapper>()?;
-    m.add_class::<OffLoggingPolicyWrapper>()?;
-    Ok(())
-}
-
-#[pyclass(name = "SolrHost", module = "solrstice.hosts", subclass)]
+#[pyclass(name = "SolrHost", module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct SolrHostWrapper {
     pub solr_host: Arc<dyn SolrHost + Send + Sync>,
@@ -37,12 +17,12 @@ pub struct SolrHostWrapper {
 
 #[async_trait]
 impl SolrHost for SolrHostWrapper {
-    async fn get_solr_node(&self) -> Result<Cow<str>, SolrError> {
+    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         self.solr_host.get_solr_node().await
     }
 }
 
-#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
+#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct SolrSingleServerHostWrapper;
 
@@ -59,7 +39,7 @@ impl SolrSingleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
+#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct SolrMultipleServerHostWrapper;
 
@@ -79,11 +59,15 @@ impl SolrMultipleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module= "solrstice.hosts", subclass)]
+#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostWrapper;
 
-#[pyclass(name = "ZookeeperEnsembleHostConnector", subclass)]
+#[pyclass(
+    name = "ZookeeperEnsembleHostConnector",
+    module = "solrstice",
+    subclass
+)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostConnectorWrapper(ZookeeperEnsembleHostConnector);
 

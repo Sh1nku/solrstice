@@ -1,9 +1,9 @@
 use serial_test::parallel;
 
 /// ```rust
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
+/// # use solrstice::AsyncSolrCloudClient;
+/// # use solrstice::SolrSingleServerHost;
+/// # use solrstice::SolrServerContextBuilder;
 /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
 /// ```

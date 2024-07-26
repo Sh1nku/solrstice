@@ -1,5 +1,5 @@
+use crate::error::{try_solr_error, Error};
 use crate::models::context::SolrServerContext;
-use crate::models::error::{try_solr_error, SolrError};
 use crate::models::response::SolrResponse;
 use log::debug;
 use reqwest::header::HeaderMap;
@@ -58,7 +58,7 @@ impl<'a> SolrRequestBuilder<'a> {
         self
     }
 
-    pub async fn send_get(self) -> Result<SolrResponse, SolrError> {
+    pub async fn send_get(self) -> Result<SolrResponse, Error> {
         let request = create_standard_request(
             self.context,
             self.url,
@@ -82,7 +82,7 @@ impl<'a> SolrRequestBuilder<'a> {
     pub async fn send_post_with_json<T: Serialize + 'a + ?Sized>(
         self,
         json: &T,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         let mut request = create_standard_request(
             self.context,
             self.url,
@@ -104,10 +104,7 @@ impl<'a> SolrRequestBuilder<'a> {
         Ok(solr_response)
     }
 
-    pub async fn send_post_with_body<T: Into<Body>>(
-        self,
-        data: T,
-    ) -> Result<SolrResponse, SolrError> {
+    pub async fn send_post_with_body<T: Into<Body>>(self, data: T) -> Result<SolrResponse, Error> {
         let mut request = create_standard_request(
             self.context,
             self.url,
@@ -136,7 +133,7 @@ async fn create_standard_request<'a>(
     request_type: SolrRequestType,
     query_params: Option<&'a [(&'a str, &'a str)]>,
     headers: Option<&Vec<(String, String)>>,
-) -> Result<RequestBuilder, SolrError> {
+) -> Result<RequestBuilder, Error> {
     let url = format!("{}{}", context.host.get_solr_node().await?, url);
     let mut request = match request_type {
         SolrRequestType::Get => context.client.get(url),
@@ -157,15 +154,15 @@ async fn create_standard_request<'a>(
     Ok(request)
 }
 
-async fn try_request_auth_error(response: &Response) -> Result<(), SolrError> {
+async fn try_request_auth_error(response: &Response) -> Result<(), Error> {
     match response.error_for_status_ref() {
         Ok(_) => Ok(()),
         Err(e) => {
-            if e.status().ok_or(SolrError::Unknown(
+            if e.status().ok_or(Error::Unknown(
                 "Error while getting response code from request".to_string(),
             ))? == 401
             {
-                Err(SolrError::SolrAuthError(
+                Err(Error::SolrAuthError(
                     "Authentication failed with 401. Check credentials.".to_string(),
                 ))
             } else {

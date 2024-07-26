@@ -1,10 +1,10 @@
 use serial_test::parallel;
 
 /// ```rust,no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::index::UpdateQuery;
+/// # use solrstice::AsyncSolrCloudClient;
+/// # use solrstice::SolrSingleServerHost;
+/// # use solrstice::SolrServerContextBuilder;
+/// # use solrstice::UpdateQuery;
 /// # use serde::{Serialize, Deserialize};
 ///
 /// #[derive(Serialize, Deserialize, Debug)]

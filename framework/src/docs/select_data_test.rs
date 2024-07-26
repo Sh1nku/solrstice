@@ -1,10 +1,10 @@
 use serial_test::parallel;
 
 /// ```rust,no_run
-/// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-/// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-/// # use solrstice::models::context::SolrServerContextBuilder;
-/// # use solrstice::queries::select::SelectQuery;
+/// # use solrstice::AsyncSolrCloudClient;
+/// # use solrstice::SolrSingleServerHost;
+/// # use solrstice::SolrServerContextBuilder;
+/// # use solrstice::SelectQuery;
 /// # use serde::{Serialize, Deserialize};
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();

@@ -1,14 +1,14 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
-use solrstice::queries::components::grouping::{GroupFormatting, GroupingComponent};
-use solrstice::queries::index::UpdateQuery;
-use solrstice::queries::select::SelectQuery;
+use solrstice::Error;
+use solrstice::SelectQuery;
+use solrstice::UpdateQuery;
+use solrstice::{GroupFormatting, GroupingComponent};
 use std::collections::HashMap;
 
 #[tokio::test]
 #[parallel]
-async fn group_fields() -> Result<(), SolrError> {
+async fn group_fields() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupBasic")
         .await
         .unwrap();
@@ -24,7 +24,7 @@ async fn group_fields() -> Result<(), SolrError> {
         .await?;
     let groups = response
         .get_groups()
-        .ok_or(SolrError::Unknown("No groups found".to_string()))?;
+        .ok_or(Error::Unknown("No groups found".to_string()))?;
     let age_group = groups.get("age").unwrap();
     let correct_data: HashMap<usize, usize> = [(20, 2), (40, 2), (60, 2)].iter().cloned().collect();
     for group in age_group.get_field_result().unwrap() {
@@ -41,7 +41,7 @@ async fn group_fields() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn group_queries() -> Result<(), SolrError> {
+async fn group_queries() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupQuery")
         .await
         .unwrap();
@@ -60,7 +60,7 @@ async fn group_queries() -> Result<(), SolrError> {
         .await?;
     let groups = response
         .get_groups()
-        .ok_or(SolrError::Unknown("Could not get groups".to_string()))?;
+        .ok_or(Error::Unknown("Could not get groups".to_string()))?;
     let first = groups
         .get("age:[0 TO 59]")
         .unwrap()
@@ -79,7 +79,7 @@ async fn group_queries() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn group_n_groups() -> Result<(), SolrError> {
+async fn group_n_groups() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupNGroups")
         .await
         .unwrap();
@@ -100,11 +100,11 @@ async fn group_n_groups() -> Result<(), SolrError> {
         .await?;
     let groups = response
         .get_groups()
-        .ok_or(SolrError::Unknown("Could not get groups".to_string()))?;
+        .ok_or(Error::Unknown("Could not get groups".to_string()))?;
     let age_group = groups.get("age").unwrap();
     let n_groups = age_group
         .get_n_groups()
-        .ok_or(SolrError::Unknown("No n_groups".to_string()))?;
+        .ok_or(Error::Unknown("No n_groups".to_string()))?;
     assert_eq!(n_groups, 3);
     let _ = config.tear_down().await;
     Ok(())
@@ -112,7 +112,7 @@ async fn group_n_groups() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn group_main() -> Result<(), SolrError> {
+async fn group_main() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupMain")
         .await
         .unwrap();
@@ -140,7 +140,7 @@ async fn group_main() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn group_main_false() -> Result<(), SolrError> {
+async fn group_main_false() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupMainFalse")
         .await
         .unwrap();
@@ -166,7 +166,7 @@ async fn group_main_false() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-async fn group_simple() -> Result<(), SolrError> {
+async fn group_simple() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("GroupSimple")
         .await
         .unwrap();

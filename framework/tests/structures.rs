@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-use solrstice::models::auth::SolrBasicAuth;
-use solrstice::models::context::{SolrServerContext, SolrServerContextBuilder};
-use solrstice::models::error::SolrError;
+use solrstice;
 use solrstice::queries::collection::{create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
-use solrstice::queries::request_builder::SolrRequestBuilder;
+use solrstice::SolrBasicAuth;
+use solrstice::SolrRequestBuilder;
+use solrstice::SolrSingleServerHost;
+use solrstice::{AsyncSolrCloudClient, Error};
+use solrstice::{SolrServerContext, SolrServerContextBuilder};
 use std::path::Path;
 use std::string::ToString;
 use std::time::Duration;
@@ -57,7 +57,7 @@ pub struct FunctionalityTestsBuildup {
 }
 
 impl FunctionalityTestsBuildup {
-    pub async fn build_up(basename: &str) -> Result<Self, SolrError> {
+    pub async fn build_up(basename: &str) -> Result<Self, Error> {
         dotenv::from_filename("../test_setup/.env").ok();
         let host = std::env::var("SOLR_HOST").unwrap();
         let config_path = "../test_setup/test_collection".to_string();
@@ -65,7 +65,7 @@ impl FunctionalityTestsBuildup {
         let password = std::env::var("SOLR_PASSWORD").unwrap();
         let auth = match username.is_empty() {
             true => {
-                return Err(SolrError::Unknown(
+                return Err(Error::Unknown(
                     "Could not find solr username in tests .env file".to_string(),
                 ))
             }
@@ -100,7 +100,7 @@ impl FunctionalityTestsBuildup {
         })
     }
 
-    pub async fn tear_down(&self) -> Result<(), SolrError> {
+    pub async fn tear_down(&self) -> Result<(), Error> {
         delete_collection(&self.context, &self.collection_name)
             .await
             .unwrap();

@@ -24,6 +24,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
       - name: Install mdbook
         run: |
           wget https://github.com/rust-lang/mdBook/releases/download/v0.4.34/mdbook-v0.4.34-x86_64-unknown-linux-gnu.tar.gz
@@ -33,22 +36,10 @@ jobs:
         working-directory: ./docs
         run: |
           mdbook build
-          mkdir docs_built
-          mv book/* docs_built
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: Build Python documentation
-        working-directory: ./wrappers/python
-        run: |
-          pip install -r requirements-dev.txt
-          ./generate_documentation.py
-          mkdir ../../docs/docs_built/python
-          mv docs/* ../../docs/docs_built/python
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'docs/docs_built/'
+          path: 'docs/book/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2

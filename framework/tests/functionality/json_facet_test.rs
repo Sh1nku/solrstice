@@ -1,16 +1,12 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use serial_test::parallel;
-use solrstice::models::error::SolrError;
-use solrstice::models::json_facet::SolrJsonFacetResponse;
-use solrstice::queries::components::json_facet::{
-    JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet,
-};
-use solrstice::queries::index::UpdateQuery;
-use solrstice::queries::select::SelectQuery;
+use solrstice::models::SolrJsonFacetResponse;
+use solrstice::{Error, SelectQuery, UpdateQuery};
+use solrstice::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
 
 #[tokio::test]
 #[parallel]
-pub async fn test_json_query_facet_works() -> Result<(), SolrError> {
+pub async fn test_json_query_facet_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetQuery")
         .await
         .unwrap();
@@ -39,7 +35,7 @@ pub async fn test_json_query_facet_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_json_stat_facet_works() -> Result<(), SolrError> {
+pub async fn test_json_stat_facet_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetStats")
         .await
         .unwrap();
@@ -68,7 +64,7 @@ pub async fn test_json_stat_facet_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_json_terms_facet_works() -> Result<(), SolrError> {
+pub async fn test_json_terms_facet_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetTerms")
         .await
         .unwrap();
@@ -97,7 +93,7 @@ pub async fn test_json_terms_facet_works() -> Result<(), SolrError> {
 
 #[tokio::test]
 #[parallel]
-pub async fn test_json_facet_sub_works() -> Result<(), SolrError> {
+pub async fn test_json_facet_sub_works() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("JsonFacetSub")
         .await
         .unwrap();

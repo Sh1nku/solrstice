@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::error::Error;
 use crate::models::context::SolrServerContext;
-use crate::models::error::SolrError;
 use crate::models::response::SolrResponse;
 use crate::queries::components::facet_set::FacetSetComponent;
 use crate::queries::components::grouping::GroupingComponent;
@@ -18,9 +18,9 @@ struct PostQueryWrapper {
 
 /// Builder for a select query.
 ///
-/// Also take a look at [AsyncSolrCloudClient::select](crate::clients::async_cloud_client::AsyncSolrCloudClient::select)
+/// Also take a look at [AsyncSolrCloudClient::select](crate::AsyncSolrCloudClient::select)
 /// ```rust
-///     use solrstice::queries::select::SelectQuery;
+///     use solrstice::SelectQuery;
 ///     SelectQuery::new().fq(["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
 /// ```
 #[derive(Serialize, Deserialize, Clone, Default, PartialEq, Debug)]
@@ -63,9 +63,9 @@ impl AsRef<SelectQuery> for SelectQuery {
 impl SelectQuery {
     /// Builder for a select query.
     ///
-    /// Also take a look at [AsyncSolrCloudClient::select](crate::clients::async_cloud_client::AsyncSolrCloudClient::select)
+    /// Also take a look at [AsyncSolrCloudClient::select](crate::select)
     /// ```rust
-    ///     use solrstice::queries::select::SelectQuery;
+    ///     use solrstice::SelectQuery;
     ///     SelectQuery::new().fq(["field1:val1", "field2:val2"]).q("*:*").rows(10).start(0);
     /// ```
     pub fn new() -> Self {
@@ -93,7 +93,7 @@ impl SelectQuery {
 
     /// A list of filter queries
     /// ```rust
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::SelectQuery;
     /// SelectQuery::new().fq(["id:1"]);
     /// ```
     pub fn fq<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
@@ -108,7 +108,7 @@ impl SelectQuery {
 
     /// Set the fields to return
     /// ```rust
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::SelectQuery;
     /// SelectQuery::new().fl(["field1", "field2"]);
     /// ```
     pub fn fl<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
@@ -123,7 +123,7 @@ impl SelectQuery {
 
     ///Set the sort order
     ///```rust
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::SelectQuery;
     /// SelectQuery::new().sort(["id asc", "field1 desc"]);
     /// ```
     pub fn sort<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
@@ -138,7 +138,7 @@ impl SelectQuery {
 
     /// How many rows to return
     /// ```rust
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::SelectQuery;
     /// SelectQuery::new().rows(1000);
     /// ```
     pub fn rows(mut self, rows: usize) -> Self {
@@ -148,7 +148,7 @@ impl SelectQuery {
 
     /// The offset to start from
     /// ```rust
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::SelectQuery;
     /// SelectQuery::new().start(10);
     /// ```
     pub fn start(mut self, start: usize) -> Self {
@@ -159,11 +159,8 @@ impl SelectQuery {
     /// Use a cursor mark to iterate over the results
     /// Default starts with "*", and which causes [SolrResponse::next_cursor_mark](crate::models::response::SolrResponse::next_cursor_mark) to be set. And can be provided for the next select.
     /// ```no_run
-    /// use solrstice::queries::select::SelectQuery;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::clients::async_cloud_client;
-    /// use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
+    /// use solrstice::{AsyncSolrCloudClient, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
     /// let mut builder = SelectQuery::new().cursor_mark("*");
@@ -190,11 +187,9 @@ impl SelectQuery {
     /// Do a grouping query. Also take a look at [SolrGroupResult](crate::models::group::SolrGroupResult) and [SolrGroupFieldResult](crate::models::group::SolrGroupFieldResult)
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{GroupingComponent, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
     /// let builder = SelectQuery::new()
@@ -219,12 +214,9 @@ impl SelectQuery {
     /// Note. The default q parameter is *:*, which will not work on `dismax` or `edismax`. So you need to specify a query.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// use solrstice::queries::components::grouping::GroupingComponent;
-    /// use solrstice::queries::def_type::{DefType, EdismaxQuery};
-    /// use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{DefType, EdismaxQuery, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrServerContextBuilder;
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let client = AsyncSolrCloudClient::new(SolrServerContextBuilder::new(SolrSingleServerHost::new("localhost:8983")).build());
     /// let builder = SelectQuery::new()
@@ -259,7 +251,7 @@ impl SelectQuery {
         &self,
         context: C,
         collection: T,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         let solr_url = format!("/solr/{}/{}", collection.as_ref(), &self.handle);
         let wrapper = PostQueryWrapper {
             params: self.clone(),
@@ -277,7 +269,7 @@ impl SelectQuery {
         &self,
         context: C,
         collection: S,
-    ) -> Result<SolrResponse, SolrError> {
+    ) -> Result<SolrResponse, Error> {
         RUNTIME.handle().block_on(self.execute(context, collection))
     }
 }

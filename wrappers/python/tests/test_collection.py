@@ -1,5 +1,6 @@
+from typing import Generator
+
 import pytest
-from helpers import Config, create_config
 
 from solrstice.collection import (
     collection_exists,
@@ -18,14 +19,16 @@ from solrstice.config import (
     upload_config_blocking,
 )
 
+from .helpers import Config, create_config
+
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_collection_all_async_functions_exported(config: Config):
+async def test_collection_all_async_functions_exported(config: Config) -> None:
     name = "CollectionConfig"
 
     try:
@@ -49,7 +52,7 @@ async def test_collection_all_async_functions_exported(config: Config):
     await delete_config(config.context, name)
 
 
-def test_collection_all_blocking_functions_exported(config: Config):
+def test_collection_all_blocking_functions_exported(config: Config) -> None:
     name = "CollectionBlockingConfig"
 
     try:

@@ -1,9 +1,9 @@
 use crate::structures::BaseTestsBuildup;
 use serde::{Deserialize, Serialize};
 use serial_test::parallel;
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::queries::index::{DeleteQuery, UpdateQuery};
-use solrstice::queries::select::SelectQuery;
+use solrstice::AsyncSolrCloudClient;
+use solrstice::SelectQuery;
+use solrstice::{DeleteQuery, UpdateQuery};
 use std::path::Path;
 use tokio::join;
 

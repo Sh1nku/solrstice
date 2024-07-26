@@ -1,10 +1,10 @@
 use crate::structures::BaseTestsBuildup;
 use log::{Metadata, Record};
 use serial_test::serial;
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::models::context::SolrServerContextBuilder;
-use solrstice::models::error::SolrError;
-use solrstice::queries::request_builder::LoggingPolicy;
+use solrstice::AsyncSolrCloudClient;
+use solrstice::Error;
+use solrstice::LoggingPolicy;
+use solrstice::SolrServerContextBuilder;
 use std::sync::{Arc, Mutex, OnceLock};
 
 struct TestLogger {
@@ -40,7 +40,7 @@ pub fn init_logger() -> Arc<Mutex<Vec<String>>> {
 
 #[tokio::test]
 #[serial]
-async fn logging_logs_message() -> Result<(), SolrError> {
+async fn logging_logs_message() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     let mut context = SolrServerContextBuilder::new(config.host);
     if config.auth.is_some() {
@@ -62,12 +62,12 @@ async fn logging_logs_message() -> Result<(), SolrError> {
             return Ok(());
         }
     }
-    Err(SolrError::Unknown("No log message found".to_string()))
+    Err(Error::Unknown("No log message found".to_string()))
 }
 
 #[tokio::test]
 #[serial]
-async fn logging_does_not_log_message_if_disabled() -> Result<(), SolrError> {
+async fn logging_does_not_log_message_if_disabled() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     let mut context =
         SolrServerContextBuilder::new(config.host).with_logging_policy(LoggingPolicy::Off);
@@ -88,7 +88,7 @@ async fn logging_does_not_log_message_if_disabled() -> Result<(), SolrError> {
     let messages = LOGGER_MESSAGES.get().unwrap().lock().unwrap();
     for message in messages.iter() {
         if message.contains("Sending Solr request to") {
-            return Err(SolrError::Unknown(format!(
+            return Err(Error::Unknown(format!(
                 "Did not expect log message, but got {}",
                 message
             )));

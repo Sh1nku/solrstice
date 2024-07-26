@@ -1,4 +1,4 @@
-use crate::models::error::SolrError;
+use crate::error::Error;
 use crate::models::facet_set::SolrFacetSetResult;
 use crate::models::group::SolrGroupResult;
 use crate::models::json_facet::SolrJsonFacetResponse;
@@ -68,12 +68,8 @@ impl SolrDocsResponse {
     ///
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponent;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, SelectQuery, SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -82,7 +78,7 @@ impl SolrDocsResponse {
     /// Ok(())
     /// # }
     /// ```
-    pub fn get_docs<V: DeserializeOwned>(&self) -> Result<Vec<V>, SolrError> {
+    pub fn get_docs<V: DeserializeOwned>(&self) -> Result<Vec<V>, Error> {
         serde_json::from_str::<Vec<V>>(self.docs.get()).map_err(|e| e.into())
     }
 }
@@ -125,12 +121,8 @@ impl SolrResponse {
     /// Get the docs returned by a select request.
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponent;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// use solrstice::{AsyncSolrCloudClient, SelectQuery, SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
     /// let client = AsyncSolrCloudClient::new(context);
@@ -146,12 +138,8 @@ impl SolrResponse {
     ///
     /// # Examples
     /// ```no_run
-    /// # use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-    /// # use solrstice::hosts::solr_server_host::SolrSingleServerHost;
-    /// # use solrstice::models::auth::SolrBasicAuth;
-    /// # use solrstice::models::context::SolrServerContextBuilder;
-    /// # use solrstice::queries::components::grouping::GroupingComponent;
-    /// # use solrstice::queries::select::SelectQuery;
+    /// # use solrstice::{AsyncSolrCloudClient, GroupingComponent, SelectQuery, SolrBasicAuth, SolrServerContextBuilder, SolrSingleServerHost};
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).with_auth(SolrBasicAuth::new("solr", Some("SolrRocks"))).build();
     /// let client = AsyncSolrCloudClient::new(context);

@@ -1,21 +1,9 @@
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::queries::def_type::{
-    DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator,
-};
-
-#[pymodule]
-pub fn def_type(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<QueryOperatorWrapper>()?;
-    m.add_class::<DefTypeWrapper>()?;
-    m.add_class::<LuceneQueryWrapper>()?;
-    m.add_class::<DismaxQueryWrapper>()?;
-    m.add_class::<EdismaxQueryWrapper>()?;
-    Ok(())
-}
+use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator};
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
-#[pyclass(name = "QueryOperator", module = "solrstice.def_type")]
+#[pyclass(name = "QueryOperator")]
 pub enum QueryOperatorWrapper {
     AND,
     OR,
@@ -39,7 +27,7 @@ impl From<QueryOperator> for QueryOperatorWrapper {
     }
 }
 
-#[pyclass(name = "DefType", module = "solrstice.def_type", subclass)]
+#[pyclass(name = "DefType", module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DefTypeWrapper(DefType);
 
@@ -65,7 +53,7 @@ impl DefTypeWrapper {
     }
 }
 
-#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
+#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LuceneQueryWrapper {}
 
@@ -85,7 +73,7 @@ impl LuceneQueryWrapper {
     }
 }
 
-#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
+#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DismaxQueryWrapper {}
 
@@ -118,7 +106,7 @@ impl DismaxQueryWrapper {
     }
 }
 
-#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice.def_type", subclass)]
+#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EdismaxQueryWrapper {}
 

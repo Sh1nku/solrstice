@@ -1,13 +1,13 @@
 use crate::structures::BaseTestsBuildup;
 use serial_test::parallel;
-use solrstice::clients::async_cloud_client::AsyncSolrCloudClient;
-use solrstice::models::auth::SolrBasicAuth;
-use solrstice::models::context::SolrServerContextBuilder;
-use solrstice::models::error::SolrError;
+use solrstice::AsyncSolrCloudClient;
+use solrstice::Error;
+use solrstice::SolrBasicAuth;
+use solrstice::SolrServerContextBuilder;
 
 #[tokio::test]
 #[parallel]
-async fn auth_gives_sensible_error_when_not_provided() -> Result<(), SolrError> {
+async fn auth_gives_sensible_error_when_not_provided() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     if config.auth.is_none() {
         return Ok(());
@@ -16,19 +16,17 @@ async fn auth_gives_sensible_error_when_not_provided() -> Result<(), SolrError> 
     let client = AsyncSolrCloudClient::new(context);
     let response = client.get_collections().await;
     match response {
-        Ok(_) => Err(SolrError::Unknown("Should not have succeeded".to_string())),
+        Ok(_) => Err(Error::Unknown("Should not have succeeded".to_string())),
         Err(e) => match e {
-            SolrError::SolrAuthError(_) => Ok(()),
-            _ => Err(SolrError::Unknown(
-                "Should have been auth error".to_string(),
-            )),
+            Error::SolrAuthError(_) => Ok(()),
+            _ => Err(Error::Unknown("Should have been auth error".to_string())),
         },
     }
 }
 
 #[tokio::test]
 #[parallel]
-async fn auth_gives_sensible_error_when_wrong() -> Result<(), SolrError> {
+async fn auth_gives_sensible_error_when_wrong() -> Result<(), Error> {
     let config = BaseTestsBuildup::new().await;
     if config.auth.is_none() {
         return Ok(());
@@ -39,12 +37,10 @@ async fn auth_gives_sensible_error_when_wrong() -> Result<(), SolrError> {
     let client = AsyncSolrCloudClient::new(context);
     let response = client.get_collections().await;
     match response {
-        Ok(_) => Err(SolrError::Unknown("Should not have succeeded".to_string())),
+        Ok(_) => Err(Error::Unknown("Should not have succeeded".to_string())),
         Err(e) => match e {
-            SolrError::SolrAuthError(_) => Ok(()),
-            _ => Err(SolrError::Unknown(
-                "Should have been auth error".to_string(),
-            )),
+            Error::SolrAuthError(_) => Ok(()),
+            _ => Err(Error::Unknown("Should have been auth error".to_string())),
         },
     }
 }

@@ -17,7 +17,7 @@ If the `blocking` feature is not provided, only async will work.
 ```bash
 pip install solrstice
 ```
-* [Python docs](https://sh1nku.github.io/solrstice/python)
+* [Python docs](https://pypi.org/project/solrstice/)
 
 ## Getting started
 
