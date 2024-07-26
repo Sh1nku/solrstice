@@ -1,5 +1,10 @@
+from typing import Generator
+
 import pytest
-from helpers import (
+
+from solrstice import DismaxQuery, EdismaxQuery, LuceneQuery, SelectQuery
+
+from .helpers import (
     Config,
     create_config,
     index_test_data,
@@ -8,17 +13,14 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice import DismaxQuery, EdismaxQuery, LuceneQuery
-from solrstice import SelectQuery
-
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_lucene_query_parser(config: Config):
+async def test_lucene_query_parser(config: Config) -> None:
     name = "LuceneQueryParser"
     wait_for_solr(config.solr_host, 30)
 
@@ -34,7 +36,7 @@ async def test_lucene_query_parser(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_dismax_query_parser(config: Config):
+async def test_dismax_query_parser(config: Config) -> None:
     name = "DismaxQueryParser"
     wait_for_solr(config.solr_host, 30)
 
@@ -47,6 +49,7 @@ async def test_dismax_query_parser(config: Config):
         response = (
             await select_builder.execute(config.context, name)
         ).get_docs_response()
+        assert response is not None
         first_doc = response.get_docs()[0]
         assert first_doc["id"] == "city_Alta_20"
     finally:
@@ -54,7 +57,7 @@ async def test_dismax_query_parser(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_edismax_query_parser(config: Config):
+async def test_edismax_query_parser(config: Config) -> None:
     name = "EdismaxQueryParser"
     wait_for_solr(config.solr_host, 30)
 
@@ -67,6 +70,7 @@ async def test_edismax_query_parser(config: Config):
         response = (
             await select_builder.execute(config.context, name)
         ).get_docs_response()
+        assert response is not None
         first_doc = response.get_docs()[0]
         assert first_doc["id"] == "city_Alta_20"
     finally:

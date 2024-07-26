@@ -1,19 +1,23 @@
 import dataclasses
 import random
 from multiprocessing.pool import ThreadPool
-from typing import Optional
+from typing import Generator, Optional
 
 import pytest
-from helpers import Config, create_config
 
-from solrstice import SolrBasicAuth
-from solrstice import BlockingSolrCloudClient
-from solrstice import SolrServerContext, SolrSingleServerHost
-from solrstice import UpdateQuery
+from solrstice import (
+    BlockingSolrCloudClient,
+    SolrBasicAuth,
+    SolrServerContext,
+    SolrSingleServerHost,
+    UpdateQuery,
+)
+
+from .helpers import Config, create_config
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
@@ -24,7 +28,7 @@ class PickableConfig:
     solr_password: Optional[str]
 
 
-def create_client(config: PickableConfig):
+def create_client(config: PickableConfig) -> BlockingSolrCloudClient:
     auth = (
         None
         if not config.solr_username
@@ -35,7 +39,7 @@ def create_client(config: PickableConfig):
     )
 
 
-def index_independent(config: PickableConfig, collection_name):
+def index_independent(config: PickableConfig, collection_name: str) -> None:
     client = create_client(config)
     client.index(
         UpdateQuery(),
@@ -76,7 +80,7 @@ def index_independent(config: PickableConfig, collection_name):
 #         pass
 
 
-def test_blocking_multithreading_works(config: Config):
+def test_blocking_multithreading_works(config: Config) -> None:
     name = "BlockingMultithreadingWorks"
 
     pickable_config = PickableConfig(

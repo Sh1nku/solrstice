@@ -2,22 +2,27 @@
 import asyncio
 import time
 from multiprocessing.pool import ThreadPool
-from typing import Optional
+from typing import Generator, List, Optional
 
 import pytest
-from helpers import Config, create_config
 
-from solrstice import SolrBasicAuth
-from solrstice import AsyncSolrCloudClient, BlockingSolrCloudClient
-from solrstice import SolrServerContext, SolrSingleServerHost
+from solrstice import (
+    AsyncSolrCloudClient,
+    BlockingSolrCloudClient,
+    SolrBasicAuth,
+    SolrServerContext,
+    SolrSingleServerHost,
+)
+
+from .helpers import Config, create_config
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
-def test_blocking_client_does_not_block_gil_config(config: Config):
+def test_blocking_client_does_not_block_gil_config(config: Config) -> None:
     processes = 8
     if not config.speedbump_host:
         pytest.skip("No speedbump host configured")
@@ -39,7 +44,7 @@ def test_blocking_client_does_not_block_gil_config(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_async_client_does_not_block_event_loop(config: Config):
+async def test_async_client_does_not_block_event_loop(config: Config) -> None:
     processes = 8
     if not config.speedbump_host:
         pytest.skip("No speedbump host configured")
@@ -58,7 +63,9 @@ async def test_async_client_does_not_block_event_loop(config: Config):
     assert elapsed_seconds < processes
 
 
-def get_configs_blocking(host: str, username: Optional[str], password: Optional[str]):
+def get_configs_blocking(
+    host: str, username: Optional[str], password: Optional[str]
+) -> List[str]:
     auth = None if not username else SolrBasicAuth(username, password)
     client = BlockingSolrCloudClient(
         SolrServerContext(SolrSingleServerHost(host), auth)
@@ -67,8 +74,8 @@ def get_configs_blocking(host: str, username: Optional[str], password: Optional[
 
 
 async def get_configs_async(
-        host: str, username: Optional[str], password: Optional[str]
-):
+    host: str, username: Optional[str], password: Optional[str]
+) -> List[str]:
     auth = None if not username else SolrBasicAuth(username, password)
     client = AsyncSolrCloudClient(SolrServerContext(SolrSingleServerHost(host), auth))
     return await client.get_configs()

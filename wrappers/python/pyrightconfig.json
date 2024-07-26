@@ -1,6 +1,8 @@
 {
   "include": [
-    "solrstice"
+    "solrstice/**/*.py",
+    "solrstice/**/*.pyi",
+    "tests/**/*.py"
   ],
   "exclude": [
     "**/__pycache__"

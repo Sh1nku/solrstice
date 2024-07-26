@@ -1,5 +1,5 @@
 name: Test python wrapper
-on: [push]
+on: [ push ]
 jobs:
   checks:
     runs-on: ubuntu-latest
@@ -35,18 +35,18 @@ jobs:
       - name: Start docker containers
         run: docker-compose up -d
         working-directory: ./docker/${{ matrix.docker-version }}
+      - name: Run pyright
+        working-directory: ./wrappers/python
+        run: |
+          source venv/bin/activate
+          pyright
+      - name: Run mypy
+        working-directory: ./wrappers/python
+        run: |
+          source venv/bin/activate
+          mypy
       - name: Run tests
         working-directory: ./wrappers/python
         run: |
           source venv/bin/activate
           pytest
-      - name: Run mypy
-        working-directory: ./wrappers/python
-        run: |
-          source venv/bin/activate
-          mypy solrstice/
-      - name: Run pyright
-        working-directory: ./wrappers/python
-        run: |
-          source venv/bin/activate
-          pyright solrstice/

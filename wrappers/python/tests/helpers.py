@@ -8,8 +8,14 @@ from urllib.request import urlopen
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
-from solrstice import SolrBasicAuth, SolrServerContext, AsyncSolrCloudClient, SolrSingleServerHost, UpdateQuery
-from solrstice.collection import delete_collection, create_collection
+from solrstice import (
+    AsyncSolrCloudClient,
+    SolrBasicAuth,
+    SolrServerContext,
+    SolrSingleServerHost,
+    UpdateQuery,
+)
+from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
 
 
@@ -41,6 +47,7 @@ def create_config() -> Config:
     if solr_username:
         solr_auth = SolrBasicAuth(solr_username, solr_password)
     host = os.getenv("SOLR_HOST")
+    assert host is not None
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
     solr_host = SolrSingleServerHost(host)
     context = SolrServerContext(solr_host, solr_auth)
@@ -57,12 +64,12 @@ def create_config() -> Config:
     )
 
 
-def wait_for_solr(host: str, max_time: int):
+def wait_for_solr(host: str, max_time: int) -> None:
     end = time.time() + max_time
     while time.time() < end:
         try:
             with urlopen(
-                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -104,7 +111,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-        context: SolrServerContext, name: str, config_path: str
+    context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)

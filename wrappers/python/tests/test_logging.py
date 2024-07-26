@@ -1,15 +1,16 @@
 import logging
+from typing import Generator
 
 import pytest
 from _pytest.logging import LogCaptureFixture
-from helpers import Config, create_config, wait_for_solr
 
-from solrstice import AsyncSolrCloudClient
-from solrstice import OffLoggingPolicy, SolrServerContext
+from solrstice import AsyncSolrCloudClient, OffLoggingPolicy, SolrServerContext
+
+from .helpers import Config, create_config, wait_for_solr
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
@@ -30,8 +31,8 @@ def config() -> Config:
 
 @pytest.mark.asyncio
 async def test_logging_does_not_log_message_if_disabled(
-        config: Config, caplog: LogCaptureFixture
-):
+    config: Config, caplog: LogCaptureFixture
+) -> None:
     wait_for_solr(config.solr_host, 30)
 
     context = SolrServerContext(config.solr_host, config.solr_auth, OffLoggingPolicy())

@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional
 
-
 class SolrFacetSetResult:
     """
     Gets the facet counts from a query
@@ -28,7 +27,6 @@ class SolrFacetSetResult:
 
         :return: The field facets
         """
-
 
 class SolrPivotFacetResult:
     """
@@ -61,7 +59,6 @@ class SolrPivotFacetResult:
         :return: The count of the pivot
         """
 
-
 class SolrFieldFacetResult:
     def get_key(self) -> Any:
         """
@@ -76,7 +73,6 @@ class SolrFieldFacetResult:
         Gets the count of the facet
         :return: The count of the facet
         """
-
 
 class SolrGroupFieldResult:
     """
@@ -94,7 +90,6 @@ class SolrGroupFieldResult:
         Gets the document response from solr
         :return: Document response
         """
-
 
 class SolrGroupResult:
     """
@@ -131,7 +126,6 @@ class SolrGroupResult:
         :return: Number of groups
         """
 
-
 class SolrJsonFacetResponse:
     """
     A response from a json facet query
@@ -167,7 +161,6 @@ class SolrJsonFacetResponse:
         :return: The value for this facet
         """
 
-
 class SolrDocsResponse:
     def get_num_found(self) -> int:
         """Get the number of documents found in the query"""
@@ -180,7 +173,6 @@ class SolrDocsResponse:
 
     def get_docs(self) -> List[Dict[str, Any]]:
         """Get the documents from the query"""
-
 
 class SolrResponse:
     """The response from a solr query"""

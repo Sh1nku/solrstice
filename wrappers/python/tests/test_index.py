@@ -1,5 +1,10 @@
+from typing import Generator
+
 import pytest
-from helpers import (
+
+from solrstice import CommitType, UpdateQuery
+
+from .helpers import (
     Config,
     create_config,
     setup_collection,
@@ -7,16 +12,14 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice import CommitType, UpdateQuery
-
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_index_indexes_documents(config: Config):
+async def test_index_indexes_documents(config: Config) -> None:
     name = "IndexIndexesDocuments"
     wait_for_solr(config.solr_host, 30)
 

@@ -1,20 +1,21 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Optional
 
 import pytest
 from dotenv import load_dotenv
-from helpers import wait_for_solr
 
-from solrstice import SolrBasicAuth
-from solrstice.config import get_configs, get_configs_blocking
 from solrstice import (
+    SolrBasicAuth,
     SolrMultipleServerHost,
     SolrServerContext,
     SolrSingleServerHost,
     ZookeeperEnsembleHostConnector,
 )
+from solrstice.config import get_configs, get_configs_blocking
+
+from .helpers import wait_for_solr
 
 
 @dataclass
@@ -25,22 +26,28 @@ class Config:
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     path = Path("../../test_setup/.env").resolve()
     load_dotenv(path)
     solr_auth = None
-    if os.getenv("SOLR_USERNAME") is not None and os.getenv("SOLR_PASSWORD") is not "":
+    solr_username = os.getenv("SOLR_USERNAME")
+    solr_password = os.getenv("SOLR_PASSWORD")
+
+    if solr_username is not None and solr_password is not "":
         solr_auth = SolrBasicAuth(
-            os.getenv("SOLR_USERNAME"),
-            os.getenv("SOLR_PASSWORD"),
+            solr_username,
+            solr_password,
         )
     host = os.getenv("SOLR_HOST")
+    assert host is not None
+    zookeeper_host = os.getenv("ZK_HOST")
+    assert zookeeper_host is not None
 
-    yield Config(host, os.getenv("ZK_HOST"), solr_auth)
+    yield Config(host, zookeeper_host, solr_auth)
 
 
 @pytest.mark.asyncio
-async def test_zookeeper_connection_works(config: Config):
+async def test_zookeeper_connection_works(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(
         await ZookeeperEnsembleHostConnector([config.zookeeper_host], 30).connect(),
@@ -49,7 +56,7 @@ async def test_zookeeper_connection_works(config: Config):
     await get_configs(context)
 
 
-def test_zookeeper_connection_works_blocking(config: Config):
+def test_zookeeper_connection_works_blocking(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(
         ZookeeperEnsembleHostConnector([config.zookeeper_host], 30).connect_blocking(),
@@ -59,27 +66,27 @@ def test_zookeeper_connection_works_blocking(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_solr_single_server_works(config: Config):
+async def test_solr_single_server_works(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(SolrSingleServerHost(config.host), config.auth)
     await get_configs(context)
 
 
 @pytest.mark.asyncio
-async def test_solr_single_server_works_with_string(config: Config):
+async def test_solr_single_server_works_with_string(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(config.host, config.auth)
     await get_configs(context)
 
 
 @pytest.mark.asyncio
-async def test_multiple_server_works(config: Config):
+async def test_multiple_server_works(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(SolrMultipleServerHost([config.host], 5), config.auth)
     await get_configs(context)
 
 
-def test_solr_multiple_server_works_blocking(config: Config):
+def test_solr_multiple_server_works_blocking(config: Config) -> None:
     wait_for_solr(config.host, 30)
     context = SolrServerContext(SolrMultipleServerHost([config.host], 5), config.auth)
     get_configs_blocking(context)

@@ -1,5 +1,16 @@
+from typing import Generator
+
 import pytest
-from helpers import (
+
+from solrstice import (
+    FacetSetComponent,
+    FieldFacetComponent,
+    FieldFacetEntry,
+    PivotFacetComponent,
+    SelectQuery,
+)
+
+from .helpers import (
     Config,
     create_config,
     index_test_data,
@@ -8,22 +19,14 @@ from helpers import (
     wait_for_solr,
 )
 
-from solrstice import (
-    FacetSetComponent,
-    FieldFacetComponent,
-    FieldFacetEntry,
-    PivotFacetComponent,
-)
-from solrstice import SelectQuery
-
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> Generator[Config, None, None]:
     yield create_config()
 
 
 @pytest.mark.asyncio
-async def test_facet_pivot_works(config: Config):
+async def test_facet_pivot_works(config: Config) -> None:
     name = "FacetPivot"
     wait_for_solr(config.solr_host, 30)
 
@@ -36,8 +39,8 @@ async def test_facet_pivot_works(config: Config):
         select_builder = SelectQuery(facet_set=facet_set)
         response = await config.async_client.select(select_builder, name)
         facets = response.get_facet_set()
-        pivot = facets.get_pivots()
-        interests_age = pivot.get("interests,age")
+        pivot_result = facets.get_pivots()
+        interests_age = pivot_result["interests,age"]
         cars_pivot = next(p for p in interests_age if p.get_value() == "cars")
         assert cars_pivot.get_count() == 1
         age_pivot = cars_pivot.get_pivots()[0]
@@ -47,7 +50,7 @@ async def test_facet_pivot_works(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_facet_query_works(config: Config):
+async def test_facet_query_works(config: Config) -> None:
     name = "FacetQuery"
     wait_for_solr(config.solr_host, 30)
 
@@ -67,7 +70,7 @@ async def test_facet_query_works(config: Config):
 
 
 @pytest.mark.asyncio
-async def test_facet_field_works(config: Config):
+async def test_facet_field_works(config: Config) -> None:
     name = "FacetField"
     wait_for_solr(config.solr_host, 30)
 
@@ -80,8 +83,8 @@ async def test_facet_field_works(config: Config):
         select_builder = SelectQuery(facet_set=facet_set)
         response = await config.async_client.select(select_builder, name)
         facets = response.get_facet_set()
-        fields = facets.get_fields()
-        age = fields.get("age")
+        fields_result = facets.get_fields()
+        age = fields_result["age"]
         assert len(age) == 3
     finally:
         await teardown_collection(config.context, name)

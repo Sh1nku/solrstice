@@ -2,13 +2,12 @@ from typing import List, Optional
 
 from solrstice import SolrServerContext
 
-
 async def create_collection(
-        context: SolrServerContext,
-        name: str,
-        config: str,
-        shards: Optional[int] = 1,
-        replication_factor: Optional[int] = 1,
+    context: SolrServerContext,
+    name: str,
+    config: str,
+    shards: Optional[int] = 1,
+    replication_factor: Optional[int] = 1,
 ) -> None:
     """
     Create a collection on the Solr server.
@@ -19,14 +18,13 @@ async def create_collection(
     :param shards: The number of shards to create.
     :param replication_factor: The replication factor to use.
     """
-
 
 def create_collection_blocking(
-        context: SolrServerContext,
-        name: str,
-        config: str,
-        shards: Optional[int] = 1,
-        replication_factor: Optional[int] = 1,
+    context: SolrServerContext,
+    name: str,
+    config: str,
+    shards: Optional[int] = 1,
+    replication_factor: Optional[int] = 1,
 ) -> None:
     """
     Create a collection on the Solr server.
@@ -37,7 +35,6 @@ def create_collection_blocking(
     :param shards: The number of shards to create.
     :param replication_factor: The replication factor to use.
     """
-
 
 async def get_collections(context: SolrServerContext) -> List[str]:
     """
@@ -47,7 +44,6 @@ async def get_collections(context: SolrServerContext) -> List[str]:
     :return: The list of collections on the Solr server.
     """
 
-
 def get_collections_blocking(context: SolrServerContext) -> List[str]:
     """
     Get the list of collections on the Solr server.
@@ -55,7 +51,6 @@ def get_collections_blocking(context: SolrServerContext) -> List[str]:
     :param context: The Solr server context.
     :return: The list of collections on the Solr server.
     """
-
 
 async def collection_exists(context: SolrServerContext, name: str) -> bool:
     """
@@ -66,7 +61,6 @@ async def collection_exists(context: SolrServerContext, name: str) -> bool:
     :return: True if the collection exists, False otherwise.
     """
 
-
 def collection_exists_blocking(context: SolrServerContext, name: str) -> bool:
     """
     Check if a collection exists on the Solr server.
@@ -76,7 +70,6 @@ def collection_exists_blocking(context: SolrServerContext, name: str) -> bool:
     :return: True if the collection exists, False otherwise.
     """
 
-
 async def delete_collection(context: SolrServerContext, name: str) -> None:
     """
     Delete a config from the Solr server.
@@ -84,7 +77,6 @@ async def delete_collection(context: SolrServerContext, name: str) -> None:
     :param context: The Solr server context.
     :param name: The name of the collection to delete.
     """
-
 
 def delete_collection_blocking(context: SolrServerContext, name: str) -> None:
     """

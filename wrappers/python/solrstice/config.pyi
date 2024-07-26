@@ -8,9 +8,8 @@ if TYPE_CHECKING:
 else:
     Somepath = Union[PathLike, str]
 
-
 async def upload_config(
-        context: SolrServerContext, config_name: str, config_path: Somepath
+    context: SolrServerContext, config_name: str, config_path: Somepath
 ) -> None:
     """Uploads a Solr config to a Solr instance
 
@@ -19,10 +18,9 @@ async def upload_config(
     :param config_path: Path to the config
     """
     pass
-
 
 def upload_config_blocking(
-        context: SolrServerContext, config_name: str, config_path: Somepath
+    context: SolrServerContext, config_name: str, config_path: Somepath
 ) -> None:
     """Uploads a Solr config to a Solr instance
 
@@ -31,7 +29,6 @@ def upload_config_blocking(
     :param config_path: Path to the config
     """
     pass
-
 
 async def delete_config(context: SolrServerContext, config_name: str) -> None:
     """Deletes a Solr config from a Solr instance
@@ -41,7 +38,6 @@ async def delete_config(context: SolrServerContext, config_name: str) -> None:
     """
     pass
 
-
 def delete_config_blocking(context: SolrServerContext, config_name: str) -> None:
     """Deletes a Solr config from a Solr instance
 
@@ -49,7 +45,6 @@ def delete_config_blocking(context: SolrServerContext, config_name: str) -> None
     :param config_name: Name of the config
     """
     pass
-
 
 async def config_exists(context: SolrServerContext, config_name: str) -> bool:
     """Checks if a Solr config exists on a Solr instance
@@ -59,7 +54,6 @@ async def config_exists(context: SolrServerContext, config_name: str) -> bool:
     """
     pass
 
-
 def config_exists_blocking(context: SolrServerContext, config_name: str) -> bool:
     """Checks if a Solr config exists on a Solr instance
 
@@ -68,14 +62,12 @@ def config_exists_blocking(context: SolrServerContext, config_name: str) -> bool
     """
     pass
 
-
 async def get_configs(context: SolrServerContext) -> List[str]:
     """Gets a list of Solr configs on a Solr instance
 
     :param context: SolrServerRequest context
     """
     pass
-
 
 def get_configs_blocking(context: SolrServerContext) -> List[str]:
     """Gets a list of Solr configs on a Solr instance
