@@ -47,6 +47,46 @@ impl BaseTestsBuildup {
     }
 }
 
+pub struct ErrrorTestsSetup {
+    pub context: SolrServerContext,
+    pub config_path: String,
+    pub host: SolrSingleServerHost,
+    pub auth: Option<SolrBasicAuth>,
+}
+
+impl ErrrorTestsSetup {
+    pub async fn new() -> Self {
+        dotenv::from_filename("../test_setup/.env").ok();
+        let username = std::env::var("SOLR_USERNAME").unwrap();
+        let password = std::env::var("SOLR_PASSWORD").unwrap();
+        let auth = match username.is_empty() {
+            true => None,
+            false => Some(SolrBasicAuth::new(
+                username.as_str(),
+                Some(password.as_str()),
+            )),
+        };
+        let error_nginx_hostname = std::env::var("ERROR_NGINX_HOST")
+            .unwrap()
+            .as_str()
+            .to_string();
+        let host = SolrSingleServerHost::new(&error_nginx_hostname);
+        let builder = SolrServerContextBuilder::new(host.clone());
+        let context = if let Some(auth) = auth.clone() {
+            builder.with_auth(auth).build()
+        } else {
+            builder.build()
+        };
+        wait_for_error_nginx(&error_nginx_hostname, Duration::from_secs(30)).await;
+        ErrrorTestsSetup {
+            context,
+            config_path: "../test_setup/test_collection".to_string(),
+            host,
+            auth,
+        }
+    }
+}
+
 pub struct FunctionalityTestsBuildup {
     pub context: SolrServerContext,
     pub async_client: AsyncSolrCloudClient,
@@ -146,4 +186,15 @@ pub async fn wait_for_solr(context: &SolrServerContext, max_time: Duration) {
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
     panic!("Solr did not respond within {:?} seconds", max_time);
+}
+
+pub async fn wait_for_error_nginx(host: &str, max_time: Duration) {
+    let end = std::time::Instant::now() + max_time;
+    while std::time::Instant::now() < end {
+        let response = reqwest::get(format!("{}/status", host)).await.unwrap();
+        if response.status().is_success() {
+            return;
+        }
+        tokio::time::sleep(Duration::from_secs(1)).await;
+    }
 }

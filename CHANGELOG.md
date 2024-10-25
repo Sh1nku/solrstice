@@ -1,3 +1,6 @@
+# v0.6.0
+* Breaking changes to error handling. Clearer error messages.
+
 # v0.5.0
 
 * Add logging of solr requests

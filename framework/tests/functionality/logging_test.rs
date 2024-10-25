@@ -1,10 +1,10 @@
-use crate::structures::{BaseTestsBuildup, FunctionalityTestsBuildup};
+use crate::structures::{BaseTestsBuildup, ErrrorTestsSetup, FunctionalityTestsBuildup};
 use log::{Metadata, Record};
 use serial_test::serial;
-use solrstice::{AsyncSolrCloudClient, SelectQuery};
 use solrstice::Error;
 use solrstice::LoggingPolicy;
 use solrstice::SolrServerContextBuilder;
+use solrstice::{AsyncSolrCloudClient, SelectQuery};
 use std::sync::{Arc, Mutex, OnceLock};
 
 struct TestLogger {
@@ -113,6 +113,28 @@ async fn logging_works_if_request_fails() -> Result<(), Error> {
 
     let query = SelectQuery::new().fq(["this_is_a_syntax_error::0"]);
     let _ = client.select(query, &config.collection_name).await;
+    let messages = LOGGER_MESSAGES.get().unwrap().lock().unwrap();
+    for message in messages.iter() {
+        if message.contains("Sending Solr request to") {
+            return Ok(());
+        }
+    }
+    Err(Error::Unknown("No log message found".to_string()))
+}
+
+#[tokio::test]
+#[serial]
+async fn logging_works_if_request_never_reaches_solr() -> Result<(), Error> {
+    let config = ErrrorTestsSetup::new().await;
+    let client = AsyncSolrCloudClient::new(config.context);
+
+    LOGGER_MESSAGES
+        .get_or_init(init_logger)
+        .lock()
+        .unwrap()
+        .clear();
+
+    let _ = client.select(SelectQuery::new(), "error_collection").await;
     let messages = LOGGER_MESSAGES.get().unwrap().lock().unwrap();
     for message in messages.iter() {
         if message.contains("Sending Solr request to") {

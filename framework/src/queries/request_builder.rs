@@ -1,6 +1,7 @@
 use crate::error::{try_solr_error, Error};
 use crate::models::context::SolrServerContext;
 use crate::models::response::SolrResponse;
+use crate::Error::SolrConnectionError;
 use log::debug;
 use reqwest::header::HeaderMap;
 use reqwest::{Body, Request, RequestBuilder, Response, Url};
@@ -73,10 +74,7 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        try_request_auth_error(&response).await?;
-        let solr_response = response.json::<SolrResponse>().await?;
-        try_solr_error(&solr_response)?;
-        Ok(solr_response)
+        handle_solr_response(response).await
     }
 
     pub async fn send_post_with_json<T: Serialize + 'a + ?Sized>(
@@ -98,10 +96,7 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        try_request_auth_error(&response).await?;
-        let solr_response = response.json::<SolrResponse>().await?;
-        try_solr_error(&solr_response)?;
-        Ok(solr_response)
+        handle_solr_response(response).await
     }
 
     pub async fn send_post_with_body<T: Into<Body>>(self, data: T) -> Result<SolrResponse, Error> {
@@ -120,10 +115,7 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        try_request_auth_error(&response).await?;
-        let solr_response = response.json::<SolrResponse>().await?;
-        try_solr_error(&solr_response)?;
-        Ok(solr_response)
+        handle_solr_response(response).await
     }
 }
 
@@ -154,22 +146,24 @@ async fn create_standard_request<'a>(
     Ok(request)
 }
 
-async fn try_request_auth_error(response: &Response) -> Result<(), Error> {
-    match response.error_for_status_ref() {
-        Ok(_) => Ok(()),
-        Err(e) => {
-            if e.status().ok_or(Error::Unknown(
-                "Error while getting response code from request".to_string(),
-            ))? == 401
-            {
-                Err(Error::SolrAuthError(
-                    "Authentication failed with 401. Check credentials.".to_string(),
-                ))
-            } else {
-                Ok(())
-            }
-        }
+async fn handle_solr_response(response: Response) -> Result<SolrResponse, Error> {
+    let url = response.url().clone();
+    let status_code = response.status();
+    let body = response.text().await.unwrap_or_default();
+    let solr_response = serde_json::from_str::<SolrResponse>(&body);
+    if let Ok(r) = solr_response {
+        try_solr_error(&r)?;
+        return Ok(r);
     }
+    if status_code == 401 {
+        return Err(Error::SolrAuthError(
+            "Authentication failed with 401. Check credentials.".to_string(),
+        ));
+    }
+    Err(SolrConnectionError(format!(
+        "Error while sending request to {}: {}\n{}",
+        url, status_code, body
+    )))
 }
 
 static NO_BODY: &[u8] = "No body".as_bytes();
