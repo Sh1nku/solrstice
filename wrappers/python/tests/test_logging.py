@@ -5,21 +5,9 @@ from typing import Generator
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from solrstice import (
-    AsyncSolrCloudClient,
-    OffLoggingPolicy,
-    SelectQuery,
-    SolrServerContext,
-)
+from solrstice import AsyncSolrCloudClient, OffLoggingPolicy, SolrServerContext
 
-from .helpers import (
-    Config,
-    create_config,
-    index_test_data,
-    setup_collection,
-    teardown_collection,
-    wait_for_solr,
-)
+from .helpers import Config, create_config, wait_for_solr
 
 
 @pytest.fixture()

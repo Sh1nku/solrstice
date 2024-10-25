@@ -82,7 +82,7 @@ def wait_for_solr(host: str, max_time: int) -> None:
     while time.time() < end:
         try:
             with urlopen(
-                    f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
+                f'{host}{"/solr/admin/collections"}?action=CLUSTERSTATUS'
             ) as response:
                 if response.status == 200:
                     return
@@ -116,9 +116,7 @@ def wait_for_error_nginx(host: str, max_time: int) -> None:
     end = time.time() + max_time
     while time.time() < end:
         try:
-            with urlopen(
-                    f'{host}{"/status"}'
-            ) as response:
+            with urlopen(f'{host}{"/status"}') as response:
                 if response.status == 200:
                     return
         except Exception:
@@ -156,7 +154,7 @@ async def index_test_data(context: SolrServerContext, name: str) -> None:
 
 
 async def setup_collection(
-        context: SolrServerContext, name: str, config_path: str
+    context: SolrServerContext, name: str, config_path: str
 ) -> None:
     try:
         await delete_collection(context, name)

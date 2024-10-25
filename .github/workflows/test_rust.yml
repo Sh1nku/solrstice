@@ -1,6 +1,31 @@
 name: Unit tests, linting, and formatting
-on: [push]
+on: [ push ]
 jobs:
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update Rust
+        run: |
+          rustup override set stable
+          rustup update stable
+      - name: Install cargo-msrv
+        run: cargo install cargo-msrv
+      - name: Check MSRV
+        run: cargo msrv verify --all-features --path framework/
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update Rust
+        run: |
+          rustup override set stable
+          rustup update stable
+      - name: Lint
+        run: cargo clippy
+      - name: Check formatting
+        run: cargo fmt --check
+
   checks:
     runs-on: ubuntu-latest
     strategy:
@@ -13,11 +38,7 @@ jobs:
           rustup override set stable
           rustup update stable
       - name: Start docker containers
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: ./docker/${{ matrix.docker-version }}
       - name: Run tests
         run: cargo test --all-features
-      - name: Lint
-        run: cargo clippy
-      - name: Check formatting
-        run: cargo fmt --check
