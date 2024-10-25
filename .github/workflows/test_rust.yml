@@ -10,7 +10,7 @@ jobs:
           rustup override set stable
           rustup update stable
       - name: Install cargo-msrv
-        run: cargo install cargo-msrv
+        run: cargo install cargo-msrv --locked
       - name: Check MSRV
         run: cargo msrv verify --all-features --path framework/
   format:
