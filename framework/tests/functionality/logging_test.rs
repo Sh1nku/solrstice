@@ -1,7 +1,7 @@
-use crate::structures::BaseTestsBuildup;
+use crate::structures::{BaseTestsBuildup, FunctionalityTestsBuildup};
 use log::{Metadata, Record};
 use serial_test::serial;
-use solrstice::AsyncSolrCloudClient;
+use solrstice::{AsyncSolrCloudClient, SelectQuery};
 use solrstice::Error;
 use solrstice::LoggingPolicy;
 use solrstice::SolrServerContextBuilder;
@@ -95,4 +95,29 @@ async fn logging_does_not_log_message_if_disabled() -> Result<(), Error> {
         }
     }
     Ok(())
+}
+
+#[tokio::test]
+#[serial]
+async fn logging_works_if_request_fails() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SyntaxErrorLogging")
+        .await
+        .unwrap();
+    let client = AsyncSolrCloudClient::new(config.context);
+
+    LOGGER_MESSAGES
+        .get_or_init(init_logger)
+        .lock()
+        .unwrap()
+        .clear();
+
+    let query = SelectQuery::new().fq(["this_is_a_syntax_error::0"]);
+    let _ = client.select(query, &config.collection_name).await;
+    let messages = LOGGER_MESSAGES.get().unwrap().lock().unwrap();
+    for message in messages.iter() {
+        if message.contains("Sending Solr request to") {
+            return Ok(());
+        }
+    }
+    Err(Error::Unknown("No log message found".to_string()))
 }

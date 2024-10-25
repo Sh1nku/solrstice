@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 from solrstice import (
     AsyncSolrCloudClient,
+    OffLoggingPolicy,
     SolrBasicAuth,
     SolrServerContext,
     SolrSingleServerHost,
@@ -32,13 +33,20 @@ class Config:
 
 
 def get_path_prefix() -> str:
-    path_prefix = "../../"
-    if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
-        path_prefix = "../../../"
+    iterations = 0
+    path_prefix = ""
+    while True:
+        if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
+            path_prefix += "../"
+        else:
+            break
+        iterations += 1
+        if iterations > 100:
+            raise FileNotFoundError("Could not find test_setup/.env")
     return path_prefix
 
 
-def create_config() -> Config:
+def create_config(logging: bool = False) -> Config:
     path = os.path.join(get_path_prefix(), "test_setup/.env")
     load_dotenv(path)
     solr_auth = None
@@ -50,7 +58,9 @@ def create_config() -> Config:
     assert host is not None
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
     solr_host = SolrSingleServerHost(host)
-    context = SolrServerContext(solr_host, solr_auth)
+    context = SolrServerContext(
+        solr_host, solr_auth, OffLoggingPolicy() if not logging else None
+    )
     wait_for_solr(host, 30)
     return Config(
         host,
