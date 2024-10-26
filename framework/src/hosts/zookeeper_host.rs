@@ -119,7 +119,7 @@ impl SolrHost for ZookeeperEnsembleHost {
     async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         let hosts = get_hosts_from_zookeeper(&self.client).await?;
         match hosts.get(fastrand::usize(0..hosts.len())) {
-            None => Err(Error::SolrConnectionError(
+            None => Err(Error::SolrSetupError(
                 "No ready Solr nodes from Zookeeper".to_string(),
             )),
             //TODO Investigate this further. Is it always http://, and do people use auth?

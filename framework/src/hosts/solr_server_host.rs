@@ -59,9 +59,7 @@ impl SolrHost for SolrMultipleServerHost {
     async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
         let mut server_indices: Vec<usize> = (0..self.hosts.len()).collect();
         if server_indices.is_empty() {
-            return Err(Error::SolrConnectionError(
-                "No Solr Host Specified".to_string(),
-            ));
+            return Err(Error::SolrSetupError("No Solr Host Specified".to_string()));
         }
         fastrand::shuffle(&mut server_indices);
         for i in server_indices {
@@ -82,9 +80,7 @@ impl SolrHost for SolrMultipleServerHost {
                 }
             }
         }
-        Err(Error::SolrConnectionError(
-            "No Solr Host answered".to_string(),
-        ))
+        Err(Error::SolrSetupError("No Solr Host answered".to_string()))
     }
 }
 

@@ -152,18 +152,21 @@ async fn handle_solr_response(response: Response) -> Result<SolrResponse, Error>
     let body = response.text().await.unwrap_or_default();
     let solr_response = serde_json::from_str::<SolrResponse>(&body);
     if let Ok(r) = solr_response {
-        try_solr_error(&r)?;
+        try_solr_error(url.to_string(), &r)?;
         return Ok(r);
     }
     if status_code == 401 {
-        return Err(Error::SolrAuthError(
-            "Authentication failed with 401. Check credentials.".to_string(),
-        ));
+        return Err(Error::SolrAuthError {
+            code: status_code.as_u16(),
+            url: url.to_string(),
+            msg: body,
+        });
     }
-    Err(SolrConnectionError(format!(
-        "Error while sending request to {}: {}\n{}",
-        url, status_code, body
-    )))
+    Err(SolrConnectionError {
+        url: url.to_string(),
+        code: status_code.as_u16(),
+        msg: body,
+    })
 }
 
 static NO_BODY: &[u8] = "No body".as_bytes();

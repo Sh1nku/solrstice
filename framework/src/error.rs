@@ -13,18 +13,20 @@ pub enum Error {
 
     #[error(transparent)]
     SerdeJsonError(#[from] serde_json::Error),
-    #[error("Error from Solr {code:?}: {msg:?}")]
-    SolrResponseError { code: usize, msg: String },
-    #[error("Authentication error: {0}")]
-    SolrAuthError(String),
     #[error(transparent)]
     ZkError(#[from] zookeeper_async::ZkError),
 
     #[error(transparent)]
     StripPrefixError(#[from] std::path::StripPrefixError),
 
-    #[error("Solr Connection error: {0}")]
-    SolrConnectionError(String),
+    #[error("Solr setup error: {0}")]
+    SolrSetupError(String),
+    #[error("Solr connection error: {code:?} - {url:?}\n{msg:?}")]
+    SolrConnectionError { code: u16, url: String, msg: String },
+    #[error("Solr response error: {code:?} - {url:?}\n{msg:?}")]
+    SolrResponseError { code: u16, url: String, msg: String },
+    #[error("Solr auth error: {code:?} - {url:?}\n{msg:?}")]
+    SolrAuthError { code: u16, url: String, msg: String },
 
     #[error("Unknown error: {0}")]
     Unknown(String),
@@ -37,7 +39,7 @@ impl From<&str> for Error {
 }
 
 /// Helper function to check if a SolrResponse contains an error
-pub fn try_solr_error(response: &SolrResponse) -> Result<(), Error> {
+pub fn try_solr_error(url: String, response: &SolrResponse) -> Result<(), Error> {
     match &response.error {
         None => Ok(()),
         Some(err) => {
@@ -49,6 +51,7 @@ pub fn try_solr_error(response: &SolrResponse) -> Result<(), Error> {
             }
             Err(Error::SolrResponseError {
                 code: err.code,
+                url,
                 msg,
             })
         }
