@@ -18,7 +18,7 @@ async fn auth_gives_sensible_error_when_not_provided() -> Result<(), Error> {
     match response {
         Ok(_) => Err(Error::Unknown("Should not have succeeded".to_string())),
         Err(e) => match e {
-            Error::SolrAuthError(_) => Ok(()),
+            Error::SolrAuthError { .. } => Ok(()),
             _ => Err(Error::Unknown("Should have been auth error".to_string())),
         },
     }
@@ -39,7 +39,7 @@ async fn auth_gives_sensible_error_when_wrong() -> Result<(), Error> {
     match response {
         Ok(_) => Err(Error::Unknown("Should not have succeeded".to_string())),
         Err(e) => match e {
-            Error::SolrAuthError(_) => Ok(()),
+            Error::SolrAuthError { .. } => Ok(()),
             _ => Err(Error::Unknown("Should have been auth error".to_string())),
         },
     }

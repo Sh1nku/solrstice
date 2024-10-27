@@ -8,7 +8,7 @@ The library is written in Rust, and has a wrapper to Python. Both async and bloc
 ### Rust
 You can install the library by putting this in your `Cargo.toml`
 ```toml
-solrstice = { version = "0.5.0", features = ["blocking"] }
+solrstice = { version = "0.6.0", features = ["blocking"] }
 ```
 If the `blocking` feature is not provided, only async will work.
 * [Rust mdBook docs]()

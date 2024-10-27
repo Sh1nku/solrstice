@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 from solrstice import (
     AsyncSolrCloudClient,
+    OffLoggingPolicy,
     SolrBasicAuth,
     SolrServerContext,
     SolrSingleServerHost,
@@ -23,6 +24,7 @@ from solrstice.config import delete_config, upload_config
 class Config:
     solr_host: str
     speedbump_host: Optional[str]
+    error_nginx_host: Optional[str]
     solr_username: Optional[str]
     solr_password: Optional[str]
     solr_auth: Optional[SolrBasicAuth]
@@ -32,13 +34,20 @@ class Config:
 
 
 def get_path_prefix() -> str:
-    path_prefix = "../../"
-    if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
-        path_prefix = "../../../"
+    iterations = 0
+    path_prefix = ""
+    while True:
+        if not os.path.exists(os.path.join(path_prefix, "test_setup/.env")):
+            path_prefix += "../"
+        else:
+            break
+        iterations += 1
+        if iterations > 100:
+            raise FileNotFoundError("Could not find test_setup/.env")
     return path_prefix
 
 
-def create_config() -> Config:
+def create_config(logging: bool = False) -> Config:
     path = os.path.join(get_path_prefix(), "test_setup/.env")
     load_dotenv(path)
     solr_auth = None
@@ -49,12 +58,16 @@ def create_config() -> Config:
     host = os.getenv("SOLR_HOST")
     assert host is not None
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
+    error_nginx_host = os.getenv("ERROR_NGINX_HOST")
     solr_host = SolrSingleServerHost(host)
-    context = SolrServerContext(solr_host, solr_auth)
+    context = SolrServerContext(
+        solr_host, solr_auth, OffLoggingPolicy() if not logging else None
+    )
     wait_for_solr(host, 30)
     return Config(
         host,
         speedbump_host,
+        error_nginx_host,
         solr_username,
         solr_password,
         solr_auth,
@@ -80,6 +93,36 @@ def wait_for_solr(host: str, max_time: int) -> None:
             pass
         time.sleep(1)
     raise RuntimeError(f"Solr did not respond within {max_time} seconds")
+
+
+@dataclass
+class ErrorTestsSetup:
+    error_nginx_host: str
+    context: SolrServerContext
+    async_client: AsyncSolrCloudClient
+
+
+def create_nginx_error_config() -> ErrorTestsSetup:
+    path = os.path.join(get_path_prefix(), "test_setup/.env")
+    load_dotenv(path)
+    error_nginx_host = os.getenv("ERROR_NGINX_HOST")
+    assert error_nginx_host is not None
+    context = SolrServerContext(SolrSingleServerHost(error_nginx_host))
+    wait_for_error_nginx(error_nginx_host, 30)
+    return ErrorTestsSetup(error_nginx_host, context, AsyncSolrCloudClient(context))
+
+
+def wait_for_error_nginx(host: str, max_time: int) -> None:
+    end = time.time() + max_time
+    while time.time() < end:
+        try:
+            with urlopen(f'{host}{"/status"}') as response:
+                if response.status == 200:
+                    return
+        except Exception:
+            pass
+        time.sleep(1)
+    raise RuntimeError(f"Error nginx did not respond within {max_time} seconds")
 
 
 @dataclass_json

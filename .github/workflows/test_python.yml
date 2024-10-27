@@ -33,7 +33,7 @@ jobs:
           maturin develop
         working-directory: ./wrappers/python
       - name: Start docker containers
-        run: docker-compose up -d
+        run: docker compose up -d
         working-directory: ./docker/${{ matrix.docker-version }}
       - name: Run pyright
         working-directory: ./wrappers/python

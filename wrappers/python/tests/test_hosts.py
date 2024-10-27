@@ -33,7 +33,7 @@ def config() -> Generator[Config, None, None]:
     solr_username = os.getenv("SOLR_USERNAME")
     solr_password = os.getenv("SOLR_PASSWORD")
 
-    if solr_username is not None and solr_password is not "":
+    if solr_username is not None and solr_password != "":
         solr_auth = SolrBasicAuth(
             solr_username,
             solr_password,

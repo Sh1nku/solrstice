@@ -13,6 +13,8 @@ pub mod zk_test;
 
 pub mod auth_test;
 
+pub mod error_test;
+pub mod logging_test;
+
 #[cfg(feature = "blocking")]
 pub mod blocking_tests;
-mod logging_test;

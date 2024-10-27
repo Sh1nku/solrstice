@@ -9,7 +9,10 @@ if TYPE_CHECKING:
 
 # region auth
 class SolrAuth(ABC):
-    """Base class for Solr authentication"""
+    """
+    Base class for Solr authentication
+    Valid implementations are :class:`SolrBasicAuth`
+    """
 
 class SolrBasicAuth(SolrAuth):
     """Basic authentication for Solr
@@ -25,10 +28,19 @@ class SolrBasicAuth(SolrAuth):
 
 # region def_type
 class QueryOperator(Enum):
+    """
+    The default query operator
+    """
+
     AND = "AND"
     OR = "OR"
 
 class DefType(abc.ABC):
+    """
+    Specify query type.
+    Valid implementations are :class:`LuceneQuery`, :class:`DismaxQuery`, and :class:`EdismaxQuery`
+    """
+
     pass
 
 class LuceneQuery(DefType):
@@ -239,6 +251,11 @@ class JsonFacetComponent:
         pass
 
 class JsonFacetType(abc.ABC):
+    """
+    Base class for a json facet type
+    Valid implementations are :class:`JsonTermsFacet`, :class:`JsonQueryFacet`, and :class:`JsonStatFacet`
+    """
+
     pass
 
 class JsonTermsFacet(JsonFacetType):
@@ -298,7 +315,10 @@ class JsonStatFacet(JsonFacetType):
 
 # region hosts
 class SolrHost(ABC):
-    """Base class for Solr hosts"""
+    """
+    Base class for Solr hosts
+    Valid implementations are :class:`SolrSingleServerHost`, :class:`SolrMultipleServerHost`, and :class:`ZookeeperEnsembleHost`
+    """
 
 class SolrSingleServerHost(SolrHost):
     """Solr host for a single Solr instance
@@ -341,7 +361,10 @@ class ZookeeperEnsembleHostConnector:
         pass
 
 class LoggingPolicy(abc.ABC):
-    """Policy describing how to log solr queries. Valid values are :class:`OffLoggingPolicy`, :class:`FastLoggingPolicy`, and :class:`PrettyLoggingPolicy`"""
+    """
+    Policy describing how to log solr queries.
+    Valid values are :class:`OffLoggingPolicy`, :class:`FastLoggingPolicy`, and :class:`PrettyLoggingPolicy`
+    """
 
     pass
 

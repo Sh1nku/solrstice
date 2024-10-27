@@ -10,14 +10,14 @@ services:
       ZOO_PORT: 2181
       ZOO_SERVERS: 'server.1=0.0.0.0:2888:3888'
     ports:
-      - "2181:2181"
+      - "127.0.0.1:2181:2181"
     restart: unless-stopped
   solr1:
     build:
       context: .
     hostname: solr1
     ports:
-      - "8983:8983"
+      - "127.0.0.1:8983:8983"
     volumes:
       - 'solr1_varsolr:/var/solr'
     environment:
@@ -27,9 +27,15 @@ services:
   speedbump:
     image: kffl/speedbump:latest
     ports:
-      - "8984:8984"
+      - "127.0.0.1:8984:8984"
     command: --latency 2s --port 8984 solr1:8983
     restart: unless-stopped
+  error_nginx:
+    image: nginx:alpine
+    volumes:
+      - '../error-nginx.conf:/etc/nginx/nginx.conf'
+    ports:
+      - '127.0.0.1:8985:80'
 volumes:
   zoo1_data:
   solr1_varsolr:

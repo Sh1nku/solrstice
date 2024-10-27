@@ -28,7 +28,7 @@ pub struct SolrResponseError {
     /// The trace of the error.
     pub trace: Option<String>,
     /// The code of the error.
-    pub code: usize,
+    pub code: u16,
 }
 
 fn default_true() -> bool {
