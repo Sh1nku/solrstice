@@ -9,14 +9,14 @@ import doctest
 import mypy.api
 
 def find_mypy_config() -> Path:
-    solrstice_path = Path(solrstice.__path__[0])
+    solrstice_path = Path(solrstice.__path__[0]) # type: ignore
     solrstice_parent = solrstice_path.parent
     if (solrstice_parent / "mypy.ini").exists():
         return solrstice_parent / "mypy.ini"
     raise FileNotFoundError("Could not find mypy.ini")
 
 def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
-    to_parse = [Path(solrstice.__path__[0])]
+    to_parse = [Path(solrstice.__path__[0])] # type: ignore
     doctest_parser = doctest.DocTestParser()
     doctest_examples = {}
     while to_parse:
