@@ -1,11 +1,11 @@
+import json
 import os
 import time
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json
 from dotenv import load_dotenv
 
 from solrstice import (
@@ -125,26 +125,62 @@ def wait_for_error_nginx(host: str, max_time: int) -> None:
     raise RuntimeError(f"Error nginx did not respond within {max_time} seconds")
 
 
-@dataclass_json
 @dataclass
-class Population(DataClassJsonMixin):
+class Population:
     id: str
     age: int
     count: int
     interests: List[str]
 
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "Population":
+        return Population(
+            data["id"],
+            data["age"],
+            data["count"],
+            data["interests"] if "interests" in data else [],
+        )
 
-@dataclass_json
+    @staticmethod
+    def to_dict(population: "Population") -> Dict[str, Any]:
+        return {
+            "id": population.id,
+            "age": population.age,
+            "count": population.count,
+            "interests": population.interests,
+        }
+
+
 @dataclass
-class City(DataClassJsonMixin):
+class City:
     id: str
     city_name: str
     population: List[Population]
 
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "City":
+        return City(
+            data["id"],
+            data["city_name"],
+            (
+                [Population.from_dict(x) for x in data["population"]]
+                if "population" in data
+                else []
+            ),
+        )
+
+    @staticmethod
+    def to_dict(city: "City") -> Dict[str, Any]:
+        return {
+            "id": city.id,
+            "city_name": city.city_name,
+            "population": [Population.to_dict(x) for x in city.population],
+        }
+
 
 def load_test_data() -> List[City]:
     with open(os.path.join(get_path_prefix(), "test_setup/test_data.json")) as f:
-        return City.schema().loads(f.read(), many=True)
+        return [City.from_dict(x) for x in json.loads(f.read())]
 
 
 async def index_test_data(context: SolrServerContext, name: str) -> None:

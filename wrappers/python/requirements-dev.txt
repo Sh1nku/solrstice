@@ -3,7 +3,6 @@ pytest-asyncio
 pytest-xdist[psutil]
 python-dotenv
 maturin
-dataclasses-json
 pdoc
 autoflake
 isort
