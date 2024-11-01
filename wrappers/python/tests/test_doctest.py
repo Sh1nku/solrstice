@@ -16,7 +16,7 @@ def find_mypy_config() -> Path:
     raise FileNotFoundError("Could not find mypy.ini")
 
 def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
-    to_parse = [solrstice.__path__[0]]
+    to_parse = [Path(solrstice.__path__[0])]
     doctest_parser = doctest.DocTestParser()
     doctest_examples = {}
     while to_parse:
@@ -26,19 +26,19 @@ def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
                 to_parse.append(file)
             elif file.suffix in [".py", ".pyi"]:
                 with open(file) as f:
-                    doctests = doctest_parser.get_doctest(f.read(), {}, file, file, 0)
+                    doctests = doctest_parser.get_doctest(f.read(), {}, str(file), str(file), 0)
                     doctest_examples[file.name] = doctests.examples
     return doctest_examples
 
 
-def test_doctests_with_mypy():
+def test_doctests_with_mypy() -> None:
     mypy_confg = find_mypy_config()
     solrstice_examples = get_doctests_from_solrstice()
     with tempfile.TemporaryDirectory() as d:
         for file, examples in solrstice_examples.items():
             file_path = os.path.join(d, file)
             with open(file_path, "w") as f:
-                file_contents = []
+                file_contents: List[str] = []
                 # Add spacing so that the code is at the same line in the new file as it was in the original file
                 for example in examples:
                     first_example_line = example.lineno
@@ -52,7 +52,7 @@ def test_doctests_with_mypy():
                 f.write(''.join(file_contents))
         results = list(mypy.api.run(['--config-file', f'{mypy_confg}', d]))
         # Replace file path with the original file name
-        results[0] = results[0].replace(d, solrstice.__path__[0])
+        results[0] = results[0].replace(d, solrstice.__path__[0]) # type: ignore
         if results[2] != 0:
             print(f'\n{results[0]}', stderr)
             raise AssertionError('Mypy failed. See above for details.')
