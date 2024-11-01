@@ -582,8 +582,8 @@ class AsyncSolrCloudClient:
     :param context: The context of the Solr server.
 
     >>> from solrstice import SolrServerContext, SolrBasicAuth, AsyncSolrCloudClient
-    >>> context = SolrServerContext("http://localhost:8983", SolrBasicAuth("user", "pass"))
-    >>> client = AsyncSolrCloudClient(context)
+    ... context = SolrServerContext("http://localhost:8983", SolrBasicAuth("user", "pass"))
+    ... client = AsyncSolrCloudClient(context)
 
     """
 
@@ -599,10 +599,9 @@ class AsyncSolrCloudClient:
         :param config_path: Path to the config
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def upload_config() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def upload_config() -> None:
         ...     await client.upload_config("config_name", "/path/to/config")
 
         """
@@ -612,11 +611,10 @@ class AsyncSolrCloudClient:
         :returns: A list of Solr configs
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> from typing import List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def get_configs() -> List[str]:
+        ... from typing import List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def get_configs() -> List[str]:
         ...     return await client.get_configs()
 
         """
@@ -628,10 +626,9 @@ class AsyncSolrCloudClient:
         :returns: True if the config exists, False otherwise
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def config_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def config_exists() -> bool:
         ...     return await client.config_exists("config_name")
 
         """
@@ -641,10 +638,9 @@ class AsyncSolrCloudClient:
         :param config_name: Name of the config
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def delete_config() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def delete_config() -> None:
         ...     await client.delete_config("config_name")
 
         """
@@ -666,10 +662,9 @@ class AsyncSolrCloudClient:
         :param replication_factor: The replication factor to use.
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def create_collection() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def create_collection() -> None:
         ...     await client.create_collection("collection_name", "config_name", 1, 1)
 
         """
@@ -681,11 +676,10 @@ class AsyncSolrCloudClient:
         :return: The list of collections on the Solr server.
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> from typing import List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def get_collections() -> List[str]:
+        ... from typing import List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def get_collections() -> List[str]:
         ...     return await client.get_collections()
 
         """
@@ -698,10 +692,9 @@ class AsyncSolrCloudClient:
         :return: True if the collection exists, False otherwise.
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def collection_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def collection_exists() -> bool:
         ...     return await client.collection_exists("collection_name")
 
         """
@@ -712,10 +705,9 @@ class AsyncSolrCloudClient:
         :param name: The name of the collection to delete.
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def delete_collection() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def delete_collection() -> None:
         ...     await client.delete_collection("collection_name")
 
         """
@@ -728,10 +720,9 @@ class AsyncSolrCloudClient:
         :param collections: The collections to alias
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def create_alias() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def create_alias() -> None:
         ...     await client.create_alias("alias_name", ["collection_name"])
 
         """
@@ -743,11 +734,10 @@ class AsyncSolrCloudClient:
         :return: A dictionary of aliases to collections
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> from typing import Dict, List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def get_aliases() -> Dict[str, List[str]]:
+        ... from typing import Dict, List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def get_aliases() -> Dict[str, List[str]]:
         ...     return await client.get_aliases()
 
         """
@@ -760,10 +750,9 @@ class AsyncSolrCloudClient:
         :return: True if the alias exists, False otherwise
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def alias_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def alias_exists() -> bool:
         ...     return await client.alias_exists("alias_name")
 
         """
@@ -775,10 +764,9 @@ class AsyncSolrCloudClient:
         :param name: The name of the alias to delete
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def delete_alias() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def delete_alias() -> None:
         ...     await client.delete_alias("alias_name")
 
         """
@@ -793,11 +781,10 @@ class AsyncSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, SelectQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def select() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def select() -> SolrResponse:
         ...     query = SelectQuery(q="*:*", rows=10)
         ...     return await client.select(query, "collection_name")
 
@@ -816,11 +803,10 @@ class AsyncSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, UpdateQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def index() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def index() -> SolrResponse:
         ...     query = UpdateQuery()
         ...     data_to_index = [{"id": "1", "name": "test"}]
         ...     return await client.index(query, "collection_name", data_to_index)
@@ -837,11 +823,10 @@ class AsyncSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, DeleteQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = AsyncSolrCloudClient(context)
-
-        >>> async def delete() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = AsyncSolrCloudClient(context)
+        ... async def delete() -> SolrResponse:
         ...     query = DeleteQuery(ids=["1"])
         ...     return await client.delete(query, "collection_name")
 
@@ -854,8 +839,8 @@ class BlockingSolrCloudClient:
     :param context: The context of the Solr server.
 
     >>> from solrstice import SolrServerContext, SolrBasicAuth, BlockingSolrCloudClient
-    >>> context = SolrServerContext("http://localhost:8983", SolrBasicAuth("user", "pass"))
-    >>> client = BlockingSolrCloudClient(context)
+    ... context = SolrServerContext("http://localhost:8983", SolrBasicAuth("user", "pass"))
+    ... client = BlockingSolrCloudClient(context)
 
     """
 
@@ -871,10 +856,9 @@ class BlockingSolrCloudClient:
         :param config_path: Path to the config
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def upload_config() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def upload_config() -> None:
         ...     client.upload_config("config_name", "/path/to/config")
 
         """
@@ -885,11 +869,10 @@ class BlockingSolrCloudClient:
         :returns: A list of Solr configs
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> from typing import List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def get_configs() -> List[str]:
+        ... from typing import List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def get_configs() -> List[str]:
         ...     return client.get_configs()
 
         """
@@ -901,10 +884,9 @@ class BlockingSolrCloudClient:
         :returns: True if the config exists, False otherwise
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def config_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def config_exists() -> bool:
         ...     return client.config_exists("config_name")
 
         """
@@ -915,10 +897,9 @@ class BlockingSolrCloudClient:
         :param config_name: Name of the config
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def delete_config() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def delete_config() -> None:
         ...     client.delete_config("config_name")
 
         """
@@ -939,10 +920,9 @@ class BlockingSolrCloudClient:
         :param replication_factor: The replication factor to use.
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def create_collection() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def create_collection() -> None:
         ...    client.create_collection("collection_name", "config_name", 1, 1)
 
         """
@@ -954,11 +934,10 @@ class BlockingSolrCloudClient:
         :return: The list of collections on the Solr server.
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> from typing import List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def get_collections() -> List[str]:
+        ... from typing import List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def get_collections() -> List[str]:
         ...     return client.get_collections()
 
         """
@@ -971,11 +950,9 @@ class BlockingSolrCloudClient:
         :return: True if the collection exists, False otherwise.
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-
-        >>> def collection_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def collection_exists() -> bool:
         ...     return client.collection_exists("collection_name")
 
         """
@@ -988,10 +965,9 @@ class BlockingSolrCloudClient:
         :param name: The name of the collection to delete.
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def delete_collection() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def delete_collection() -> None:
         ...     client.delete_collection("collection_name")
 
         """
@@ -1004,10 +980,9 @@ class BlockingSolrCloudClient:
         :param collections: The collections to alias
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def create_alias() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def create_alias() -> None:
         ...     client.create_alias("alias_name", ["collection_name"])
 
         """
@@ -1019,11 +994,10 @@ class BlockingSolrCloudClient:
         :return: A dictionary of aliases to collections
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> from typing import Dict, List
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def get_aliases() -> Dict[str, List[str]]:
+        ... from typing import Dict, List
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def get_aliases() -> Dict[str, List[str]]:
         ...     return client.get_aliases()
 
         """
@@ -1036,10 +1010,9 @@ class BlockingSolrCloudClient:
         :return: True if the alias exists, False otherwise
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def alias_exists() -> bool:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def alias_exists() -> bool:
         ...     return client.alias_exists("alias_name")
 
         """
@@ -1051,10 +1024,9 @@ class BlockingSolrCloudClient:
         :param name: The name of the alias to delete
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def delete_alias() -> None:
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def delete_alias() -> None:
         ...     client.delete_alias("alias_name")
 
         """
@@ -1069,10 +1041,10 @@ class BlockingSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, SelectQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-        >>> def select() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def select() -> SolrResponse:
         ...     query = SelectQuery(q="*:*", rows=10)
         ...     return client.select(query, "collection_name")
 
@@ -1090,11 +1062,10 @@ class BlockingSolrCloudClient:
         :param data: The data to index
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, UpdateQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def index() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def index() -> SolrResponse:
         ...     query = UpdateQuery()
         ...     data_to_index = [{"id": "1", "name": "test"}]
         ...     return  client.index(query, "collection_name", data_to_index)
@@ -1109,11 +1080,10 @@ class BlockingSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, DeleteQuery
-        >>> from solrstice.models import SolrResponse
-        >>> context = SolrServerContext("http://localhost:8983")
-        >>> client = BlockingSolrCloudClient(context)
-
-        >>> def delete() -> SolrResponse:
+        ... from solrstice.models import SolrResponse
+        ... context = SolrServerContext("http://localhost:8983")
+        ... client = BlockingSolrCloudClient(context)
+        ... def delete() -> SolrResponse:
         ...     query = DeleteQuery(ids=["1"])
         ...     return client.delete(query, "collection_name")
 
