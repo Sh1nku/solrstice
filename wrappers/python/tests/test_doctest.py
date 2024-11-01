@@ -2,7 +2,7 @@ import os.path
 import tempfile
 from pathlib import Path
 from sys import stderr
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 import solrstice
 import doctest
@@ -18,7 +18,7 @@ def find_mypy_config() -> Path:
 def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
     to_parse = [Path(solrstice.__path__[0])] # type: ignore
     doctest_parser = doctest.DocTestParser()
-    doctest_examples = {}
+    doctest_examples: Dict[str, List[doctest.Example]] = {}
     while to_parse:
         path = Path(to_parse.pop())
         for file in path.iterdir():
@@ -28,6 +28,24 @@ def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
                 with open(file) as f:
                     doctests = doctest_parser.get_doctest(f.read(), {}, str(file), str(file), 0)
                     doctest_examples[file.name] = doctests.examples
+
+    # Merge examples that are from the same code block
+    for examples in doctest_examples.values():
+        if examples:
+            finished_examples = []
+            current_example: doctest.Example = examples[0]
+            current_lineno: int = current_example.lineno
+            for example in examples[1:]:
+                # Allow for a single whitespace between code blocks
+                if example.lineno < current_lineno + 3:
+                    current_example.source += example.source
+                    current_lineno = example.lineno
+                else:
+                    finished_examples.append(current_example)
+                    current_example = example
+                    current_lineno = example.lineno
+            examples.clear()
+            examples.extend(finished_examples)
     return doctest_examples
 
 
