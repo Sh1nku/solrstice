@@ -38,7 +38,7 @@ context = SolrServerContext(SolrSingleServerHost('localhost:8983'), SolrBasicAut
 client = AsyncSolrCloudClient(context)
 
 
-async def main():
+async def main() -> None:
     # Create config and collection
     await client.upload_config('example_config', 'path/to/config')
     await client.create_collection('example_collection', 'example_config', shards=1, replication_factor=1)
@@ -48,7 +48,10 @@ async def main():
 
     # Search for the document
     response = await client.select(SelectQuery(fq=['title:Example document']), 'example_collection')
-    docs = response.get_docs_response().get_docs()
+    docs_response = response.get_docs_response()
+    assert docs_response is not None
+    assert docs_response.get_num_found() == 1
+    docs = docs_response.get_docs()
 
     # Delete the document
     await client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
@@ -76,7 +79,10 @@ client.index(UpdateQuery(), 'example_collection', [{'id': 'example_document', 't
 
 # Search for the document
 response = client.select(SelectQuery(fq=['title:Example document']), 'example_collection')
-docs = response.get_docs_response().get_docs()
+docs_response = response.get_docs_response()
+assert docs_response is not None
+assert docs_response.get_num_found() == 1
+docs = docs_response.get_docs()
 
 # Delete the document
 client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
@@ -90,7 +96,7 @@ client.delete(DeleteQuery(ids=['example_document']), 'example_collection')
 from solrstice import GroupingComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   group_builder = GroupingComponent(fields=["age"], limit=10)
   select_builder = SelectQuery(fq=["age:[* TO *]"], grouping=group_builder)
   groups = (await client.select(select_builder, "example_collection")).get_groups()
@@ -104,12 +110,13 @@ async def main():
 from solrstice import GroupingComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   group_builder = GroupingComponent(queries=["age:[0 TO 59]", "age:[60 TO *]"], limit=10)
   select_builder = SelectQuery(fq=["age:[* TO *]"], grouping=group_builder)
   groups = (await client.select(select_builder, "example_collection")).get_groups()
   age_group = groups["age:[0 TO 59]"]
   group = age_group.get_query_result()
+  assert group is not None
   docs = group.get_docs()
 ```
 
@@ -121,7 +128,7 @@ async def main():
 from solrstice import LuceneQuery, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   query_parser = LuceneQuery(df="population")
   select_builder = SelectQuery(q="outdoors", def_type=query_parser)
   response = (await client.select(select_builder, "example_collection")).get_docs_response()
@@ -135,7 +142,7 @@ async def main():
 from solrstice import DismaxQuery, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   query_parser = DismaxQuery(qf="interests^20", bq=["interests:cars^20"])
   select_builder = SelectQuery(q="outdoors", def_type=query_parser)
   response = (await client.select(select_builder, "example_collection")).get_docs_response()
@@ -149,7 +156,7 @@ async def main():
 from solrstice import EdismaxQuery, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   query_parser = EdismaxQuery(qf="interests^20", bq=["interests:cars^20"])
   select_builder = SelectQuery(q="outdoors", def_type=query_parser)
   response = (await client.select(select_builder, "example_collection")).get_docs_response()
@@ -165,7 +172,7 @@ async def main():
 from solrstice import FacetSetComponent, PivotFacetComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   select_builder = SelectQuery(facet_set=FacetSetComponent(pivots=PivotFacetComponent(["interests,age"])))
   response = await client.select(select_builder, "example_collection")
   facets = response.get_facet_set()
@@ -179,7 +186,7 @@ async def main():
 from solrstice import FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   facet_set = FacetSetComponent(fields=FieldFacetComponent(fields=[FieldFacetEntry("age")]))
   select_builder = SelectQuery(facet_set=facet_set)
   response = await client.select(select_builder, "example_collection")
@@ -194,7 +201,7 @@ async def main():
 from solrstice import AsyncSolrCloudClient, SolrServerContext, SelectQuery, FacetSetComponent, FacetSetComponent
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   select_builder = SelectQuery(facet_set=FacetSetComponent(queries=["age:[0 TO 59]"]))
   response = await client.select(select_builder, "example_collection")
   facets = response.get_facet_set()
@@ -208,7 +215,7 @@ async def main():
 
 ```python
 from solrstice import JsonFacetComponent, JsonQueryFacet, SelectQuery, SolrServerContext, AsyncSolrCloudClient
-async def main():
+async def main() -> None:
   client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
   select_builder = SelectQuery(
       json_facet=JsonFacetComponent(
@@ -217,7 +224,9 @@ async def main():
   )
   response = await client.select(select_builder, "example_collection")
   facets = response.get_json_facets()
+  assert facets is not None
   below_60 = facets.get_nested_facets().get("below_60")
+  assert below_60 is not None
   assert below_60.get_count() == 4
 ```
 
@@ -227,7 +236,7 @@ async def main():
 from solrstice import JsonFacetComponent, JsonStatFacet, SelectQuery, SolrServerContext, AsyncSolrCloudClient
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   select_builder = SelectQuery(
       json_facet=JsonFacetComponent(
           facets={"total_people": JsonStatFacet("sum(count)")}
@@ -235,7 +244,8 @@ async def main():
   )
   response = await client.select(select_builder, "example_collection")
   facets = response.get_json_facets()
-  total_people = facets.get_flat_facets().get("total_people")
+  assert facets is not None
+  total_people = facets.get_flat_facets()["total_people"]
   assert total_people == 1000
 ```
 
@@ -245,13 +255,14 @@ async def main():
 from solrstice import AsyncSolrCloudClient, SolrServerContext, SelectQuery, JsonFacetComponent, JsonTermsFacet
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   select_builder = SelectQuery(
       json_facet=JsonFacetComponent(facets={"age": JsonTermsFacet("age")})
   )
   response = await client.select(select_builder, "example_collection")
   facets = response.get_json_facets()
-  age_buckets = facets.get_nested_facets().get("age").get_buckets()
+  assert facets is not None
+  age_buckets = facets.get_nested_facets()["age"].get_buckets()
   assert len(age_buckets) == 3
 ```
 
@@ -261,7 +272,7 @@ async def main():
 from solrstice import AsyncSolrCloudClient, SolrServerContext, SelectQuery, JsonFacetComponent, JsonQueryFacet, JsonStatFacet
 client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 
-async def main():
+async def main() -> None:
   select_builder = SelectQuery(
       json_facet=JsonFacetComponent(
           facets={
@@ -274,9 +285,10 @@ async def main():
   )
   response = await client.select(select_builder, "example_collection")
   facets = response.get_json_facets()
+  assert facets is not None
   total_people = (
       facets.get_nested_facets()
-      .get("below_60")
+      ["below_60"]
       .get_flat_facets()
       .get("total_people")
   )
@@ -312,7 +324,7 @@ client = AsyncSolrCloudClient(context)
 ```python
 from solrstice import SolrServerContext, ZookeeperEnsembleHostConnector, SolrBasicAuth, AsyncSolrCloudClient
 
-async def main():
+async def main() -> None:
   context = SolrServerContext(
       await ZookeeperEnsembleHostConnector(["localhost:2181"], 30).connect(),
       SolrBasicAuth('solr', 'SolrRocks'),
@@ -328,11 +340,11 @@ async def main():
 
   For example, if you want to create a simpler way to create a client
   ```python
-    from typing import Optional
-    from solrstice import SolrServerContext, SolrSingleServerHost, SolrBasicAuth, AsyncSolrCloudClient, SolrAuth
-    class SolrClient(AsyncSolrCloudClient):
-        def __new__(cls, host: str, auth: Optional[SolrAuth] = None):
-            context = SolrServerContext(SolrSingleServerHost(host), auth)
-            return super().__new__(cls, context=context)
-    client = SolrClient("localhost:8983", SolrBasicAuth("username", "password"))
+  from typing import Optional
+  from solrstice import SolrServerContext, SolrSingleServerHost, SolrBasicAuth, AsyncSolrCloudClient, SolrAuth
+  class SolrClient(AsyncSolrCloudClient):
+      def __new__(cls, host: str, auth: Optional[SolrAuth] = None):
+          context = SolrServerContext(SolrSingleServerHost(host), auth)
+          return super().__new__(cls, context=context)
+  client = SolrClient("localhost:8983", SolrBasicAuth("username", "password"))
   ```

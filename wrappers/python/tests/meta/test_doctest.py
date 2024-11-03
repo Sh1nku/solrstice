@@ -9,13 +9,7 @@ import mypy.api
 
 import solrstice
 
-
-def find_mypy_config() -> Path:
-    solrstice_path = Path(solrstice.__path__[0])  # type: ignore
-    solrstice_parent = solrstice_path.parent
-    if (solrstice_parent / "mypy.ini").exists():
-        return solrstice_parent / "mypy.ini"
-    raise FileNotFoundError("Could not find mypy.ini")
+from .helpers import find_mypy_config
 
 
 def get_doctests_from_solrstice() -> Dict[str, List[doctest.Example]]:
