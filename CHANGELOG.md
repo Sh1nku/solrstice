@@ -1,3 +1,8 @@
+# v0.6.1
+
+* Additional documentation
+* Update thiserror from 1.x to 2.x
+
 # v0.6.0
 
 * Breaking changes to error handling. More consistent and clearer error messages.
