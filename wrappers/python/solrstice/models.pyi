@@ -10,6 +10,16 @@ class SolrFacetSetResult:
         Gets the query facets
 
         :return: The query facets
+
+        >>> from solrstice import AsyncSolrCloudClient, SolrServerContext, SelectQuery, FacetSetComponent, FacetSetComponent
+        >>> client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
+        >>> async def query_select() -> None:
+        ...     select_builder = SelectQuery(facet_set=FacetSetComponent(queries=["age:[0 TO 59]"]))
+        ...     response = await client.select(select_builder, "example_collection")
+        ...     facets = response.get_facet_set()
+        ...     queries = facets.get_queries()
+        ...     query = queries.get("age:[0 TO 59]")
+
         """
         pass
 
@@ -18,6 +28,16 @@ class SolrFacetSetResult:
         Gets the pivot facets
 
         :return: The pivot facets
+
+        >>> from solrstice import FacetSetComponent, PivotFacetComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
+        >>> client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
+        >>> async def pivot_select() -> None:
+        ...     select_builder = SelectQuery(facet_set=FacetSetComponent(pivots=PivotFacetComponent(["interests,age"])))
+        ...     response = await client.select(select_builder, "example_collection")
+        ...     facets = response.get_facet_set()
+        ...     pivots = facets.get_pivots()
+        ...     interests_age = pivots.get("interests,age")
+
         """
         pass
 
@@ -26,6 +46,17 @@ class SolrFacetSetResult:
         Gets the field facets
 
         :return: The field facets
+
+        >>> from solrstice import FacetSetComponent, FieldFacetComponent, FieldFacetEntry, SelectQuery, SolrServerContext, AsyncSolrCloudClient
+        >>> client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
+        >>> async def field_facet_select() -> None:
+        ...     facet_set = FacetSetComponent(fields=FieldFacetComponent(fields=[FieldFacetEntry("age")]))
+        ...     select_builder = SelectQuery(facet_set=facet_set)
+        ...     response = await client.select(select_builder, "example_collection")
+        ...     facets = response.get_facet_set()
+        ...     fields = facets.get_fields()
+        ...     age = fields.get("age")
+
         """
 
 class SolrPivotFacetResult:

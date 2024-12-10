@@ -500,7 +500,7 @@ class SelectQuery:
         """
 
 class CommitType(Enum):
-    Hard = ("Hard",)
+    Hard = "Hard"
     Soft = "Soft"
 
 class UpdateQuery:
