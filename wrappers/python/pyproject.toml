@@ -4,6 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "solrstice"
+dynamic = ["version"]
 requires-python = ">=3.8"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
