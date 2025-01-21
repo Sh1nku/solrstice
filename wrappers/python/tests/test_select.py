@@ -88,3 +88,31 @@ async def test_select_works_with_cursor_mark(config: Config) -> None:
 
     finally:
         await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_select_works_with_additional_params(config: Config) -> None:
+    name = "SelectAdditionalParams"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        await index_test_data(config.context, name)
+
+        builder = SelectQuery(
+            q='{!parent which=city_name:*}',
+            fl=["id", "city_name", "child:[subquery]"],
+            additional_params={
+                'child.q': '*:*',
+            }
+        )
+        solr_response = await builder.execute(config.context, name)
+        docs_response = solr_response.get_docs_response()
+        assert docs_response is not None
+        assert docs_response.get_num_found() > 0
+        child_result = docs_response.get_docs()[0].get("child")
+        assert child_result is not None
+        assert child_result['numFound'] > 0
+    finally:
+        await teardown_collection(config.context, name)

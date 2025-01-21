@@ -8,6 +8,7 @@ use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use solrstice::DefType;
 use solrstice::Error;
 use solrstice::FacetSetComponent;
@@ -15,6 +16,7 @@ use solrstice::GroupingComponent;
 use solrstice::JsonFacetComponent;
 use solrstice::SelectQuery;
 use solrstice::SolrServerContext;
+use std::collections::HashMap;
 
 #[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
 #[derive(Clone, Serialize, Deserialize)]
@@ -36,7 +38,8 @@ impl SelectQueryWrapper {
         def_type: Option<DefTypeWrapper>,
         facet_set: Option<FacetSetComponentWrapper>,
         json_facet: Option<JsonFacetComponentWrapper>,
-    ) -> Self {
+        additional_params: Option<HashMap<String, PyObject>>,
+    ) -> PyResult<Self> {
         let mut builder = SelectQuery::new();
         if let Some(q) = q {
             builder = builder.q(q);
@@ -63,7 +66,26 @@ impl SelectQueryWrapper {
         builder = builder.json_facet::<JsonFacetComponent, Option<JsonFacetComponent>>(
             json_facet.map(|x| x.into()),
         );
-        Self(builder)
+        if let Some(additional_params) = additional_params {
+            // Import the json module and convert the PyObject to a string, then to a serde_json::Value
+            let converted_params = Python::with_gil(|py| -> PyResult<HashMap<String, Value>> {
+                let mut converted_params = HashMap::new();
+                let json = py.import_bound("json")?;
+                for (key, value) in additional_params {
+                    let value = json
+                        .call_method1("dumps", (value,))
+                        .map_err(PyErrWrapper::from)?
+                        .extract::<String>()
+                        .map_err(PyErrWrapper::from)?;
+                    let value: Value =
+                        serde_json::from_str(value.as_str()).map_err(PyErrWrapper::from)?;
+                    converted_params.insert(key, value);
+                }
+                Ok(converted_params)
+            })?;
+            builder = builder.additional_params(converted_params);
+        }
+        Ok(Self(builder))
     }
 
     pub fn execute<'py>(
