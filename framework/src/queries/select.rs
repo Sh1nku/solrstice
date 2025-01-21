@@ -8,13 +8,23 @@ use crate::queries::def_type::DefType;
 use crate::queries::request_builder::SolrRequestBuilder;
 #[cfg(feature = "blocking")]
 use crate::runtime::RUNTIME;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 struct PostQueryWrapper {
     pub params: SelectQuery,
+}
+
+fn deserialize_empty_map_as_none<'de, D>(
+    deserializer: D,
+) -> Result<Option<HashMap<String, Value>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.filter(|map: &HashMap<String, Value>| !map.is_empty()))
 }
 
 /// Builder for a select query.
@@ -47,7 +57,11 @@ pub struct SelectQuery {
     facet_set: Option<FacetSetComponent>,
     #[serde(flatten)]
     json_facet: Option<JsonFacetComponent>,
-    #[serde(skip_serializing_if = "Option::is_none", flatten)]
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        flatten,
+        deserialize_with = "deserialize_empty_map_as_none"
+    )]
     additional_params: Option<HashMap<String, Value>>,
 }
 
