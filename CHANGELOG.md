@@ -2,6 +2,7 @@
 
 * Additional documentation
 * Update thiserror from 1.x to 2.x
+* Add additional_params parameter to allow for arbitrary parameters to be passed when selecting
 
 # v0.6.0
 

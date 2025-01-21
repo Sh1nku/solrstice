@@ -29,3 +29,15 @@ impl From<PyDowncastError<'_>> for PyErrWrapper {
         PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
     }
 }
+
+impl From<pyo3::PyErr> for PyErrWrapper {
+    fn from(err: pyo3::PyErr) -> Self {
+        PyErrWrapper(err)
+    }
+}
+
+impl From<serde_json::Error> for PyErrWrapper {
+    fn from(err: serde_json::Error) -> Self {
+        PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
+    }
+}

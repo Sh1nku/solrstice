@@ -1,5 +1,3 @@
-use serde::{Deserialize, Serialize};
-
 use crate::error::Error;
 use crate::models::context::SolrServerContext;
 use crate::models::response::SolrResponse;
@@ -10,10 +8,23 @@ use crate::queries::def_type::DefType;
 use crate::queries::request_builder::SolrRequestBuilder;
 #[cfg(feature = "blocking")]
 use crate::runtime::RUNTIME;
+use serde::{Deserialize, Deserializer, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 struct PostQueryWrapper {
     pub params: SelectQuery,
+}
+
+fn deserialize_empty_map_as_none<'de, D>(
+    deserializer: D,
+) -> Result<Option<HashMap<String, Value>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.filter(|map: &HashMap<String, Value>| !map.is_empty()))
 }
 
 /// Builder for a select query.
@@ -46,6 +57,12 @@ pub struct SelectQuery {
     facet_set: Option<FacetSetComponent>,
     #[serde(flatten)]
     json_facet: Option<JsonFacetComponent>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        flatten,
+        deserialize_with = "deserialize_empty_map_as_none"
+    )]
+    additional_params: Option<HashMap<String, Value>>,
 }
 
 impl From<&SelectQuery> for SelectQuery {
@@ -82,6 +99,7 @@ impl SelectQuery {
             def_type: None,
             facet_set: None,
             json_facet: None,
+            additional_params: None,
         }
     }
 
@@ -244,6 +262,30 @@ impl SelectQuery {
         json_facet: O,
     ) -> Self {
         self.json_facet = json_facet.into().map(|x| x.into());
+        self
+    }
+
+    /// Additional parameters to send to Solr in the `params` field of the JSON Query DSL.
+    /// ```json
+    /// {
+    ///     "params": {
+    ///         "child.q": "{!term f=_nest_parent_ v=$row.id}",
+    ///         "child.fl": "id,age,count,interests"
+    ///     }
+    /// }
+    /// ```
+    pub fn additional_params<T, K, V>(mut self, params: T) -> Self
+    where
+        T: IntoIterator<Item = (K, V)>,
+        K: Into<String>,
+        V: Into<Value>,
+    {
+        self.additional_params = Some(
+            params
+                .into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect(),
+        );
         self
     }
 

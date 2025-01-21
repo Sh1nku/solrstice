@@ -1,8 +1,10 @@
 use crate::structures::{get_test_data, City, FunctionalityTestsBuildup};
 use serial_test::parallel;
+use solrstice::models::SolrDocsResponse;
 use solrstice::Error;
 use solrstice::SelectQuery;
 use solrstice::UpdateQuery;
+use std::collections::HashMap;
 
 #[tokio::test]
 #[parallel]
@@ -88,4 +90,40 @@ async fn select_works_using_cursor_mark() -> Result<(), Error> {
         }
         current_iteration += 1;
     }
+}
+
+#[tokio::test]
+#[parallel]
+async fn select_works_with_additional_params() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SelectAdditionalParams")
+        .await
+        .unwrap();
+    UpdateQuery::new()
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await
+        .unwrap();
+    let mut params = HashMap::new();
+    params.insert("child.q", "*:*");
+
+    let result = SelectQuery::new()
+        .q("{!parent which=city_name:*}")
+        .fl(["id", "city_name", "child:[subquery]"])
+        .additional_params(params)
+        .execute(&config.context, &config.collection_name)
+        .await
+        .unwrap();
+    let docs = result
+        .get_docs_response()
+        .unwrap()
+        .get_docs::<serde_json::Value>()
+        .unwrap();
+    assert_eq!(docs.len(), 2);
+    assert!(docs[0].get("child").is_some());
+
+    let child_response = docs[0].get("child").unwrap();
+    let child_response: SolrDocsResponse = serde_json::from_value(child_response.clone()).unwrap();
+    assert!(child_response.get_num_found() > 0);
+
+    let _ = config.tear_down().await;
+    Ok(())
 }
