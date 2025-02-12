@@ -1,6 +1,7 @@
 # v0.7.0
 
 * Rename Rust module to `_solrstice` instead of `solrstice` to make IDEs less likely to want to import from it.
+* Update tests to run against Solr 9.8 as the highest version.
 
 # v0.6.1
 
