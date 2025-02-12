@@ -4,9 +4,47 @@ from enum import Enum
 from os import PathLike
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
+__all__ = [
+    "SolrAuth",
+    "SolrBasicAuth",
+    "QueryOperator",
+    "DefType",
+    "LuceneQuery",
+    "DismaxQuery",
+    "EdismaxQuery",
+    "FacetSetComponent",
+    "PivotFacetComponent",
+    "FieldFacetComponent",
+    "FieldFacetSort",
+    "FieldFacetMethod",
+    "FieldFacetEntry",
+    "JsonFacetComponent",
+    "JsonFacetType",
+    "JsonTermsFacet",
+    "JsonQueryFacet",
+    "JsonStatFacet",
+    "SolrHost",
+    "SolrSingleServerHost",
+    "SolrMultipleServerHost",
+    "ZookeeperEnsembleHost",
+    "ZookeeperEnsembleHostConnector",
+    "LoggingPolicy",
+    "OffLoggingPolicy",
+    "FastLoggingPolicy",
+    "PrettyLoggingPolicy",
+    "SolrServerContext",
+    "GroupFormatting",
+    "GroupingComponent",
+    "SelectQuery",
+    "CommitType",
+    "UpdateQuery",
+    "DeleteQuery",
+    "AsyncSolrCloudClient",
+    "BlockingSolrCloudClient",
+]
+
 if TYPE_CHECKING:
     from solrstice.models import SolrResponse
-
 
 # region auth
 class SolrAuth(ABC):
@@ -14,7 +52,6 @@ class SolrAuth(ABC):
     Base class for Solr authentication
     Valid implementations are :class:`SolrBasicAuth`
     """
-
 
 class SolrBasicAuth(SolrAuth):
     """Basic authentication for Solr
@@ -25,7 +62,6 @@ class SolrBasicAuth(SolrAuth):
 
     def __init__(self, username: str, password: Optional[str] = None) -> None:
         pass
-
 
 # endregion
 
@@ -38,7 +74,6 @@ class QueryOperator(Enum):
     AND = "AND"
     OR = "OR"
 
-
 class DefType(abc.ABC):
     """
     Specify query type.
@@ -46,7 +81,6 @@ class DefType(abc.ABC):
     """
 
     pass
-
 
 class LuceneQuery(DefType):
     """
@@ -58,13 +92,12 @@ class LuceneQuery(DefType):
     """
 
     def __init__(
-            self,
-            q_op: Optional[QueryOperator] = None,
-            df: Optional[str] = None,
-            sow: Optional[bool] = None,
+        self,
+        q_op: Optional[QueryOperator] = None,
+        df: Optional[str] = None,
+        sow: Optional[bool] = None,
     ):
         pass
-
 
 class DismaxQuery(DefType):
     """
@@ -82,19 +115,18 @@ class DismaxQuery(DefType):
     """
 
     def __init__(
-            self,
-            q_alt: Optional[str] = None,
-            qf: Optional[str] = None,
-            mm: Optional[str] = None,
-            pf: Optional[str] = None,
-            ps: Optional[str] = None,
-            qs: Optional[str] = None,
-            tie: Optional[str] = None,
-            bq: Optional[List[str]] = None,
-            bf: Optional[List[str]] = None,
+        self,
+        q_alt: Optional[str] = None,
+        qf: Optional[str] = None,
+        mm: Optional[str] = None,
+        pf: Optional[str] = None,
+        ps: Optional[str] = None,
+        qs: Optional[str] = None,
+        tie: Optional[str] = None,
+        bq: Optional[List[str]] = None,
+        bf: Optional[List[str]] = None,
     ):
         pass
-
 
 class EdismaxQuery(DefType):
     """
@@ -122,29 +154,28 @@ class EdismaxQuery(DefType):
     """
 
     def __init__(
-            self,
-            q_alt: Optional[str] = None,
-            qf: Optional[str] = None,
-            mm: Optional[str] = None,
-            mm_auto_relax: Optional[bool] = None,
-            pf: Optional[str] = None,
-            pf2: Optional[str] = None,
-            pf3: Optional[str] = None,
-            ps: Optional[str] = None,
-            ps2: Optional[str] = None,
-            ps3: Optional[str] = None,
-            qs: Optional[str] = None,
-            tie: Optional[str] = None,
-            bq: Optional[List[str]] = None,
-            bf: Optional[List[str]] = None,
-            sow: Optional[bool] = None,
-            boost: Optional[List[str]] = None,
-            lowercase_operators: Optional[bool] = None,
-            stopwords: Optional[bool] = None,
-            uf: Optional[str] = None,
+        self,
+        q_alt: Optional[str] = None,
+        qf: Optional[str] = None,
+        mm: Optional[str] = None,
+        mm_auto_relax: Optional[bool] = None,
+        pf: Optional[str] = None,
+        pf2: Optional[str] = None,
+        pf3: Optional[str] = None,
+        ps: Optional[str] = None,
+        ps2: Optional[str] = None,
+        ps3: Optional[str] = None,
+        qs: Optional[str] = None,
+        tie: Optional[str] = None,
+        bq: Optional[List[str]] = None,
+        bf: Optional[List[str]] = None,
+        sow: Optional[bool] = None,
+        boost: Optional[List[str]] = None,
+        lowercase_operators: Optional[bool] = None,
+        stopwords: Optional[bool] = None,
+        uf: Optional[str] = None,
     ):
         pass
-
 
 # endregion
 
@@ -160,13 +191,12 @@ class FacetSetComponent:
     """
 
     def __init__(
-            self,
-            queries: Optional[List[str]] = None,
-            fields: Optional["FieldFacetComponent"] = None,
-            pivots: Optional["PivotFacetComponent"] = None,
+        self,
+        queries: Optional[List[str]] = None,
+        fields: Optional["FieldFacetComponent"] = None,
+        pivots: Optional["PivotFacetComponent"] = None,
     ):
         pass
-
 
 class PivotFacetComponent:
     """
@@ -179,7 +209,6 @@ class PivotFacetComponent:
     def __init__(self, pivots: List[str], min_count: Optional[str] = None):
         pass
 
-
 class FieldFacetComponent:
     """
     Allows faceting using fields
@@ -189,12 +218,11 @@ class FieldFacetComponent:
     """
 
     def __init__(
-            self,
-            fields: List["FieldFacetEntry"],
-            exclude_terms: Optional[str] = None,
+        self,
+        fields: List["FieldFacetEntry"],
+        exclude_terms: Optional[str] = None,
     ):
         pass
-
 
 class FieldFacetSort(Enum):
     """
@@ -204,7 +232,6 @@ class FieldFacetSort(Enum):
     Count = "Count"
     Index = "Index"
 
-
 class FieldFacetMethod(Enum):
     """
     The method for a field facet
@@ -213,7 +240,6 @@ class FieldFacetMethod(Enum):
     Enum = "Enum"
     Fc = "Fc"
     Fcs = "Fcs"
-
 
 class FieldFacetEntry:
     """
@@ -233,22 +259,21 @@ class FieldFacetEntry:
     """
 
     def __init__(
-            self,
-            field: str,
-            prefix: Optional[str] = None,
-            contains: Optional[str] = None,
-            contains_ignore_case: Optional[bool] = None,
-            sort: Optional["FieldFacetSort"] = None,
-            limit: Optional[int] = None,
-            offset: Optional[int] = None,
-            min_count: Optional[int] = None,
-            missing: Optional[bool] = None,
-            method: Optional["FieldFacetMethod"] = None,
-            enum_cache_min_df: Optional[int] = None,
-            exists: Optional[bool] = None,
+        self,
+        field: str,
+        prefix: Optional[str] = None,
+        contains: Optional[str] = None,
+        contains_ignore_case: Optional[bool] = None,
+        sort: Optional["FieldFacetSort"] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        min_count: Optional[int] = None,
+        missing: Optional[bool] = None,
+        method: Optional["FieldFacetMethod"] = None,
+        enum_cache_min_df: Optional[int] = None,
+        exists: Optional[bool] = None,
     ):
         pass
-
 
 # endregion
 
@@ -264,7 +289,6 @@ class JsonFacetComponent:
     def __init__(self, facets: Optional[Dict[str, "JsonFacetType"]] = None):
         pass
 
-
 class JsonFacetType(abc.ABC):
     """
     Base class for a json facet type
@@ -272,7 +296,6 @@ class JsonFacetType(abc.ABC):
     """
 
     pass
-
 
 class JsonTermsFacet(JsonFacetType):
     """
@@ -285,15 +308,14 @@ class JsonTermsFacet(JsonFacetType):
     """
 
     def __init__(
-            self,
-            field: str,
-            offset: Optional[int] = None,
-            limit: Optional[int] = None,
-            sort: Optional[str] = None,
-            facets: Optional[Dict[str, JsonFacetType]] = None,
+        self,
+        field: str,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        sort: Optional[str] = None,
+        facets: Optional[Dict[str, JsonFacetType]] = None,
     ):
         pass
-
 
 class JsonQueryFacet(JsonFacetType):
     """
@@ -308,16 +330,15 @@ class JsonQueryFacet(JsonFacetType):
     """
 
     def __init__(
-            self,
-            q: str,
-            limit: Optional[int] = None,
-            offset: Optional[int] = None,
-            sort: Optional[str] = None,
-            fq: Optional[str] = None,
-            facets: Optional[Dict[str, JsonFacetType]] = None,
+        self,
+        q: str,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort: Optional[str] = None,
+        fq: Optional[str] = None,
+        facets: Optional[Dict[str, JsonFacetType]] = None,
     ):
         pass
-
 
 class JsonStatFacet(JsonFacetType):
     """
@@ -329,7 +350,6 @@ class JsonStatFacet(JsonFacetType):
     def __init__(self, query: str):
         pass
 
-
 # endregion
 
 # region hosts
@@ -339,7 +359,6 @@ class SolrHost(ABC):
     Valid implementations are :class:`SolrSingleServerHost`, :class:`SolrMultipleServerHost`, and :class:`ZookeeperEnsembleHost`
     """
 
-
 class SolrSingleServerHost(SolrHost):
     """Solr host for a single Solr instance
 
@@ -348,7 +367,6 @@ class SolrSingleServerHost(SolrHost):
 
     def __init__(self, host: str) -> None:
         pass
-
 
 class SolrMultipleServerHost(SolrHost):
     """Solr host for multiple solr instances
@@ -360,10 +378,8 @@ class SolrMultipleServerHost(SolrHost):
     def __init__(self, hosts: List[str], timeout: float) -> None:
         pass
 
-
 class ZookeeperEnsembleHost(SolrHost):
     """Zookeeper ensemble connection. Cannot be constructed directly, use ZookeeperEnsembleHostConnector instead"""
-
 
 class ZookeeperEnsembleHostConnector:
     """The builder for a Zookeeper ensemble host
@@ -383,7 +399,6 @@ class ZookeeperEnsembleHostConnector:
         """Connect to the Zookeeper ensemble"""
         pass
 
-
 class LoggingPolicy(abc.ABC):
     """
     Policy describing how to log solr queries.
@@ -392,13 +407,11 @@ class LoggingPolicy(abc.ABC):
 
     pass
 
-
 class OffLoggingPolicy(LoggingPolicy):
     """Do not log requests"""
 
     def __init__(self) -> None:
         pass
-
 
 class FastLoggingPolicy(LoggingPolicy):
     """For each request create a logging::DEBUG message with url, headers, and body
@@ -409,7 +422,6 @@ class FastLoggingPolicy(LoggingPolicy):
     def __init__(self, max_body_length: int) -> None:
         pass
 
-
 class PrettyLoggingPolicy(LoggingPolicy):
     """For each request create a logging::DEBUG message with url, headers, and a pretty body
 
@@ -418,7 +430,6 @@ class PrettyLoggingPolicy(LoggingPolicy):
 
     def __init__(self, max_body_length: int) -> None:
         pass
-
 
 class SolrServerContext:
     """The context for a connection to a solr instance
@@ -429,13 +440,12 @@ class SolrServerContext:
     """
 
     def __init__(
-            self,
-            host: Union[SolrHost, str],
-            auth: Optional[SolrAuth] = None,
-            logging_policy: Optional[LoggingPolicy] = None,
+        self,
+        host: Union[SolrHost, str],
+        auth: Optional[SolrAuth] = None,
+        logging_policy: Optional[LoggingPolicy] = None,
     ):
         pass
-
 
 # endregion
 
@@ -443,7 +453,6 @@ class SolrServerContext:
 class GroupFormatting(Enum):
     Simple = "Simple"
     Grouped = "Grouped"
-
 
 class GroupingComponent:
     """
@@ -462,20 +471,19 @@ class GroupingComponent:
     """
 
     def __init__(
-            self,
-            fields: Optional[List[str]] = None,
-            queries: Optional[List[str]] = None,
-            limit: Optional[int] = None,
-            offset: Optional[int] = None,
-            sort: Optional[List[str]] = None,
-            format: Optional[GroupFormatting] = None,
-            main: Optional[bool] = None,
-            n_groups: Optional[bool] = None,
-            truncate: Optional[bool] = None,
-            facet: Optional[bool] = None,
+        self,
+        fields: Optional[List[str]] = None,
+        queries: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        sort: Optional[List[str]] = None,
+        format: Optional[GroupFormatting] = None,
+        main: Optional[bool] = None,
+        n_groups: Optional[bool] = None,
+        truncate: Optional[bool] = None,
+        facet: Optional[bool] = None,
     ):
         pass
-
 
 # endregion
 
@@ -498,24 +506,24 @@ class SelectQuery:
     """
 
     def __init__(
-            self,
-            q: Optional[str] = None,
-            fq: Optional[List[str]] = None,
-            fl: Optional[List[str]] = None,
-            sort: Optional[List[str]] = None,
-            rows: Optional[int] = None,
-            start: Optional[int] = None,
-            cursor_mark: Optional[str] = None,
-            grouping: Optional["GroupingComponent"] = None,
-            def_type: Optional["DefType"] = None,
-            facet_set: Optional["FacetSetComponent"] = None,
-            json_facet: Optional["JsonFacetComponent"] = None,
-            additional_params: Optional[Dict[str, Any]] = None,
+        self,
+        q: Optional[str] = None,
+        fq: Optional[List[str]] = None,
+        fl: Optional[List[str]] = None,
+        sort: Optional[List[str]] = None,
+        rows: Optional[int] = None,
+        start: Optional[int] = None,
+        cursor_mark: Optional[str] = None,
+        grouping: Optional["GroupingComponent"] = None,
+        def_type: Optional["DefType"] = None,
+        facet_set: Optional["FacetSetComponent"] = None,
+        json_facet: Optional["JsonFacetComponent"] = None,
+        additional_params: Optional[Dict[str, Any]] = None,
     ) -> None:
         pass
 
     async def execute(
-            self, context: "SolrServerContext", collection: str
+        self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
         """Execute the query
 
@@ -524,7 +532,7 @@ class SelectQuery:
         """
 
     def execute_blocking(
-            self, context: "SolrServerContext", collection: str
+        self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
         """Execute the query
 
@@ -532,11 +540,9 @@ class SelectQuery:
         :param collection: The collection to query
         """
 
-
 class CommitType(Enum):
     Hard = "Hard"
     Soft = "Soft"
-
 
 class UpdateQuery:
     """Builder for an update query
@@ -546,14 +552,14 @@ class UpdateQuery:
     """
 
     def __init__(
-            self,
-            handler: Optional[str] = "update",
-            commit_type: Optional[CommitType] = CommitType.Hard,
+        self,
+        handler: Optional[str] = "update",
+        commit_type: Optional[CommitType] = CommitType.Hard,
     ) -> None:
         pass
 
     async def execute(
-            self, context: "SolrServerContext", collection: str, data: List[Dict[str, Any]]
+        self, context: "SolrServerContext", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute the query
 
@@ -563,7 +569,7 @@ class UpdateQuery:
         """
 
     def execute_blocking(
-            self, context: "SolrServerContext", collection: str, data: List[Dict[str, Any]]
+        self, context: "SolrServerContext", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute the query
 
@@ -571,7 +577,6 @@ class UpdateQuery:
         :param collection: The collection to update
         :param data: The data to update
         """
-
 
 class DeleteQuery:
     """Builder for a delete query
@@ -581,16 +586,16 @@ class DeleteQuery:
     """
 
     def __init__(
-            self,
-            handler: Optional[str] = "update",
-            commit_type: Optional[CommitType] = CommitType.Hard,
-            ids: Optional[List[str]] = None,
-            queries: Optional[List[str]] = None,
+        self,
+        handler: Optional[str] = "update",
+        commit_type: Optional[CommitType] = CommitType.Hard,
+        ids: Optional[List[str]] = None,
+        queries: Optional[List[str]] = None,
     ) -> None:
         pass
 
     async def execute(
-            self, context: "SolrServerContext", collection: str
+        self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
         """Execute the query
 
@@ -599,14 +604,13 @@ class DeleteQuery:
         """
 
     def execute_blocking(
-            self, context: "SolrServerContext", collection: str
+        self, context: "SolrServerContext", collection: str
     ) -> "SolrResponse":
         """Execute the query
 
         :param context: The context for the connection to the solr instance
         :param collection: The collection to delete from
         """
-
 
 # endregion
 
@@ -628,7 +632,7 @@ class AsyncSolrCloudClient:
         pass
 
     async def upload_config(
-            self, config_name: str, config_path: Union[PathLike[str], str]
+        self, config_name: str, config_path: Union[PathLike[str], str]
     ) -> None:
         """Uploads a Solr config to a Solr instance
 
@@ -681,15 +685,14 @@ class AsyncSolrCloudClient:
         ...     await client.delete_config("config_name")
 
         """
-
     pass
 
     async def create_collection(
-            self,
-            name: str,
-            config: str,
-            shards: Optional[int] = 1,
-            replication_factor: Optional[int] = 1,
+        self,
+        name: str,
+        config: str,
+        shards: Optional[int] = 1,
+        replication_factor: Optional[int] = 1,
     ) -> None:
         """
         Create a collection on the Solr server.
@@ -829,7 +832,7 @@ class AsyncSolrCloudClient:
         """
 
     async def index(
-            self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
+        self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute an index query
 
@@ -870,7 +873,6 @@ class AsyncSolrCloudClient:
 
         """
 
-
 class BlockingSolrCloudClient:
     """
     A client for interacting with a SolrCloud cluster non-asynchronously.
@@ -887,7 +889,7 @@ class BlockingSolrCloudClient:
         pass
 
     def upload_config(
-            self, config_name: str, config_path: Union[PathLike[str], str]
+        self, config_name: str, config_path: Union[PathLike[str], str]
     ) -> None:
         """Uploads a Solr config to a Solr instance
 
@@ -944,11 +946,11 @@ class BlockingSolrCloudClient:
         """
 
     def create_collection(
-            self,
-            name: str,
-            config: str,
-            shards: Optional[int] = 1,
-            replication_factor: Optional[int] = 1,
+        self,
+        name: str,
+        config: str,
+        shards: Optional[int] = 1,
+        replication_factor: Optional[int] = 1,
     ) -> None:
         """
         Create a collection on the Solr server.
@@ -1091,7 +1093,7 @@ class BlockingSolrCloudClient:
         """
 
     def index(
-            self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
+        self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
         """Execute an index query
 
@@ -1129,44 +1131,4 @@ class BlockingSolrCloudClient:
 
         """
 
-
 # endregion
-
-__all__ = [
-    "SolrAuth",
-    "SolrBasicAuth",
-    "QueryOperator",
-    "DefType",
-    "LuceneQuery",
-    "DismaxQuery",
-    "EdismaxQuery",
-    "FacetSetComponent",
-    "PivotFacetComponent",
-    "FieldFacetComponent",
-    "FieldFacetSort",
-    "FieldFacetMethod",
-    "FieldFacetEntry",
-    "JsonFacetComponent",
-    "JsonFacetType",
-    "JsonTermsFacet",
-    "JsonQueryFacet",
-    "JsonStatFacet",
-    "SolrHost",
-    "SolrSingleServerHost",
-    "SolrMultipleServerHost",
-    "ZookeeperEnsembleHost",
-    "ZookeeperEnsembleHostConnector",
-    "LoggingPolicy",
-    "OffLoggingPolicy",
-    "FastLoggingPolicy",
-    "PrettyLoggingPolicy",
-    "SolrServerContext",
-    "GroupFormatting",
-    "GroupingComponent",
-    "SelectQuery",
-    "CommitType",
-    "UpdateQuery",
-    "DeleteQuery",
-    "AsyncSolrCloudClient",
-    "BlockingSolrCloudClient",
-]

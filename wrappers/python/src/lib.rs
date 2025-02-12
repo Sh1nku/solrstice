@@ -56,7 +56,7 @@ fn models_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     pyo3_log::init();
 
     let sys = PyModule::import_bound(_py, "sys")?;

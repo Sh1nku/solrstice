@@ -101,13 +101,13 @@ async def test_select_works_with_additional_params(config: Config) -> None:
         await index_test_data(config.context, name)
 
         builder = SelectQuery(
-            q='{!parent which=city_name:*}',
+            q="{!parent which=city_name:*}",
             fl=["id", "city_name", "child:[subquery]"],
             additional_params={
-                'child.q': '*:*',
-                'child.fl': ['id'],
-                'child.rows': 1,
-            }
+                "child.q": "*:*",
+                "child.fl": ["id"],
+                "child.rows": 1,
+            },
         )
         solr_response = await builder.execute(config.context, name)
         docs_response = solr_response.get_docs_response()
@@ -115,7 +115,7 @@ async def test_select_works_with_additional_params(config: Config) -> None:
         assert docs_response.get_num_found() > 0
         child_result = docs_response.get_docs()[0].get("child")
         assert child_result is not None
-        assert child_result['numFound'] > 0
-        assert len(child_result['docs']) == 1
+        assert child_result["numFound"] > 0
+        assert len(child_result["docs"]) == 1
     finally:
         await teardown_collection(config.context, name)
