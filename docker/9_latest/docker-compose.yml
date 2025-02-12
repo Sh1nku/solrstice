@@ -1,14 +1,9 @@
-version: '3'
 services:
   zoo1:
-    image: zookeeper:3.4
+    image: zookeeper:3.9
     hostname: zoo1
     volumes:
       - 'zoo1_data:/data'
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_PORT: 2181
-      ZOO_SERVERS: 'server.1=0.0.0.0:2888:3888'
     ports:
       - "127.0.0.1:2181:2181"
     restart: unless-stopped
@@ -21,7 +16,7 @@ services:
     volumes:
       - 'solr1_varsolr:/var/solr'
     environment:
-      ZK_HOST: 'zoo1'
+      ZK_HOST: 'zoo1:2181'
       SOLR_JAVA_MEM: "-Xms1g -Xmx1g"
     restart: unless-stopped
   speedbump:

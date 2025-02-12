@@ -1,5 +1,16 @@
 from typing import Any, Dict, List, Optional
 
+__all__ = [
+    "SolrFacetSetResult",
+    "SolrPivotFacetResult",
+    "SolrFieldFacetResult",
+    "SolrGroupFieldResult",
+    "SolrGroupResult",
+    "SolrJsonFacetResponse",
+    "SolrDocsResponse",
+    "SolrResponse",
+]
+
 class SolrFacetSetResult:
     """
     Gets the facet counts from a query
@@ -288,14 +299,3 @@ class SolrResponse:
 
     def get_json_facets(self) -> Optional["SolrJsonFacetResponse"]:
         """Get json facets"""
-
-__all__ = [
-    "SolrFacetSetResult",
-    "SolrPivotFacetResult",
-    "SolrFieldFacetResult",
-    "SolrGroupFieldResult",
-    "SolrGroupResult",
-    "SolrJsonFacetResponse",
-    "SolrDocsResponse",
-    "SolrResponse",
-]

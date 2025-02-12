@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64, aarch64, armv7, s390x, ppc64le]
+        target: [ x86_64, aarch64, armv7, s390x, ppc64le ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -34,7 +34,7 @@ jobs:
           args: --release --out dist --find-interpreter --manifest-path ./wrappers/python/Cargo.toml
           manylinux: 2_28
       - name: Upload wheels
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: "startsWith(github.ref, 'refs/tags/')"
         with:
           name: wheels
@@ -44,7 +44,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        target: [x64, x86]
+        target: [ x64, x86 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -59,7 +59,7 @@ jobs:
           sccache: 'true'
       - name: Upload wheels
         if: "startsWith(github.ref, 'refs/tags/')"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -68,7 +68,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        target: [x86_64, aarch64]
+        target: [ x86_64, aarch64 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -82,7 +82,7 @@ jobs:
           sccache: 'true'
       - name: Upload wheels
         if: "startsWith(github.ref, 'refs/tags/')"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -98,7 +98,7 @@ jobs:
           args: --out dist --manifest-path ./wrappers/python/Cargo.toml
       - name: Upload sdist
         if: "startsWith(github.ref, 'refs/tags/')"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist
@@ -107,9 +107,9 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: "startsWith(github.ref, 'refs/tags/')"
-    needs: [linux, windows, macos, sdist]
+    needs: [ linux, windows, macos, sdist ]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: wheels
       - name: Publish to PyPI
