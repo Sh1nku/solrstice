@@ -1,6 +1,9 @@
-# v0.7.1
+# v0.8.0
 
 * Fix error in github action for uploading to PyPi
+* Update minimum python version to 3.9
+* Add Python 3.13 to CI
+* Add shell.nix
 
 # v0.7.0
 
