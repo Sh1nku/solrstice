@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "solrstice"
 dynamic = ["version"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 description = "A Solr client library written in Rust"
