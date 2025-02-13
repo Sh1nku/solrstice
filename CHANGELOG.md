@@ -1,3 +1,7 @@
+# v0.7.1
+
+* Fix error in github action for uploading to PyPi
+
 # v0.7.0
 
 * Rename Rust module to `_solrstice` instead of `solrstice` to make IDEs less likely to want to import from it.
