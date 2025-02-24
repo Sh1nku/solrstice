@@ -1,3 +1,7 @@
+# v0.9.0
+
+* Update python ABI to 3.9
+
 # v0.8.0
 
 * Fix error in github action for uploading to PyPi
