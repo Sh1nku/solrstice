@@ -9,7 +9,7 @@ name = "solrstice"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { workspace = true, features = ["extension-module", "serde", "abi3-py38"] }
+pyo3 = { workspace = true, features = ["extension-module", "serde", "abi3-py39"] }
 pyo3-asyncio = { workspace = true, features = ["attributes", "tokio-runtime"] }
 pyo3-log = "0.10.0"
 pythonize.workspace = true
