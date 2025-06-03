@@ -119,3 +119,40 @@ async def test_select_works_with_additional_params(config: Config) -> None:
         assert len(child_result["docs"]) == 1
     finally:
         await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_select_sort_works(config: Config) -> None:
+    name = "SelectSort"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        await index_test_data(config.context, name)
+
+        # ASC
+        builder = SelectQuery(
+            fq=["city_name:[* TO *]"],
+            sort=["city_name asc"],
+            fl=["id", "city_name"],
+        )
+        solr_response = await builder.execute(config.context, name)
+        docs_response = solr_response.get_docs_response()
+        assert docs_response is not None
+        assert docs_response.get_num_found() == 2
+        assert docs_response.get_docs()[0].get("city_name") == "Alta"
+
+        # DESC
+        builder = SelectQuery(
+            fq=["city_name:[* TO *]"],
+            sort=["city_name desc"],
+            fl=["id", "city_name"],
+        )
+        solr_response = await builder.execute(config.context, name)
+        docs_response = solr_response.get_docs_response()
+        assert docs_response is not None
+        assert docs_response.get_num_found() == 2
+        assert docs_response.get_docs()[0].get("city_name") == "Tromsø"
+    finally:
+        await teardown_collection(config.context, name)

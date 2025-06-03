@@ -127,3 +127,53 @@ async fn select_works_with_additional_params() -> Result<(), Error> {
     let _ = config.tear_down().await;
     Ok(())
 }
+
+#[tokio::test]
+#[parallel]
+async fn select_sort_works() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SelectSort")
+        .await
+        .unwrap();
+    UpdateQuery::new()
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await
+        .unwrap();
+
+    // ASC
+    let result = SelectQuery::new()
+        .q("*:*")
+        .fq(["city_name:[* TO *]"])
+        .fl(["id", "city_name"])
+        .sort(["city_name asc"])
+        .execute(&config.context, &config.collection_name)
+        .await
+        .unwrap();
+    let docs = result
+        .get_docs_response()
+        .unwrap()
+        .get_docs::<serde_json::Value>()
+        .unwrap();
+    assert_eq!(docs.len(), 2);
+    assert_eq!(docs[0].get("city_name").unwrap().as_str().unwrap(), "Alta");
+    // DESC
+    let result = SelectQuery::new()
+        .fq(["city_name:[* TO *]"])
+        .fl(["id", "city_name"])
+        .sort(["city_name desc"])
+        .execute(&config.context, &config.collection_name)
+        .await
+        .unwrap();
+    let docs = result
+        .get_docs_response()
+        .unwrap()
+        .get_docs::<serde_json::Value>()
+        .unwrap();
+    assert_eq!(docs.len(), 2);
+    assert_eq!(
+        docs[0].get("city_name").unwrap().as_str().unwrap(),
+        "Tromsø"
+    );
+
+    let _ = config.tear_down().await;
+    Ok(())
+}
