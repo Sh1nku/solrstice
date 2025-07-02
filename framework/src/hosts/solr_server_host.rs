@@ -19,7 +19,7 @@ pub struct SolrSingleServerHost {
 
 #[async_trait]
 impl SolrHost for SolrSingleServerHost {
-    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
+    async fn get_solr_node<'a>(&'a self) -> Result<Cow<'a, str>, Error> {
         Ok(Cow::Borrowed(&self.host))
     }
 }
@@ -56,7 +56,7 @@ pub struct SolrMultipleServerHost {
 
 #[async_trait]
 impl SolrHost for SolrMultipleServerHost {
-    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
+    async fn get_solr_node<'a>(&'a self) -> Result<Cow<'a, str>, Error> {
         let mut server_indices: Vec<usize> = (0..self.hosts.len()).collect();
         if server_indices.is_empty() {
             return Err(Error::SolrSetupError("No Solr Host Specified".to_string()));

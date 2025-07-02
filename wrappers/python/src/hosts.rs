@@ -17,7 +17,7 @@ pub struct SolrHostWrapper {
 
 #[async_trait]
 impl SolrHost for SolrHostWrapper {
-    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
+    async fn get_solr_node<'a>(&'a self) -> Result<Cow<'a, str>, Error> {
         self.solr_host.get_solr_node().await
     }
 }

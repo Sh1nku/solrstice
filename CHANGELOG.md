@@ -1,3 +1,6 @@
+# v0.10.0
+* Add support for returning raw response from Solr
+
 # v0.9.0
 
 * Update python ABI to 3.9

@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::models::context::SolrServerContext;
+use crate::models::SolrResponse;
 use crate::queries::request_builder::SolrRequestBuilder;
 use std::collections::HashMap;
 
@@ -10,11 +11,12 @@ use std::collections::HashMap;
 pub async fn get_aliases<C: AsRef<SolrServerContext>>(
     context: C,
 ) -> Result<HashMap<String, Vec<String>>, Error> {
-    let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
-        .with_query_params(&[("action", "LISTALIASES")])
-        .send_get()
-        .await?;
-    match json.aliases {
+    let response: SolrResponse =
+        SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
+            .with_query_params(&[("action", "LISTALIASES")])
+            .send_get()
+            .await?;
+    match response.aliases {
         None => Err(Error::Unknown(
             "Could not find alias key in map".to_string(),
         )),
@@ -43,7 +45,7 @@ pub async fn create_alias<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     ];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     Ok(())
 }
@@ -71,7 +73,7 @@ pub async fn delete_alias<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     let query_params = [("action", "DELETEALIAS"), ("name", name.as_ref())];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     Ok(())
 }

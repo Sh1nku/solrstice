@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::models::context::SolrServerContext;
+use crate::models::SolrResponse;
 use crate::queries::request_builder::SolrRequestBuilder;
 use std::fs::File;
 use std::io::{Read, Seek, Write};
@@ -63,17 +64,17 @@ pub async fn upload_config<C: AsRef<SolrServerContext>, S: AsRef<str>, P: AsRef<
     let mut vec = Vec::new();
     outfile.read_to_end(&mut vec)?;
 
-    let _ = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+    SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
         .with_query_params(query_params.as_ref())
         .with_headers(vec![("Content-Type", "application/octet-stream")])
-        .send_post_with_body(vec)
+        .send_post_with_body::<_, SolrResponse>(vec)
         .await?;
     Ok(())
 }
 
 pub async fn get_configs<C: AsRef<SolrServerContext>>(context: C) -> Result<Vec<String>, Error> {
     let query_params = [("action", "LIST"), ("wt", "json")];
-    let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
+    let json: SolrResponse = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
         .with_query_params(query_params.as_ref())
         .send_get()
         .await?;
@@ -98,7 +99,7 @@ pub async fn delete_config<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     let query_params = [("action", "DELETE"), ("name", name.as_ref())];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/configs")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     Ok(())
 }

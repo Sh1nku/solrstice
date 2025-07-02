@@ -166,7 +166,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
+    pub async fn collection_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         collection_exists(&self.context, name).await
     }
 
