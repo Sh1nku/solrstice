@@ -1,5 +1,6 @@
 # v0.10.0
 * Add support for returning raw response from Solr
+* Update MSRV to 1.74.1
 
 # v0.9.0
 

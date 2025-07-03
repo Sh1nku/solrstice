@@ -8,7 +8,7 @@ keywords = ["solr", "search"]
 categories = ["api-bindings"]
 readme = "README.md"
 repository = "https://github.com/Sh1nku/solrstice"
-rust-version = "1.73.0"
+rust-version = "1.74.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
