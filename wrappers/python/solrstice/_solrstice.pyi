@@ -885,6 +885,24 @@ class AsyncSolrCloudClient:
 
         """
 
+    async def select_raw(self, builder: "SelectQuery", collection: str) -> Dict[str, Any]:
+        """Execute a select query. Return raw response from solr
+
+        Also see :class:`SelectQuery`
+
+        :param builder: The query builder
+        :param collection: The collection to query
+        :returns: The response from the query
+
+        >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, SelectQuery
+        >>> context = SolrServerContext("http://localhost:8983")
+        >>> client = AsyncSolrCloudClient(context)
+        >>> async def select_raw() -> Dict[str, Any]:
+        ...     query = SelectQuery(q="*:*", rows=10)
+        ...     return await client.select_raw(query, "collection_name")
+
+        """
+
     async def index(
             self, builder: "UpdateQuery", collection: str, data: List[Dict[str, Any]]
     ) -> "SolrResponse":
@@ -1144,6 +1162,24 @@ class BlockingSolrCloudClient:
         >>> def select() -> SolrResponse:
         ...     query = SelectQuery(q="*:*", rows=10)
         ...     return client.select(query, "collection_name")
+
+        """
+
+    def select_raw(self, builder: "SelectQuery", collection: str) -> Dict[str, Any]:
+        """Execute a select query. Return the raw response from Solr
+
+        Also see :class:`SelectQuery`
+
+        :param builder: The query builder
+        :param collection: The collection to query
+        :returns: The response from the query
+
+        >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, SelectQuery
+        >>> context = SolrServerContext("http://localhost:8983")
+        >>> client = BlockingSolrCloudClient(context)
+        >>> def select_raw() -> Dict[str, Any]:
+        ...     query = SelectQuery(q="*:*", rows=10)
+        ...     return client.select_raw(query, "collection_name")
 
         """
 

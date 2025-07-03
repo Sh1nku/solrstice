@@ -6,7 +6,7 @@ use crate::queries::components::grouping::GroupingComponentWrapper;
 use crate::queries::components::json_facet::JsonFacetComponentWrapper;
 use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
-use pyo3::types::{PyBytes, PyDict, PyString};
+use pyo3::types::PyBytes;
 use pythonize::pythonize;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -122,7 +122,7 @@ impl SelectQueryWrapper {
                 .map_err(PyErrWrapper::from)?;
             let result: PyObject =
                 Python::with_gil(|py| pythonize(py, &result).map_err(PyErrWrapper::from))?;
-            Ok(Python::with_gil(|py| result))
+            Ok(Python::with_gil(|_| result))
         });
         let value = value?;
         Python::with_gil(|_| -> PyResult<Bound<'py, PyAny>> { Ok(value) })

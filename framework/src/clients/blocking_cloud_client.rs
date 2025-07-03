@@ -14,6 +14,7 @@ use crate::queries::config::{
 use crate::queries::index::{DeleteQuery, UpdateQuery};
 use crate::queries::select::SelectQuery;
 use serde::Serialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -315,6 +316,31 @@ impl BlockingSolrCloudClient {
         collection: S,
     ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute_blocking(&self.context, collection)
+    }
+
+    /// Select some data from SolrCloud. Return the response directly
+    /// # Examples
+    /// ```no_run
+    /// # use std::collections::HashMap;
+    /// # use solrstice::BlockingSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::SelectQuery;
+    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = BlockingSolrCloudClient::new(context);
+    /// let response: HashMap<String, serde_json::Value> = client.select_raw(&SelectQuery::new().fq(["age:[* TO *]"]), "collection_name")?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn select_raw<S: AsRef<str>, B: AsRef<SelectQuery>>(
+        &self,
+        builder: B,
+        collection: S,
+    ) -> Result<HashMap<String, Value>, Error> {
+        builder
+            .as_ref()
+            .execute_blocking_raw(&self.context, collection)
     }
 
     /// Delete some data from SolrCloud
