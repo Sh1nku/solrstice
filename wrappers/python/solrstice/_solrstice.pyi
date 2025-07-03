@@ -895,6 +895,7 @@ class AsyncSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, SelectQuery
+        >>> from typing import Dict, Any
         >>> context = SolrServerContext("http://localhost:8983")
         >>> client = AsyncSolrCloudClient(context)
         >>> async def select_raw() -> Dict[str, Any]:
@@ -1175,6 +1176,7 @@ class BlockingSolrCloudClient:
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, SelectQuery
+        >>> from typing import Dict, Any
         >>> context = SolrServerContext("http://localhost:8983")
         >>> client = BlockingSolrCloudClient(context)
         >>> def select_raw() -> Dict[str, Any]:
