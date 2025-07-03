@@ -11,6 +11,7 @@ Both asyncio and blocking clients are provided. All apis have type hints.
 * Alias API
 * Select Documents
     * Grouping Component Query
+    * Stats Component
     * DefTypes (lucene, dismax, edismax)
     * Facet Counts (Query, Field, Pivot)
     * Json Facet (Query, Stat, Terms, Nested)
@@ -207,6 +208,20 @@ async def main() -> None:
   facets = response.get_facet_set()
   queries = facets.get_queries()
   query = queries.get("age:[0 TO 59]")
+```
+
+## Stats Component
+```python
+from solrstice import StatsComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
+client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
+
+async def main() -> None:
+  select_builder = SelectQuery(stats=StatsComponent(fields=["age"]))
+  response = await client.select(select_builder, "example_collection")
+  stats = response.get_stats()
+  assert stats is not None
+  age_stats = stats.get_fields()["age"]
+  age_count = age_stats.get_count()
 ```
 
 ## Json Facet Component

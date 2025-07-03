@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional
 
 __all__ = [
     "SolrFacetSetResult",
+    "SolrStatsResult",
+    "SolrStatsFieldResult",
     "SolrPivotFacetResult",
     "SolrFieldFacetResult",
     "SolrGroupFieldResult",
@@ -10,6 +12,7 @@ __all__ = [
     "SolrDocsResponse",
     "SolrResponse",
 ]
+
 
 class SolrFacetSetResult:
     """
@@ -70,6 +73,7 @@ class SolrFacetSetResult:
 
         """
 
+
 class SolrPivotFacetResult:
     """
     Gets the pivot facet counts from a query
@@ -101,6 +105,7 @@ class SolrPivotFacetResult:
         :return: The count of the pivot
         """
 
+
 class SolrFieldFacetResult:
     def get_key(self) -> Any:
         """
@@ -115,6 +120,7 @@ class SolrFieldFacetResult:
         Gets the count of the facet
         :return: The count of the facet
         """
+
 
 class SolrGroupFieldResult:
     """
@@ -132,6 +138,7 @@ class SolrGroupFieldResult:
         Gets the document response from solr
         :return: Document response
         """
+
 
 class SolrGroupResult:
     """
@@ -189,6 +196,65 @@ class SolrGroupResult:
         Gets the number of groups for a group query
         :return: Number of groups
         """
+
+
+class SolrStatsFieldResult:
+    def get_min(self) -> Any:
+        """
+        Gets the minimum value for this field
+        :return: The minimum value
+        """
+
+    def get_max(self) -> Any:
+        """
+        Gets the maximum value for this field
+        :return: The maximum value
+        """
+
+    def get_count(self) -> int:
+        """
+        Gets the count of values for this field
+        :return: The count of values
+        """
+
+    def get_missing(self) -> int:
+        """
+        Gets the number of missing values for this field
+        :return: The number of missing values
+        """
+
+    def get_sum(self) -> Optional[float]:
+        """
+        Gets the sum of values for this field
+        :return: The sum of values
+        """
+
+    def get_mean(self) -> Optional[Any]:
+        """
+        Gets the mean of values for this field
+        :return: The mean of values
+        """
+
+    def get_sum_of_squares(self) -> Optional[float]:
+        """
+        Gets the sum of squares for this field
+        :return: The sum of squares
+        """
+
+    def get_stddev(self) -> Optional[float]:
+        """
+        Gets the standard deviation for this field
+        :return: The standard deviation
+        """
+
+
+class SolrStatsResult:
+    def get_fields(self) -> Dict[str, SolrStatsFieldResult]:
+        """
+        Gets the stats component fields from a query
+        :return: The fields and their stats
+        """
+
 
 class SolrJsonFacetResponse:
     """
@@ -269,6 +335,7 @@ class SolrJsonFacetResponse:
         :return: The value for this facet
         """
 
+
 class SolrDocsResponse:
     def get_num_found(self) -> int:
         """Get the number of documents found in the query"""
@@ -281,6 +348,7 @@ class SolrDocsResponse:
 
     def get_docs(self) -> List[Dict[str, Any]]:
         """Get the documents from the query"""
+
 
 class SolrResponse:
     """The response from a solr query"""
@@ -299,3 +367,6 @@ class SolrResponse:
 
     def get_json_facets(self) -> Optional["SolrJsonFacetResponse"]:
         """Get json facets"""
+
+    def get_stats(self) -> Optional["SolrStatsResult"]:
+        """Get stats"""

@@ -13,6 +13,7 @@ __all__ = [
     "DismaxQuery",
     "EdismaxQuery",
     "FacetSetComponent",
+    "StatsComponent",
     "PivotFacetComponent",
     "FieldFacetComponent",
     "FieldFacetSort",
@@ -291,6 +292,18 @@ class FieldFacetEntry:
 
 # endregion
 
+# region stats
+class StatsComponent:
+    """
+    Stats component, gets statistics on fields
+
+    :param fields: A list of fields to get statistics on
+    """
+
+    def __init__(self, fields: Optional[List[str]] = None):
+        pass
+
+
 # region json_facet
 
 class JsonFacetComponent:
@@ -549,6 +562,7 @@ class SelectQuery:
             def_type: Optional["DefType"] = None,
             facet_set: Optional["FacetSetComponent"] = None,
             json_facet: Optional["JsonFacetComponent"] = None,
+            stats: Optional["StatsComponent"] = None,
             additional_params: Optional[Dict[str, Any]] = None,
     ) -> None:
         pass
