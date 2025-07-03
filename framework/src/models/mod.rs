@@ -19,5 +19,6 @@ pub use json_facet::*;
 /// Models used to get responses from Solr
 pub(crate) mod response;
 pub(crate) mod stats;
+pub use stats::*;
 
 pub use response::*;

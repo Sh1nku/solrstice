@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional
 
 __all__ = [
     "SolrFacetSetResult",
+    "SolrStatsResult",
+    "SolrStatsFieldResult",
     "SolrPivotFacetResult",
     "SolrFieldFacetResult",
     "SolrGroupFieldResult",
@@ -190,6 +192,64 @@ class SolrGroupResult:
         :return: Number of groups
         """
 
+class SolrStatsFieldResult:
+    def get_min(self) -> Any:
+        """
+        Gets the minimum value for this field
+        :return: The minimum value
+        """
+
+    def get_max(self) -> Any:
+        """
+        Gets the maximum value for this field
+        :return: The maximum value
+        """
+
+    def get_count(self) -> int:
+        """
+        Gets the count of values for this field
+        :return: The count of values
+        """
+
+    def get_missing(self) -> int:
+        """
+        Gets the number of missing values for this field
+        :return: The number of missing values
+        """
+
+    def get_sum(self) -> Optional[float]:
+        """
+        Gets the sum of values for this field
+        :return: The sum of values
+        """
+
+    def get_mean(self) -> Optional[Any]:
+        """
+        Gets the mean of values for this field
+        :return: The mean of values
+        """
+
+    def get_sum_of_squares(self) -> Optional[float]:
+        """
+        Gets the sum of squares for this field
+        :return: The sum of squares
+        """
+
+    def get_stddev(self) -> Optional[float]:
+        """
+        Gets the standard deviation for this field
+        :return: The standard deviation
+        """
+
+
+
+class SolrStatsResult:
+    def get_fields(self) -> Dict[str, SolrStatsFieldResult]
+        """
+        Gets the stats component fields from a query
+        :return: The fields and their stats
+        """
+
 class SolrJsonFacetResponse:
     """
     A response from a json facet query
@@ -299,3 +359,6 @@ class SolrResponse:
 
     def get_json_facets(self) -> Optional["SolrJsonFacetResponse"]:
         """Get json facets"""
+
+    def get_stats(self) -> Optional["SolrStatsResult"]:
+        """Get stats"""

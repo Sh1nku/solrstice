@@ -4,19 +4,20 @@ use crate::models::response::SolrResponseWrapper;
 use crate::queries::components::facet_set::FacetSetComponentWrapper;
 use crate::queries::components::grouping::GroupingComponentWrapper;
 use crate::queries::components::json_facet::JsonFacetComponentWrapper;
+use crate::queries::components::stats::StatsComponentWrapper;
 use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pythonize::pythonize;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use solrstice::DefType;
 use solrstice::Error;
 use solrstice::FacetSetComponent;
 use solrstice::GroupingComponent;
 use solrstice::JsonFacetComponent;
 use solrstice::SelectQuery;
 use solrstice::SolrServerContext;
+use solrstice::{DefType, StatsComponent};
 use std::collections::HashMap;
 
 #[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
@@ -39,6 +40,7 @@ impl SelectQueryWrapper {
         def_type: Option<DefTypeWrapper>,
         facet_set: Option<FacetSetComponentWrapper>,
         json_facet: Option<JsonFacetComponentWrapper>,
+        stats: Option<StatsComponentWrapper>,
         additional_params: Option<HashMap<String, PyObject>>,
     ) -> PyResult<Self> {
         let mut builder = SelectQuery::new();
@@ -64,6 +66,7 @@ impl SelectQueryWrapper {
         builder = builder.def_type::<DefType, Option<DefType>>(def_type.map(|x| x.into()));
         builder = builder
             .facet_set::<FacetSetComponent, Option<FacetSetComponent>>(facet_set.map(|x| x.into()));
+        builder = builder.stats::<StatsComponent, Option<StatsComponent>>(stats.map(|x| x.into()));
         builder = builder.json_facet::<JsonFacetComponent, Option<JsonFacetComponent>>(
             json_facet.map(|x| x.into()),
         );

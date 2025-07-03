@@ -17,6 +17,7 @@ use crate::models::facet_set::{SolrFacetSetResultWrapper, SolrPivotFacetResultWr
 use crate::models::group::{SolrGroupFieldResultWrapper, SolrGroupResultWrapper};
 use crate::models::json_facet::SolrJsonFacetResponseWrapper;
 use crate::models::response::{SolrDocsResponseWrapper, SolrResponseWrapper};
+use crate::models::stats::{SolrStatsFieldResultWrapper, SolrStatsResultWrapper};
 use crate::queries::alias::alias as alias_module;
 use crate::queries::collection::collection as collection_module;
 use crate::queries::components::facet_set::{
@@ -28,6 +29,7 @@ use crate::queries::components::json_facet::{
     JsonFacetComponentWrapper, JsonFacetTypeWrapper, JsonQueryFacetWrapper, JsonStatFacetWrapper,
     JsonTermsFacetWrapper,
 };
+use crate::queries::components::stats::StatsComponentWrapper;
 use crate::queries::config::config as config_module;
 use crate::queries::def_type::{
     DefTypeWrapper, DismaxQueryWrapper, EdismaxQueryWrapper, LuceneQueryWrapper,
@@ -51,6 +53,8 @@ fn models_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrDocsResponseWrapper>()?;
     m.add_class::<SolrGroupResultWrapper>()?;
     m.add_class::<SolrGroupFieldResultWrapper>()?;
+    m.add_class::<SolrStatsResultWrapper>()?;
+    m.add_class::<SolrStatsFieldResultWrapper>()?;
     Ok(())
 }
 
@@ -85,6 +89,8 @@ fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<JsonTermsFacetWrapper>()?;
     m.add_class::<JsonQueryFacetWrapper>()?;
     m.add_class::<JsonStatFacetWrapper>()?;
+
+    m.add_class::<StatsComponentWrapper>()?;
 
     m.add_class::<SolrHostWrapper>()?;
     m.add_class::<SolrSingleServerHostWrapper>()?;

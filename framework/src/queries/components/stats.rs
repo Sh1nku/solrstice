@@ -9,6 +9,27 @@ pub struct StatsComponent {
 }
 
 impl StatsComponent {
+    /// Get stats for fields
+    /// # Examples
+    /// ```no_run
+    /// use solrstice::{AsyncSolrCloudClient, StatsComponent, SelectQuery, SolrSingleServerHost};
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    ///  let query = SelectQuery::new().stats(
+    ///     StatsComponent::new().fields(["id"]),
+    /// );
+    /// let response = client
+    ///     .select(&query, "collection_name")
+    ///     .await?;
+    /// let id_field = response.get_stats().unwrap().get_fields().get("id").unwrap();
+    ///
+    /// assert!(id_field.get_count() > 0);
+    /// assert!(id_field.get_min::<String>()?.len() > 0);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new() -> Self {
         StatsComponent {
             stats: true,

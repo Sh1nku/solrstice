@@ -2,7 +2,7 @@ use crate::error::Error;
 use crate::models::facet_set::SolrFacetSetResult;
 use crate::models::group::SolrGroupResult;
 use crate::models::json_facet::SolrJsonFacetResponse;
-use crate::models::stats::SolrStatsResponse;
+use crate::models::stats::SolrStatsResult;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::value::RawValue;
@@ -116,7 +116,7 @@ pub struct SolrResponse {
     pub(crate) facet_set: Option<SolrFacetSetResult>,
     #[serde(rename = "facets")]
     pub(crate) json_facet: Option<SolrJsonFacetResponse>,
-    pub(crate) stats: Option<SolrStatsResponse>,
+    pub(crate) stats: Option<SolrStatsResult>,
 }
 
 impl SolrResponse {
@@ -166,7 +166,7 @@ impl SolrResponse {
     pub fn get_json_facets(&self) -> Option<&SolrJsonFacetResponse> {
         self.json_facet.as_ref()
     }
-    pub fn get_stats(&self) -> Option<&SolrStatsResponse> {
+    pub fn get_stats(&self) -> Option<&SolrStatsResult> {
         self.stats.as_ref()
     }
 }

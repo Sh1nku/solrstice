@@ -210,6 +210,18 @@ async def main() -> None:
   query = queries.get("age:[0 TO 59]")
 ```
 
+## Stats Component
+```python
+from solrstice import StatsComponent, SelectQuery, SolrServerContext, AsyncSolrCloudClient
+client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
+
+async def main() -> None:
+  select_builder = SelectQuery(stats=StatsComponent(fields=["age"]))
+  response = await client.select(select_builder, "example_collection")
+  age_stats = response.get_stats().get_fields()["age"]
+  age_count = age_stats.get_count()
+```
+
 ## Json Facet Component
 
 ### Query

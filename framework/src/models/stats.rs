@@ -4,18 +4,18 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct SolrStatsResponse {
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct SolrStatsResult {
     stats_fields: HashMap<String, SolrStatsFieldResult>,
 }
 
-impl SolrStatsResponse {
+impl SolrStatsResult {
     pub fn get_fields(&self) -> &HashMap<String, SolrStatsFieldResult> {
         &self.stats_fields
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct SolrStatsFieldResult {
     min: Value,
     max: Value,
@@ -39,6 +39,10 @@ impl SolrStatsFieldResult {
 
     pub fn get_count(&self) -> u64 {
         self.count
+    }
+
+    pub fn get_missing(&self) -> u64 {
+        self.missing
     }
 
     pub fn get_sum(&self) -> Option<f64> {
