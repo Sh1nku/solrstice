@@ -1,17 +1,44 @@
-use crate::error::{try_solr_error, Error};
+use crate::error::{get_solr_error_from_error_response, Error};
 use crate::models::context::SolrServerContext;
 use crate::models::response::SolrResponse;
+use crate::models::SolrResponseError;
 use crate::Error::SolrConnectionError;
 use log::debug;
 use reqwest::header::HeaderMap;
 use reqwest::{Body, Request, RequestBuilder, Response, Url};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
+use std::collections::HashMap;
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone)]
 enum SolrRequestType {
     Get,
     Post,
+}
+
+pub trait SolrResponseType: Serialize + DeserializeOwned {
+    fn check_for_error(&self, url: String) -> Result<(), Error>;
+}
+
+impl SolrResponseType for HashMap<String, serde_json::Value> {
+    fn check_for_error(&self, url: String) -> Result<(), Error> {
+        match self.get("error") {
+            None => Ok(()),
+            Some(err) => {
+                let err: SolrResponseError = serde_json::from_value(err.clone())?;
+                Err(get_solr_error_from_error_response(url, err))
+            }
+        }
+    }
+}
+impl SolrResponseType for SolrResponse {
+    fn check_for_error(&self, url: String) -> Result<(), Error> {
+        match &self.error {
+            None => Ok(()),
+            Some(e) => Err(get_solr_error_from_error_response(url, e.clone())),
+        }
+    }
 }
 
 /// How detailed the logs of the requests should be
@@ -59,7 +86,7 @@ impl<'a> SolrRequestBuilder<'a> {
         self
     }
 
-    pub async fn send_get(self) -> Result<SolrResponse, Error> {
+    pub async fn send_get<R: SolrResponseType>(self) -> Result<R, Error> {
         let request = create_standard_request(
             self.context,
             self.url,
@@ -74,13 +101,13 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        handle_solr_response(response).await
+        handle_solr_response::<R>(response).await
     }
 
-    pub async fn send_post_with_json<T: Serialize + 'a + ?Sized>(
+    pub async fn send_post_with_json<T: Serialize + 'a + ?Sized, R: SolrResponseType>(
         self,
         json: &T,
-    ) -> Result<SolrResponse, Error> {
+    ) -> Result<R, Error> {
         let mut request = create_standard_request(
             self.context,
             self.url,
@@ -96,10 +123,13 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        handle_solr_response(response).await
+        handle_solr_response::<R>(response).await
     }
 
-    pub async fn send_post_with_body<T: Into<Body>>(self, data: T) -> Result<SolrResponse, Error> {
+    pub async fn send_post_with_body<T: Into<Body>, R: SolrResponseType>(
+        self,
+        data: T,
+    ) -> Result<R, Error> {
         let mut request = create_standard_request(
             self.context,
             self.url,
@@ -115,7 +145,7 @@ impl<'a> SolrRequestBuilder<'a> {
         log_request_info(&request, self.context.logging_policy);
 
         let response = client.execute(request).await?;
-        handle_solr_response(response).await
+        handle_solr_response::<R>(response).await
     }
 }
 
@@ -146,13 +176,13 @@ async fn create_standard_request<'a>(
     Ok(request)
 }
 
-async fn handle_solr_response(response: Response) -> Result<SolrResponse, Error> {
+async fn handle_solr_response<R: SolrResponseType>(response: Response) -> Result<R, Error> {
     let url = response.url().clone();
     let status_code = response.status();
     let body = response.text().await.unwrap_or_default();
-    let solr_response = serde_json::from_str::<SolrResponse>(&body);
+    let solr_response = serde_json::from_str::<R>(&body);
     if let Ok(r) = solr_response {
-        try_solr_error(url.to_string(), &r)?;
+        r.check_for_error(url.to_string())?;
         return Ok(r);
     }
     if status_code == 401 {

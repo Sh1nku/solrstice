@@ -7,7 +7,7 @@ members = [
 
 [workspace.package]
 edition = "2021"
-version = "0.9.0"
+version = "0.10.0"
 
 [workspace.dependencies]
 solrstice = { path = "framework" }
@@ -21,7 +21,7 @@ thiserror = "2"
 zookeeper-async = "5"
 fastrand = "2"
 log = "0.4"
-zip = { version = "2", default-features = false }
+zip = { version = "4", default-features = false }
 tempfile = "3"
 walkdir = "2"
 tokio = "1"

@@ -299,7 +299,22 @@ impl SelectQuery {
             params: self.clone(),
         };
         let data = SolrRequestBuilder::new(context.as_ref(), solr_url.as_str())
-            .send_post_with_json::<PostQueryWrapper>(&wrapper)
+            .send_post_with_json::<PostQueryWrapper, SolrResponse>(&wrapper)
+            .await?;
+        Ok(data)
+    }
+
+    pub async fn execute_raw<T: AsRef<str>, C: AsRef<SolrServerContext>>(
+        &self,
+        context: C,
+        collection: T,
+    ) -> Result<HashMap<String, Value>, Error> {
+        let solr_url = format!("/solr/{}/{}", collection.as_ref(), &self.handle);
+        let wrapper = PostQueryWrapper {
+            params: self.clone(),
+        };
+        let data = SolrRequestBuilder::new(context.as_ref(), solr_url.as_str())
+            .send_post_with_json::<PostQueryWrapper, HashMap<String, Value>>(&wrapper)
             .await?;
         Ok(data)
     }
@@ -313,6 +328,16 @@ impl SelectQuery {
         collection: S,
     ) -> Result<SolrResponse, Error> {
         RUNTIME.handle().block_on(self.execute(context, collection))
+    }
+
+    pub fn execute_blocking_raw<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+        &self,
+        context: C,
+        collection: S,
+    ) -> Result<HashMap<String, Value>, Error> {
+        RUNTIME
+            .handle()
+            .block_on(self.execute_raw(context, collection))
     }
 }
 

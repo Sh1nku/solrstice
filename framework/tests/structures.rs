@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use solrstice;
+use solrstice::models::SolrResponse;
 use solrstice::queries::collection::{create_collection, delete_collection};
 use solrstice::queries::config::{delete_config, upload_config};
 use solrstice::SolrBasicAuth;
@@ -178,7 +179,7 @@ pub async fn wait_for_solr(context: &SolrServerContext, max_time: Duration) {
     while std::time::Instant::now() < end {
         let response = SolrRequestBuilder::new(context, "/solr/admin/collections")
             .with_query_params(&[("action", "CLUSTERSTATUS")])
-            .send_get()
+            .send_get::<SolrResponse>()
             .await;
         if response.is_ok() {
             return;

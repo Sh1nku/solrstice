@@ -116,7 +116,7 @@ impl ZookeeperEnsembleHost {
 
 #[async_trait]
 impl SolrHost for ZookeeperEnsembleHost {
-    async fn get_solr_node(&self) -> Result<Cow<str>, Error> {
+    async fn get_solr_node<'a>(&'a self) -> Result<Cow<'a, str>, Error> {
         let hosts = get_hosts_from_zookeeper(&self.client).await?;
         match hosts.get(fastrand::usize(0..hosts.len())) {
             None => Err(Error::SolrSetupError(

@@ -32,6 +32,26 @@ async fn select_works_when_no_result() -> Result<(), Error> {
 
 #[tokio::test]
 #[parallel]
+async fn select_raw_works() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SelectRaw")
+        .await
+        .unwrap();
+    UpdateQuery::new()
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await
+        .unwrap();
+
+    let result = SelectQuery::new()
+        .execute_raw(&config.context, &config.collection_name)
+        .await
+        .unwrap();
+    assert!(result["response"]["numFound"].as_u64().unwrap() > 0);
+    let _ = config.tear_down().await;
+    Ok(())
+}
+
+#[tokio::test]
+#[parallel]
 async fn select_works_when_no_result_serde_value() -> Result<(), Error> {
     let config = FunctionalityTestsBuildup::build_up("SelectNoResultSerdeValue")
         .await

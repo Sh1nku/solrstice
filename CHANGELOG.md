@@ -1,3 +1,7 @@
+# v0.10.0
+* Add support for returning raw response from Solr
+* Update MSRV to 1.82.0
+
 # v0.9.0
 
 * Update python ABI to 3.9

@@ -46,6 +46,9 @@ async def test_async_client_works(config: Config) -> None:
     assert docs is not None
     assert docs.get_num_found() == 1
 
+    response_raw = await client.select_raw(SelectQuery(fq=["id:example_document"]), name)
+    assert response_raw["response"]["numFound"] == 1
+
     await client.delete(DeleteQuery(ids=["example_document"]), name)
     response = await client.select(SelectQuery(fq=["id:example_document"]), name)
     docs = response.get_docs_response()
@@ -76,6 +79,9 @@ def test_blocking_client_works(config: Config) -> None:
     docs = response.get_docs_response()
     assert docs is not None
     assert docs.get_num_found() == 1
+
+    response_raw = client.select_raw(SelectQuery(fq=["id:example_document"]), name)
+    assert response_raw["response"]["numFound"] == 1
 
     client.delete(DeleteQuery(ids=["example_document"]), name)
     response = client.select(SelectQuery(fq=["id:example_document"]), name)

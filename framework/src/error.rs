@@ -1,4 +1,4 @@
-use crate::models::response::SolrResponse;
+use crate::models::SolrResponseError;
 use thiserror::Error;
 
 /// Main error type for Solrstice
@@ -38,22 +38,16 @@ impl From<&str> for Error {
     }
 }
 
-/// Helper function to check if a SolrResponse contains an error
-pub fn try_solr_error(url: String, response: &SolrResponse) -> Result<(), Error> {
-    match &response.error {
-        None => Ok(()),
-        Some(err) => {
-            let mut msg = "Unknown Solr Error".to_string();
-            if err.msg.is_some() {
-                msg = err.msg.clone().unwrap();
-            } else if err.trace.is_some() {
-                msg = err.trace.clone().unwrap();
-            }
-            Err(Error::SolrResponseError {
-                code: err.code,
-                url,
-                msg,
-            })
-        }
+pub fn get_solr_error_from_error_response(url: String, err: SolrResponseError) -> Error {
+    let mut msg = "Unknown Solr Error".to_string();
+    if err.msg.is_some() {
+        msg = err.msg.clone().unwrap();
+    } else if err.trace.is_some() {
+        msg = err.trace.clone().unwrap();
+    }
+    Error::SolrResponseError {
+        code: err.code,
+        url,
+        msg,
     }
 }

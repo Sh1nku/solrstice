@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::models::context::SolrServerContext;
+use crate::models::SolrResponse;
 use crate::queries::request_builder::SolrRequestBuilder;
 
 pub async fn create_collection<C: AsRef<SolrServerContext>, S: AsRef<str>>(
@@ -18,7 +19,7 @@ pub async fn create_collection<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     ];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     Ok(())
 }
@@ -29,7 +30,7 @@ pub async fn get_collections<C: AsRef<SolrServerContext>>(
     let query_params = [("action", "LIST"), ("wt", "json")];
     let json = SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     match json.collections {
         None => Err(Error::Unknown("Could not get collections".to_string())),
@@ -52,7 +53,7 @@ pub async fn delete_collection<C: AsRef<SolrServerContext>, S: AsRef<str>>(
     let query_params = [("action", "DELETE"), ("name", name.as_ref())];
     SolrRequestBuilder::new(context.as_ref(), "/solr/admin/collections")
         .with_query_params(query_params.as_ref())
-        .send_get()
+        .send_get::<SolrResponse>()
         .await?;
     Ok(())
 }

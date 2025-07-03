@@ -41,6 +41,46 @@ async def test_get_response_gets_response(config: Config) -> None:
 
 
 @pytest.mark.asyncio
+async def test_select_raw_gets_response(config: Config) -> None:
+    name = "SelectRawGetResponse"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        await index_test_data(config.context, name)
+
+        builder = SelectQuery()
+        solr_response = (await builder.execute_raw(config.context, name))["response"]
+        assert solr_response["numFound"] > 0
+        assert solr_response["start"] == 0
+        docs_response = solr_response["docs"]
+        assert len(docs_response) > 4
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_select_raw_blocking_gets_response(config: Config) -> None:
+    name = "SelectRawBlockingGetResponse"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        await index_test_data(config.context, name)
+
+        builder = SelectQuery()
+        solr_response = builder.execute_blocking_raw(config.context, name)["response"]
+        assert solr_response["numFound"] > 0
+        assert solr_response["start"] == 0
+        docs_response = solr_response["docs"]
+        assert len(docs_response) > 4
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
 async def test_select_works_when_no_result(config: Config) -> None:
     name = "SelectNoResult"
     wait_for_solr(config.solr_host, 30)

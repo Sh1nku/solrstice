@@ -9,6 +9,7 @@ use crate::queries::config::{config_exists, delete_config, get_configs, upload_c
 use crate::queries::index::{DeleteQuery, UpdateQuery};
 use crate::queries::select::SelectQuery;
 use serde::Serialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::path::Path;
 
@@ -166,7 +167,7 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn collection_exists<'a, S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
+    pub async fn collection_exists<S: AsRef<str>>(&self, name: S) -> Result<bool, Error> {
         collection_exists(&self.context, name).await
     }
 
@@ -310,6 +311,32 @@ impl AsyncSolrCloudClient {
         collection: C,
     ) -> Result<SolrResponse, Error> {
         builder.as_ref().execute(&self.context, collection).await
+    }
+
+    /// Select some data from SolrCloud. Return the response directly
+    /// # Examples
+    /// ```no_run
+    /// # use std::collections::HashMap;
+    /// # use solrstice::AsyncSolrCloudClient;
+    /// # use solrstice::SolrSingleServerHost;
+    /// # use solrstice::SolrServerContextBuilder;
+    /// # use solrstice::SelectQuery;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
+    /// let client = AsyncSolrCloudClient::new(context);
+    /// let response: HashMap<String, serde_json::Value> = client.select_raw(&SelectQuery::new().fq(["age:[* TO *]"]), "collection_name").await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub async fn select_raw<B: AsRef<SelectQuery>, C: AsRef<str>>(
+        &self,
+        builder: B,
+        collection: C,
+    ) -> Result<HashMap<String, Value>, Error> {
+        builder
+            .as_ref()
+            .execute_raw(&self.context, collection)
+            .await
     }
 
     /// Delete some data from SolrCloud

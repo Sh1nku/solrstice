@@ -7,6 +7,7 @@ use crate::queries::components::json_facet::JsonFacetComponentWrapper;
 use crate::queries::def_type::DefTypeWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
+use pythonize::pythonize;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use solrstice::DefType;
@@ -106,6 +107,27 @@ impl SelectQueryWrapper {
         })
     }
 
+    pub fn execute_raw<'py>(
+        &self,
+        py: Python<'py>,
+        context: SolrServerContextWrapper,
+        collection: String,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let builder = self.0.clone();
+        let value = pyo3_asyncio::tokio::future_into_py(py, async move {
+            let context: SolrServerContext = context.into();
+            let result: HashMap<String, Value> = builder
+                .execute_raw(&context, &collection)
+                .await
+                .map_err(PyErrWrapper::from)?;
+            let result: PyObject =
+                Python::with_gil(|py| pythonize(py, &result).map_err(PyErrWrapper::from))?;
+            Ok(Python::with_gil(|_| result))
+        });
+        let value = value?;
+        Python::with_gil(|_| -> PyResult<Bound<'py, PyAny>> { Ok(value) })
+    }
+
     pub fn execute_blocking(
         &self,
         py: Python,
@@ -121,6 +143,24 @@ impl SelectQueryWrapper {
                 .into();
             Ok(result)
         })
+    }
+
+    pub fn execute_blocking_raw(
+        &self,
+        py: Python,
+        context: SolrServerContextWrapper,
+        collection: String,
+    ) -> PyResult<PyObject> {
+        let builder = self.0.clone();
+        let value: Result<HashMap<String, Value>, PyErrWrapper> = py.allow_threads(move || {
+            let context: SolrServerContext = context.into();
+            let result: HashMap<String, Value> = builder
+                .execute_blocking_raw(&context, &collection)
+                .map_err(PyErrWrapper::from)?;
+            Ok(result)
+        });
+        let value = value?;
+        Python::with_gil(|py| -> PyResult<PyObject> { Ok(pythonize(py, &value)?) })
     }
 
     pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {

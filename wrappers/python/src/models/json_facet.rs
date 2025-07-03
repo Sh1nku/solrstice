@@ -47,7 +47,7 @@ impl SolrJsonFacetResponseWrapper {
             Ok(self
                 .0
                 .get_val()
-                .map(|v| pythonize(py, v).map_err(PyErrWrapper::from))
+                .map(|v| pythonize(py, v))
                 .transpose()
                 .map_err(PyErrWrapper::from)?)
         })
