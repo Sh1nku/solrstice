@@ -1,6 +1,7 @@
 # v0.10.0
 * Add support for returning raw response from Solr
 * Update MSRV to 1.82.0
+* Add stats component
 
 # v0.9.0
 
