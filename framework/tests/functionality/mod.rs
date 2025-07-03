@@ -18,3 +18,4 @@ pub mod logging_test;
 
 #[cfg(feature = "blocking")]
 pub mod blocking_tests;
+mod stats_test;

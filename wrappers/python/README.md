@@ -11,6 +11,7 @@ Both asyncio and blocking clients are provided. All apis have type hints.
 * Alias API
 * Select Documents
     * Grouping Component Query
+    * Stats Component
     * DefTypes (lucene, dismax, edismax)
     * Facet Counts (Query, Field, Pivot)
     * Json Facet (Query, Stat, Terms, Nested)

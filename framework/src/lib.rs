@@ -90,6 +90,7 @@ pub mod queries;
 pub use queries::components::facet_set::*;
 pub use queries::components::grouping::*;
 pub use queries::components::json_facet::*;
+pub use queries::components::stats::*;
 pub use queries::def_type::*;
 pub use queries::index::*;
 pub use queries::request_builder::*;

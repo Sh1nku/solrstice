@@ -4,6 +4,7 @@ use crate::models::response::SolrResponse;
 use crate::queries::components::facet_set::FacetSetComponent;
 use crate::queries::components::grouping::GroupingComponent;
 use crate::queries::components::json_facet::JsonFacetComponent;
+use crate::queries::components::stats::StatsComponent;
 use crate::queries::def_type::DefType;
 use crate::queries::request_builder::SolrRequestBuilder;
 #[cfg(feature = "blocking")]
@@ -57,6 +58,8 @@ pub struct SelectQuery {
     facet_set: Option<FacetSetComponent>,
     #[serde(flatten)]
     json_facet: Option<JsonFacetComponent>,
+    #[serde(flatten)]
+    stats: Option<StatsComponent>,
     #[serde(
         skip_serializing_if = "Option::is_none",
         flatten,
@@ -99,6 +102,7 @@ impl SelectQuery {
             def_type: None,
             facet_set: None,
             json_facet: None,
+            stats: None,
             additional_params: None,
         }
     }
@@ -262,6 +266,11 @@ impl SelectQuery {
         json_facet: O,
     ) -> Self {
         self.json_facet = json_facet.into().map(|x| x.into());
+        self
+    }
+
+    pub fn stats<T: Into<StatsComponent>, O: Into<Option<T>>>(mut self, stats: O) -> Self {
+        self.stats = stats.into().map(|x| x.into());
         self
     }
 

@@ -15,6 +15,7 @@ the [Python documentation](https://pypi.org/project/solrstice/) for more informa
 * Alias API
 * Select Documents
     * Grouping Component Query
+    * Stats Component
     * DefTypes (lucene, dismax, edismax)
     * Facet Counts (Query, Field, Pivot)
     * Json Facet (Query, Stat, Terms, Nested)

@@ -147,3 +147,18 @@ async fn select_works_with_additional_params() -> Result<(), Error> {
     let _ = config.tear_down().await;
     Ok(())
 }
+
+#[tokio::test]
+#[parallel]
+/// Create a collection without tearing it down, for exploration.
+async fn create_collection_with_data() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SolrsticeExampleData")
+        .await
+        .unwrap();
+    UpdateQuery::new()
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await
+        .unwrap();
+
+    Ok(())
+}
