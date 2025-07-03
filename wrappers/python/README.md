@@ -218,7 +218,9 @@ client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
 async def main() -> None:
   select_builder = SelectQuery(stats=StatsComponent(fields=["age"]))
   response = await client.select(select_builder, "example_collection")
-  age_stats = response.get_stats().get_fields()["age"]
+  stats = response.get_stats()
+  assert stats is not None
+  age_stats = stats.get_fields()["age"]
   age_count = age_stats.get_count()
 ```
 
