@@ -2,7 +2,7 @@ from typing import Generator
 
 import pytest
 
-from helpers import Config, create_config, wait_for_solr, setup_collection, index_test_data, teardown_collection
+from .helpers import Config, create_config, wait_for_solr, setup_collection, index_test_data, teardown_collection
 from solrstice import SelectQuery, StatsComponent
 
 

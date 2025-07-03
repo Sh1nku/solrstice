@@ -26,7 +26,7 @@ async fn stats_works() -> Result<(), Error> {
 #[tokio::test]
 #[parallel]
 async fn stats_works_string_field() -> Result<(), Error> {
-    let config = FunctionalityTestsBuildup::build_up("StatsWorks")
+    let config = FunctionalityTestsBuildup::build_up("StatsWorksStringField")
         .await
         .unwrap();
     UpdateQuery::new()
