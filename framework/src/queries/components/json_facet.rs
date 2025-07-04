@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -114,6 +114,14 @@ pub enum JsonFacetType {
     Stat(JsonStatFacet),
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub enum JsonFacetSortDirection {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
+}
+
 /// A facet that counts the number of documents that match a query
 /// # Examples
 /// ```no_run
@@ -149,9 +157,29 @@ pub struct JsonTermsFacet {
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    sort: Option<String>,
+    sort: Option<BTreeMap<String, JsonFacetSortDirection>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    prelim_sort: Option<BTreeMap<String, JsonFacetSortDirection>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    overrequest: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refine: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    overrefine: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    mincount: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    missing: Option<bool>,
+    #[serde(rename = "numBuckets", skip_serializing_if = "Option::is_none")]
+    num_buckets: Option<bool>,
+    #[serde(rename = "allBuckets", skip_serializing_if = "Option::is_none")]
+    all_buckets: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    prefix: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     facet: Option<HashMap<String, JsonFacetType>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    method: Option<JsonTermsFacetMethod>,
 }
 
 impl From<JsonTermsFacet> for JsonFacetType {
@@ -194,7 +222,17 @@ impl JsonTermsFacet {
             offset: None,
             limit: None,
             sort: None,
+            prelim_sort: None,
+            overrequest: None,
+            refine: None,
+            overrefine: None,
+            mincount: None,
+            missing: None,
+            num_buckets: None,
+            all_buckets: None,
+            prefix: None,
             facet: None,
+            method: None,
         }
     }
 
@@ -211,8 +249,83 @@ impl JsonTermsFacet {
     }
 
     /// Sort the facet results
-    pub fn sort<S: Into<String>, O: Into<Option<S>>>(mut self, sort: O) -> Self {
-        self.sort = sort.into().map(|s| s.into());
+    pub fn sort<
+        K: Into<String>,
+        V: Into<JsonFacetSortDirection>,
+        I: IntoIterator<Item = (K, V)>,
+        O: Into<Option<I>>,
+    >(
+        mut self,
+        sort: O,
+    ) -> Self {
+        self.sort = sort.into().map(|sort| {
+            sort.into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect()
+        });
+        self
+    }
+
+    /// Prelim sort the facet results
+    pub fn prelim_sort<
+        K: Into<String>,
+        V: Into<JsonFacetSortDirection>,
+        I: IntoIterator<Item = (K, V)>,
+        O: Into<Option<I>>,
+    >(
+        mut self,
+        sort: O,
+    ) -> Self {
+        self.prelim_sort = sort.into().map(|sort| {
+            sort.into_iter()
+                .map(|(k, v)| (k.into(), v.into()))
+                .collect()
+        });
+        self
+    }
+
+    pub fn overrequest<O: Into<Option<usize>>>(mut self, overrequest: O) -> Self {
+        self.overrequest = overrequest.into();
+        self
+    }
+
+    pub fn refine<O: Into<Option<bool>>>(mut self, refine: O) -> Self {
+        self.refine = refine.into();
+        self
+    }
+
+    pub fn overrefine<O: Into<Option<usize>>>(mut self, overrefine: O) -> Self {
+        self.overrefine = overrefine.into();
+        self
+    }
+
+    /// The minimum count for a bucket to be included
+    pub fn mincount<O: Into<Option<usize>>>(mut self, mincount: O) -> Self {
+        self.mincount = mincount.into();
+        self
+    }
+
+    /// Add a special bucket that contains the number of documents that were not counted
+    pub fn missing<O: Into<Option<bool>>>(mut self, missing: O) -> Self {
+        self.missing = missing.into();
+        self
+    }
+
+    /// Add a special bucket that contains the number of buckets for the facet
+    pub fn num_buckets<O: Into<Option<bool>>>(mut self, num_buckets: O) -> Self {
+        self.num_buckets = num_buckets.into();
+        self
+    }
+
+    /// Add a special bucket
+    pub fn all_buckets<O: Into<Option<bool>>>(mut self, all_buckets: O) -> Self {
+        self.all_buckets = all_buckets.into();
+        self
+    }
+
+    /// Only return buckets with the following prefix
+    pub fn prefix<S: Into<String>, O: Into<Option<S>>>(mut self, prefix: O) -> Self {
+        self.prefix = prefix.into().map(|s| s.into());
         self
     }
 
@@ -234,6 +347,29 @@ impl JsonTermsFacet {
         });
         self
     }
+
+    /// Which facet algorithm to use
+    pub fn method<O: Into<Option<JsonTermsFacetMethod>>>(mut self, method: O) -> Self {
+        self.method = method.into();
+        self
+    }
+}
+
+/// The facet algorithm to use
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq)]
+pub enum JsonTermsFacetMethod {
+    #[serde(rename = "dv")]
+    DocValues,
+    #[serde(rename = "uif")]
+    UnInvertedField,
+    #[serde(rename = "dvhash")]
+    DocValuesHash,
+    #[serde(rename = "enum")]
+    Enum,
+    #[serde(rename = "stream")]
+    Stream,
+    #[serde(rename = "smart")]
+    Smart,
 }
 
 /// A facet that does a query and returns the number of documents that match

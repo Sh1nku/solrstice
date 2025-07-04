@@ -7,7 +7,7 @@ from solrstice import (
     JsonQueryFacet,
     JsonStatFacet,
     JsonTermsFacet,
-    SelectQuery,
+    SelectQuery, JsonTermsFacetMethod,
 )
 
 from .helpers import (
@@ -65,6 +65,41 @@ async def test_json_terms_facet_works(config: Config) -> None:
         assert facets is not None
         age_buckets = facets.get_nested_facets()["age"].get_buckets()
         assert len(age_buckets) == 3
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_json_terms_facet_extended(config: Config) -> None:
+    name = "JsonTermsFacetExtended"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+        await index_test_data(config.context, name)
+
+        select_builder = SelectQuery(
+            json_facet=JsonFacetComponent(
+                facets={
+                    "city_name": JsonTermsFacet(
+                        "city_name",
+                        num_buckets=True,
+                        all_buckets=True,
+                        missing=True,
+                        limit=10,
+                        prefix="A",
+                        method=JsonTermsFacetMethod.DocValues
+                    )
+                })
+        )
+        response = await config.async_client.select(select_builder, name)
+        facets = response.get_json_facets()
+        assert facets is not None
+        city_name = facets.get_nested_facets()["city_name"]
+        assert len(city_name.get_buckets()) == 1
+        assert city_name.get_missing() is not None
+        assert city_name.get_all_buckets() is not None
+        assert city_name.get_num_buckets() == 1
     finally:
         await teardown_collection(config.context, name)
 

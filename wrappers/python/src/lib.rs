@@ -26,7 +26,8 @@ use crate::queries::components::facet_set::{
 };
 use crate::queries::components::grouping::{GroupFormattingWrapper, GroupingComponentWrapper};
 use crate::queries::components::json_facet::{
-    JsonFacetComponentWrapper, JsonFacetTypeWrapper, JsonQueryFacetWrapper, JsonStatFacetWrapper,
+    JsonFacetComponentWrapper, JsonFacetSortDirectionWrapper, JsonFacetTypeWrapper,
+    JsonQueryFacetWrapper, JsonStatFacetWrapper, JsonTermsFacetMethodWrapper,
     JsonTermsFacetWrapper,
 };
 use crate::queries::components::stats::StatsComponentWrapper;
@@ -86,7 +87,9 @@ fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     m.add_class::<JsonFacetComponentWrapper>()?;
     m.add_class::<JsonFacetTypeWrapper>()?;
+    m.add_class::<JsonFacetSortDirectionWrapper>()?;
     m.add_class::<JsonTermsFacetWrapper>()?;
+    m.add_class::<JsonTermsFacetMethodWrapper>()?;
     m.add_class::<JsonQueryFacetWrapper>()?;
     m.add_class::<JsonStatFacetWrapper>()?;
 

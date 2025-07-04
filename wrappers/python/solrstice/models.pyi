@@ -261,6 +261,13 @@ class SolrJsonFacetResponse:
     A response from a json facet query
     """
 
+    def get_val(self) -> Optional[Any]:
+        """
+        If a bucket facet, this value will be set
+        :return: The value for this facet
+
+        """
+
     def get_buckets(self) -> List["SolrJsonFacetResponse"]:
         """
         Get the buckets for this facet
@@ -279,6 +286,21 @@ class SolrJsonFacetResponse:
         ...     assert len(age_buckets) == 3
 
         """
+
+    def get_num_buckets(self) -> Optional[int]:
+        """
+        Get the number of buckets for this facet, if specified in the query
+        :return: The number of buckets
+        """
+
+    def get_missing(self) -> Optional[int]:
+        """
+        Get the number of missing values for this facet, if specified in the query
+        :return: The number of missing values
+        """
+
+    def get_all_buckets(self) -> Optional[int]:
+        pass
 
     def get_flat_facets(self) -> Dict[str, Any]:
         """
@@ -327,12 +349,6 @@ class SolrJsonFacetResponse:
         """
         Get the count for this facet
         :return: The count for this facet
-        """
-
-    def get_val(self) -> Optional[Any]:
-        """
-        If a bucket facet, this value will be set
-        :return: The value for this facet
         """
 
 
