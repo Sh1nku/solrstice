@@ -28,6 +28,9 @@ use std::collections::HashMap;
 pub struct SolrJsonFacetResponse {
     val: Option<Value>,
     count: Option<usize>,
+    num_buckets: Option<usize>,
+    missing: Option<Box<SolrJsonFacetResponse>>,
+    all_buckets: Option<Box<SolrJsonFacetResponse>>,
     #[serde(default)]
     buckets: Vec<SolrJsonFacetResponse>,
     #[serde(flatten)]
@@ -45,6 +48,21 @@ impl SolrJsonFacetResponse {
     /// Get buckets of the facet.
     pub fn get_buckets(&self) -> impl Iterator<Item = &SolrJsonFacetResponse> {
         self.buckets.iter()
+    }
+
+    /// Get the number of buckets if specified with `numBuckets`.
+    pub fn get_num_buckets(&self) -> Option<usize> {
+        self.num_buckets
+    }
+
+    /// Get the missing special facet, populated if it was specified in the query.
+    pub fn get_missing(&self) -> Option<usize> {
+        self.missing.as_deref()?.get_count()
+    }
+
+    /// Get the all buckets special facet, populated if it was specified in the query.
+    pub fn get_all_buckets(&self) -> Option<usize> {
+        self.all_buckets.as_deref()?.get_count()
     }
 
     /// Get flat facets.
@@ -76,6 +94,17 @@ impl<'de> Deserialize<'de> for SolrJsonFacetResponse {
 
         let val = map.remove("val");
 
+        let num_buckets = map
+            .remove("numBuckets")
+            .and_then(|v| v.as_u64().map(|u| u as usize));
+        let missing = map
+            .remove("missing")
+            .and_then(|v| serde_json::from_value::<SolrJsonFacetResponse>(v).ok());
+
+        let all_buckets = map
+            .remove("allBuckets")
+            .and_then(|v| serde_json::from_value::<SolrJsonFacetResponse>(v).ok());
+
         let buckets = map
             .remove("buckets")
             .and_then(|b| serde_json::from_value::<Vec<SolrJsonFacetResponse>>(b).ok())
@@ -98,6 +127,9 @@ impl<'de> Deserialize<'de> for SolrJsonFacetResponse {
         Ok(Self {
             val,
             count,
+            num_buckets,
+            missing: missing.map(Box::new),
+            all_buckets: all_buckets.map(Box::new),
             buckets,
             flat_facets,
             nested_facets,

@@ -10,11 +10,34 @@ pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]
 impl SolrJsonFacetResponseWrapper {
+    pub fn get_val(&self) -> PyResult<Option<PyObject>> {
+        Python::with_gil(|py| -> PyResult<Option<PyObject>> {
+            Ok(self
+                .0
+                .get_val()
+                .map(|v| pythonize(py, v))
+                .transpose()
+                .map_err(PyErrWrapper::from)?)
+        })
+    }
+
     pub fn get_buckets(&self) -> Vec<SolrJsonFacetResponseWrapper> {
         self.0
             .get_buckets()
             .map(SolrJsonFacetResponseWrapper::from)
             .collect()
+    }
+
+    pub fn get_num_buckets(&self) -> Option<usize> {
+        self.0.get_num_buckets()
+    }
+
+    pub fn get_missing(&self) -> Option<usize> {
+        self.0.get_missing()
+    }
+
+    pub fn get_all_buckets(&self) -> Option<usize> {
+        self.0.get_all_buckets()
     }
 
     pub fn get_flat_facets(&self) -> PyResult<HashMap<String, PyObject>> {
@@ -40,17 +63,6 @@ impl SolrJsonFacetResponseWrapper {
 
     pub fn get_count(&self) -> Option<usize> {
         self.0.get_count()
-    }
-
-    pub fn get_val(&self) -> PyResult<Option<PyObject>> {
-        Python::with_gil(|py| -> PyResult<Option<PyObject>> {
-            Ok(self
-                .0
-                .get_val()
-                .map(|v| pythonize(py, v))
-                .transpose()
-                .map_err(PyErrWrapper::from)?)
-        })
     }
 }
 

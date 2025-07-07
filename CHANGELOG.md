@@ -2,6 +2,8 @@
 * Add support for returning raw response from Solr
 * Update MSRV to 1.82.0
 * Add stats component
+* Implemement all query fields in json facet
+  * Change sort parameter from string to ordered HashMap
 
 # v0.9.0
 

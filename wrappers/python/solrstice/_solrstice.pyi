@@ -21,7 +21,9 @@ __all__ = [
     "FieldFacetEntry",
     "JsonFacetComponent",
     "JsonFacetType",
+    "JsonFacetSortDirection",
     "JsonTermsFacet",
+    "JsonTermsFacetMethod",
     "JsonQueryFacet",
     "JsonStatFacet",
     "SolrHost",
@@ -317,6 +319,14 @@ class JsonFacetComponent:
         pass
 
 
+class JsonFacetSortDirection(Enum):
+    """
+    The sort direction for a json facet
+    """
+    Asc = "Asc"
+    Desc = "Desc"
+
+
 class JsonFacetType(abc.ABC):
     """
     Base class for a json facet type
@@ -324,6 +334,15 @@ class JsonFacetType(abc.ABC):
     """
 
     pass
+
+
+class JsonTermsFacetMethod(Enum):
+    DocValues = "DocValues"
+    UnInvertedField = "UnInvertedField"
+    DocValuesHash = "DocValuesHash"
+    Enum = "Enum"
+    Stream = "Stream"
+    Smart = "Smart"
 
 
 class JsonTermsFacet(JsonFacetType):
@@ -334,6 +353,17 @@ class JsonTermsFacet(JsonFacetType):
     :param offset: The offset into the list of terms
     :param limit: The maximum number of terms to return
     :param sort: The sort order for the terms
+    :param prelim_sort: More performant approximation of the sort order for the terms
+    :param overrequest:
+    :param refine:
+    :param overrefine:
+    :param mincount: The minimum count for a term to be returned
+    :param missing: Return a bucket for missing values
+    :param num_buckets: Return the number of buckets
+    :param all_buckets:
+    :param prefix: Limit the terms to those starting with the given prefix
+    :param facets: A dictionary of sub-facets to apply to the query
+    :param method: The method to use for the facet.
     """
 
     def __init__(
@@ -341,8 +371,18 @@ class JsonTermsFacet(JsonFacetType):
             field: str,
             offset: Optional[int] = None,
             limit: Optional[int] = None,
-            sort: Optional[str] = None,
+            sort: Optional[Dict[str, JsonFacetSortDirection]] = None,
+            prelim_sort: Optional[Dict[str, JsonFacetSortDirection]] = None,
+            overrequest: Optional[int] = None,
+            refine: Optional[bool] = None,
+            overrefine: Optional[bool] = None,
+            mincount: Optional[int] = None,
+            missing: Optional[bool] = None,
+            num_buckets: Optional[bool] = None,
+            all_buckets: Optional[bool] = None,
+            prefix: Optional[str] = None,
             facets: Optional[Dict[str, JsonFacetType]] = None,
+            method: Optional[JsonTermsFacetMethod] = None,
     ):
         pass
 

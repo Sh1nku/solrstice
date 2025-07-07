@@ -1,7 +1,7 @@
 use crate::structures::{get_test_data, FunctionalityTestsBuildup};
 use serial_test::parallel;
 use solrstice::models::SolrJsonFacetResponse;
-use solrstice::{Error, SelectQuery, UpdateQuery};
+use solrstice::{Error, JsonTermsFacetMethod, SelectQuery, UpdateQuery};
 use solrstice::{JsonFacetComponent, JsonQueryFacet, JsonStatFacet, JsonTermsFacet};
 
 #[tokio::test]
@@ -86,6 +86,50 @@ pub async fn test_json_terms_facet_works() -> Result<(), Error> {
         .ok_or("No age facet")?;
     let buckets = age.get_buckets().collect::<Vec<&SolrJsonFacetResponse>>();
     assert_eq!(buckets.len(), 3);
+
+    let _ = config.tear_down().await;
+    Ok(())
+}
+
+#[tokio::test]
+#[parallel]
+pub async fn test_json_terms_facet_extended() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("JsonFacetTermsExtended")
+        .await
+        .unwrap();
+    let update = UpdateQuery::new();
+    update
+        .execute(&config.context, &config.collection_name, &get_test_data())
+        .await?;
+
+    let query = SelectQuery::new().json_facet(
+        JsonFacetComponent::new().facets([(
+            "city_name",
+            JsonTermsFacet::new("city_name")
+                .num_buckets(true)
+                .all_buckets(true)
+                .missing(true)
+                .limit(10)
+                .prefix("A")
+                .method(JsonTermsFacetMethod::DocValues),
+        )]),
+    );
+    let response = config
+        .async_client
+        .select(&query, &config.collection_name)
+        .await?;
+    let facets = response.get_json_facets().ok_or("No facets")?;
+    let city_name = facets
+        .get_nested_facets()
+        .get("city_name")
+        .ok_or("No city_name facet")?;
+    let buckets = city_name
+        .get_buckets()
+        .collect::<Vec<&SolrJsonFacetResponse>>();
+    assert_eq!(buckets.len(), 1);
+    assert!(city_name.get_missing().is_some());
+    assert!(city_name.get_all_buckets().is_some());
+    assert_eq!(city_name.get_num_buckets(), Some(1));
 
     let _ = config.tear_down().await;
     Ok(())
