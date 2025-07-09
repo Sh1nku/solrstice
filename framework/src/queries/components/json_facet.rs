@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize, Serializer};
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
 ///  let query = SelectQuery::new().json_facet(
-///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
 /// );
 /// let response = client
 ///     .select(&query, "collection_name")
@@ -53,7 +53,7 @@ impl JsonFacetComponent {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
     ///  let query = SelectQuery::new().json_facet(
-    ///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+    ///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
     /// );
     /// let response = client
     ///     .select(&query, "collection_name")
@@ -381,7 +381,7 @@ pub enum JsonTermsFacetMethod {
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
 /// let query = SelectQuery::new().json_facet(
-///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
 /// );
 /// let response = client
 ///     .select(&query, "collection_name")
@@ -400,7 +400,8 @@ pub enum JsonTermsFacetMethod {
 pub struct JsonQueryFacet {
     #[serde(rename = "type")]
     type_: String,
-    q: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    q: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -429,7 +430,7 @@ impl JsonQueryFacet {
     /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
     /// let client = AsyncSolrCloudClient::new(context);
     /// let query = SelectQuery::new().json_facet(
-    ///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+    ///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
     /// );
     /// let response = client
     ///     .select(&query, "collection_name")
@@ -443,16 +444,22 @@ impl JsonQueryFacet {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new<S: Into<String>>(q: S) -> Self {
+    pub fn new() -> Self {
         JsonQueryFacet {
             type_: "query".to_string(),
-            q: q.into(),
+            q: None,
             limit: None,
             offset: None,
             sort: None,
             fq: None,
             facet: None,
         }
+    }
+
+    /// Set the query for the facet
+    pub fn q<S: Into<String>>(mut self, q: S) -> Self {
+        self.q = Some(q.into());
+        self
     }
 
     /// Limit the number of facet results

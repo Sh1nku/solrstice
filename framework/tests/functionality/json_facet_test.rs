@@ -16,7 +16,7 @@ pub async fn test_json_query_facet_works() -> Result<(), Error> {
         .await?;
 
     let query = SelectQuery::new().json_facet(
-        JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+        JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
     );
     let response = config
         .async_client
@@ -149,7 +149,8 @@ pub async fn test_json_facet_sub_works() -> Result<(), Error> {
     let query = SelectQuery::new().json_facet(
         JsonFacetComponent::new().facets([(
             "below_60",
-            JsonQueryFacet::new("age:[0 TO 59]")
+            JsonQueryFacet::new()
+                .q("age:[0 TO 59]")
                 .facets([("total_people", JsonStatFacet::new("sum(count)"))]),
         )]),
     );

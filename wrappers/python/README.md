@@ -234,7 +234,7 @@ async def main() -> None:
   client = AsyncSolrCloudClient(SolrServerContext('localhost:8983'))
   select_builder = SelectQuery(
       json_facet=JsonFacetComponent(
-          facets={"below_60": JsonQueryFacet("age:[0 TO 59]")}
+          facets={"below_60": JsonQueryFacet(q="age:[0 TO 59]")}
       )
   )
   response = await client.select(select_builder, "example_collection")
@@ -292,7 +292,7 @@ async def main() -> None:
       json_facet=JsonFacetComponent(
           facets={
               "below_60": JsonQueryFacet(
-                  "age:[0 TO 59]",
+                  q="age:[0 TO 59]",
                   facets={"total_people": JsonStatFacet("sum(count)")},
               )
           }

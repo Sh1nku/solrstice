@@ -1,3 +1,6 @@
+# v0.11.0
+* Make JsonQueryFacet `q` parameter optional
+
 # v0.10.0
 * Add support for returning raw response from Solr
 * Update MSRV to 1.82.0

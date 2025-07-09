@@ -36,7 +36,7 @@ async def test_json_query_facet_works(config: Config) -> None:
 
         select_builder = SelectQuery(
             json_facet=JsonFacetComponent(
-                facets={"below_60": JsonQueryFacet("age:[0 TO 59]")}
+                facets={"below_60": JsonQueryFacet(q="age:[0 TO 59]")}
             )
         )
         response = await config.async_client.select(select_builder, name)
@@ -140,7 +140,7 @@ async def test_json_facet_sub_works(config: Config) -> None:
             json_facet=JsonFacetComponent(
                 facets={
                     "below_60": JsonQueryFacet(
-                        "age:[0 TO 59]",
+                        q="age:[0 TO 59]",
                         facets={"total_people": JsonStatFacet("sum(count)")},
                     )
                 }

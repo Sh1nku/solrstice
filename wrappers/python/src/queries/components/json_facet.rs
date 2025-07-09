@@ -157,14 +157,17 @@ impl JsonQueryFacetWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
     fn new(
-        q: String,
+        q: Option<String>,
         limit: Option<usize>,
         offset: Option<usize>,
         sort: Option<String>,
         fq: Option<Vec<String>>,
         facets: Option<HashMap<String, JsonFacetTypeWrapper>>,
     ) -> (Self, JsonFacetTypeWrapper) {
-        let mut query_facet = JsonQueryFacet::new(q);
+        let mut query_facet = JsonQueryFacet::new();
+        if let Some(q) = q {
+            query_facet = query_facet.q(q);
+        }
         if let Some(limit) = limit {
             query_facet = query_facet.limit(limit);
         }
