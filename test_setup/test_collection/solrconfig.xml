@@ -41,10 +41,10 @@
         <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
     </query>
 
-    <circuitBreakers enabled="true" />
+    <circuitBreakers enabled="true"/>
 
     <requestDispatcher>
-        <httpCaching never304="true" />
+        <httpCaching never304="true"/>
     </requestDispatcher>
 
     <requestHandler name="/select" class="solr.SearchHandler">
@@ -54,7 +54,14 @@
         </lst>
     </requestHandler>
 
-    <queryResponseWriter name="json" class="solr.JSONResponseWriter" />
+    <requestHandler name="/select2" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">0</int>
+        </lst>
+    </requestHandler>
+
+    <queryResponseWriter name="json" class="solr.JSONResponseWriter"/>
 
 
 </config>

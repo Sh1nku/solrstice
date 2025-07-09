@@ -44,9 +44,10 @@ pub struct SelectQuery {
     fl: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     sort: Option<Vec<String>>,
-    handle: String,
-    rows: usize,
-    start: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rows: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    start: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "cursorMark")]
     cursor_mark: Option<String>,
@@ -94,9 +95,8 @@ impl SelectQuery {
             fq: None,
             fl: None,
             sort: None,
-            handle: "select".to_string(),
-            rows: 10,
-            start: 0,
+            rows: None,
+            start: None,
             cursor_mark: None,
             grouping: None,
             def_type: None,
@@ -164,7 +164,7 @@ impl SelectQuery {
     /// SelectQuery::new().rows(1000);
     /// ```
     pub fn rows(mut self, rows: usize) -> Self {
-        self.rows = rows;
+        self.rows = Some(rows);
         self
     }
 
@@ -174,7 +174,7 @@ impl SelectQuery {
     /// SelectQuery::new().start(10);
     /// ```
     pub fn start(mut self, start: usize) -> Self {
-        self.start = start;
+        self.start = Some(start);
         self
     }
 
@@ -298,12 +298,17 @@ impl SelectQuery {
         self
     }
 
-    pub async fn execute<T: AsRef<str>, C: AsRef<SolrServerContext>>(
+    pub async fn execute<D: Into<SelectDestination>, C: AsRef<SolrServerContext>>(
         &self,
         context: C,
-        collection: T,
+        destination: D,
     ) -> Result<SolrResponse, Error> {
-        let solr_url = format!("/solr/{}/{}", collection.as_ref(), &self.handle);
+        let destination = destination.into();
+        let solr_url = format!(
+            "/solr/{}/{}",
+            destination.collection.as_str(),
+            destination.handler.as_str()
+        );
         let wrapper = PostQueryWrapper {
             params: self.clone(),
         };
@@ -313,12 +318,17 @@ impl SelectQuery {
         Ok(data)
     }
 
-    pub async fn execute_raw<T: AsRef<str>, C: AsRef<SolrServerContext>>(
+    pub async fn execute_raw<D: Into<SelectDestination>, C: AsRef<SolrServerContext>>(
         &self,
         context: C,
-        collection: T,
+        destination: D,
     ) -> Result<HashMap<String, Value>, Error> {
-        let solr_url = format!("/solr/{}/{}", collection.as_ref(), &self.handle);
+        let destination = destination.into();
+        let solr_url = format!(
+            "/solr/{}/{}",
+            destination.collection.as_str(),
+            destination.handler.as_str()
+        );
         let wrapper = PostQueryWrapper {
             params: self.clone(),
         };
@@ -331,22 +341,68 @@ impl SelectQuery {
 
 #[cfg(feature = "blocking")]
 impl SelectQuery {
-    pub fn execute_blocking<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    pub fn execute_blocking<C: AsRef<SolrServerContext>, D: Into<SelectDestination>>(
         &self,
         context: C,
-        collection: S,
+        destination: D,
     ) -> Result<SolrResponse, Error> {
-        RUNTIME.handle().block_on(self.execute(context, collection))
+        RUNTIME
+            .handle()
+            .block_on(self.execute(context, destination.into()))
     }
 
-    pub fn execute_blocking_raw<C: AsRef<SolrServerContext>, S: AsRef<str>>(
+    pub fn execute_blocking_raw<C: AsRef<SolrServerContext>, D: Into<SelectDestination>>(
         &self,
         context: C,
-        collection: S,
+        destination: D,
     ) -> Result<HashMap<String, Value>, Error> {
         RUNTIME
             .handle()
-            .block_on(self.execute_raw(context, collection))
+            .block_on(self.execute_raw(context, destination.into()))
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct SelectDestination {
+    collection: String,
+    handler: String,
+}
+
+impl SelectDestination {
+    pub fn new<S: Into<String>>(collection: S) -> Self {
+        SelectDestination {
+            collection: collection.into(),
+            handler: "select".to_string(),
+        }
+    }
+
+    pub fn handler<S: Into<String>>(mut self, handler: S) -> Self {
+        self.handler = handler.into();
+        self
+    }
+}
+
+impl From<String> for SelectDestination {
+    fn from(collection: String) -> Self {
+        SelectDestination::new(collection)
+    }
+}
+
+impl From<&str> for SelectDestination {
+    fn from(collection: &str) -> Self {
+        SelectDestination::new(collection)
+    }
+}
+
+impl From<&SelectDestination> for SelectDestination {
+    fn from(destination: &SelectDestination) -> Self {
+        destination.clone()
+    }
+}
+
+impl From<&String> for SelectDestination {
+    fn from(collection: &String) -> Self {
+        SelectDestination::new(collection.as_str())
     }
 }
 

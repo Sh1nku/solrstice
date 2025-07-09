@@ -578,9 +578,9 @@ class SelectQuery:
     :param q: The query string
     :param fq: The filter queries
     :param fl: The fields to return
-    :param sort: The sort order
-    :param rows: The number of rows to return
     :param start: Set the start index
+    :param rows: The number of rows to return
+    :param sort: The sort order
     :param cursor_mark: Set the cursor mark
     :param grouping: Set the grouping component
     :param def_type: Set the query type
@@ -594,9 +594,9 @@ class SelectQuery:
             q: Optional[str] = None,
             fq: Optional[List[str]] = None,
             fl: Optional[List[str]] = None,
-            sort: Optional[List[str]] = None,
-            rows: Optional[int] = None,
             start: Optional[int] = None,
+            rows: Optional[int] = None,
+            sort: Optional[List[str]] = None,
             cursor_mark: Optional[str] = None,
             grouping: Optional["GroupingComponent"] = None,
             def_type: Optional["DefType"] = None,
