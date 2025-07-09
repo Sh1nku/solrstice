@@ -401,7 +401,7 @@ class JsonQueryFacet(JsonFacetType):
 
     def __init__(
             self,
-            q: str,
+            q: Optional[str] = None,
             limit: Optional[int] = None,
             offset: Optional[int] = None,
             sort: Optional[str] = None,

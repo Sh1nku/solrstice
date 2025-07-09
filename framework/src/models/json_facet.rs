@@ -10,7 +10,7 @@ use std::collections::HashMap;
 /// # let context = SolrServerContextBuilder::new(SolrSingleServerHost::new("http://localhost:8983")).build();
 /// let client = AsyncSolrCloudClient::new(context);
 ///  let query = SelectQuery::new().json_facet(
-///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new("age:[0 TO 59]"))]),
+///     JsonFacetComponent::new().facets([("below_60", JsonQueryFacet::new().q("age:[0 TO 59]"))]),
 /// );
 /// let response = client
 ///     .select(&query, "collection_name")
