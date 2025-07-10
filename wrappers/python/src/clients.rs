@@ -125,9 +125,10 @@ impl AsyncSolrCloudClientWrapper {
         py: Python<'py>,
         builder: &SelectQueryWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
-        builder.execute(py, context, collection)
+        builder.execute(py, context, collection, handler)
     }
 
     pub fn select_raw<'py>(
@@ -135,9 +136,10 @@ impl AsyncSolrCloudClientWrapper {
         py: Python<'py>,
         builder: &SelectQueryWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
-        builder.execute_raw(py, context, collection)
+        builder.execute_raw(py, context, collection, handler)
     }
 
     pub fn delete<'py>(
@@ -245,9 +247,10 @@ impl BlockingSolrCloudClientWrapper {
         py: Python,
         builder: &SelectQueryWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<SolrResponseWrapper> {
         let context = self.0.clone();
-        builder.execute_blocking(py, context, collection)
+        builder.execute_blocking(py, context, collection, handler)
     }
 
     pub fn select_raw(
@@ -255,9 +258,10 @@ impl BlockingSolrCloudClientWrapper {
         py: Python,
         builder: &SelectQueryWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<PyObject> {
         let context = self.0.clone();
-        builder.execute_blocking_raw(py, context, collection)
+        builder.execute_blocking_raw(py, context, collection, handler)
     }
 
     pub fn delete(

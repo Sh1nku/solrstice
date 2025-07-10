@@ -1,9 +1,10 @@
 use crate::structures::{get_test_data, City, FunctionalityTestsBuildup};
+use serde_json::Value;
 use serial_test::parallel;
 use solrstice::models::SolrDocsResponse;
-use solrstice::Error;
 use solrstice::SelectQuery;
 use solrstice::UpdateQuery;
+use solrstice::{Error, SelectDestination};
 use std::collections::HashMap;
 
 #[tokio::test]
@@ -22,6 +23,33 @@ async fn select_works_when_no_result() -> Result<(), Error> {
             .get_docs_response()
             .unwrap()
             .get_docs::<City>()
+            .unwrap()
+            .len(),
+        0
+    );
+    let _ = config.tear_down().await;
+    Ok(())
+}
+
+#[tokio::test]
+#[parallel]
+async fn select_works_non_default_handler() -> Result<(), Error> {
+    let config = FunctionalityTestsBuildup::build_up("SelectNonDefaultHandler")
+        .await
+        .unwrap();
+
+    let result = SelectQuery::new()
+        .execute(
+            &config.context,
+            SelectDestination::new(&config.collection_name).handler("select2"),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        result
+            .get_docs_response()
+            .unwrap()
+            .get_docs::<HashMap<String, Value>>()
             .unwrap()
             .len(),
         0

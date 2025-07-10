@@ -578,9 +578,9 @@ class SelectQuery:
     :param q: The query string
     :param fq: The filter queries
     :param fl: The fields to return
-    :param sort: The sort order
-    :param rows: The number of rows to return
     :param start: Set the start index
+    :param rows: The number of rows to return
+    :param sort: The sort order
     :param cursor_mark: Set the cursor mark
     :param grouping: Set the grouping component
     :param def_type: Set the query type
@@ -594,9 +594,9 @@ class SelectQuery:
             q: Optional[str] = None,
             fq: Optional[List[str]] = None,
             fl: Optional[List[str]] = None,
-            sort: Optional[List[str]] = None,
-            rows: Optional[int] = None,
             start: Optional[int] = None,
+            rows: Optional[int] = None,
+            sort: Optional[List[str]] = None,
             cursor_mark: Optional[str] = None,
             grouping: Optional["GroupingComponent"] = None,
             def_type: Optional["DefType"] = None,
@@ -608,39 +608,43 @@ class SelectQuery:
         pass
 
     async def execute(
-            self, context: "SolrServerContext", collection: str
+            self, context: "SolrServerContext", collection: str, handler: Optional[str] = None
     ) -> "SolrResponse":
         """Execute the query
 
         :param context: The context for the connection to the solr instance
         :param collection: The collection to query
+        :param handler: The handler. Default is "select"
         """
 
     async def execute_raw(
-            self, context: "SolrServerContext", collection: str
+            self, context: "SolrServerContext", collection: str, handler: Optional[str] = None
     ) -> Dict[str, Any]:
         """Execute the query, and return the raw solr response as a dictionary.
 
         :param context: The context for the connection to the solr instance
         :param collection: The collection to query
+        :param handler: The handler. Default is "select"
         """
 
     def execute_blocking(
-            self, context: "SolrServerContext", collection: str
+            self, context: "SolrServerContext", collection: str, handler: Optional[str] = None
     ) -> "SolrResponse":
         """Execute the query
 
         :param context: The context for the connection to the solr instance
         :param collection: The collection to query
+        :param handler: The handler. Default is "select"
         """
 
     def execute_blocking_raw(
-            self, context: "SolrServerContext", collection: str
+            self, context: "SolrServerContext", collection: str, handler: Optional[str] = None
     ) -> Dict[str, Any]:
         """Execute the query, and return the raw solr response as a dictionary.
 
         :param context: The context for the connection to the solr instance
         :param collection: The collection to query
+        :param handler: The handler. Default is "select"
         """
 
 
@@ -920,13 +924,14 @@ class AsyncSolrCloudClient:
 
         """
 
-    async def select(self, builder: "SelectQuery", collection: str) -> "SolrResponse":
+    async def select(self, builder: "SelectQuery", collection: str, handler: Optional[str] = None) -> "SolrResponse":
         """Execute a select query
 
         Also see :class:`SelectQuery`
 
         :param builder: The query builder
         :param collection: The collection to query
+        :param handler: The handler, default is "select"
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, SelectQuery
@@ -939,13 +944,15 @@ class AsyncSolrCloudClient:
 
         """
 
-    async def select_raw(self, builder: "SelectQuery", collection: str) -> Dict[str, Any]:
+    async def select_raw(self, builder: "SelectQuery", collection: str, handler: Optional[str] = None) -> Dict[
+        str, Any]:
         """Execute a select query. Return raw response from solr
 
         Also see :class:`SelectQuery`
 
         :param builder: The query builder
         :param collection: The collection to query
+        :param handler: The handler, default is "select"
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, AsyncSolrCloudClient, SelectQuery
@@ -1201,13 +1208,14 @@ class BlockingSolrCloudClient:
 
         """
 
-    def select(self, builder: "SelectQuery", collection: str) -> "SolrResponse":
+    def select(self, builder: "SelectQuery", collection: str, handler: Optional[str] = None) -> "SolrResponse":
         """Execute a select query
 
         Also see :class:`SelectQuery`
 
         :param builder: The query builder
         :param collection: The collection to query
+        :param handler: The handler, default is "select"
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, SelectQuery
@@ -1220,13 +1228,14 @@ class BlockingSolrCloudClient:
 
         """
 
-    def select_raw(self, builder: "SelectQuery", collection: str) -> Dict[str, Any]:
+    def select_raw(self, builder: "SelectQuery", collection: str, handler: Optional[str] = None) -> Dict[str, Any]:
         """Execute a select query. Return the raw response from Solr
 
         Also see :class:`SelectQuery`
 
         :param builder: The query builder
         :param collection: The collection to query
+        :param handler: The handler, default is "select"
         :returns: The response from the query
 
         >>> from solrstice import SolrServerContext, BlockingSolrCloudClient, SelectQuery

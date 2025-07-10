@@ -8,6 +8,7 @@ use crate::queries::collection::{
 use crate::queries::config::{config_exists, delete_config, get_configs, upload_config};
 use crate::queries::index::{DeleteQuery, UpdateQuery};
 use crate::queries::select::SelectQuery;
+use crate::SelectDestination;
 use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -305,12 +306,15 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn select<B: AsRef<SelectQuery>, C: AsRef<str>>(
+    pub async fn select<B: AsRef<SelectQuery>, D: Into<SelectDestination>>(
         &self,
         builder: B,
-        collection: C,
+        destination: D,
     ) -> Result<SolrResponse, Error> {
-        builder.as_ref().execute(&self.context, collection).await
+        builder
+            .as_ref()
+            .execute(&self.context, destination.into())
+            .await
     }
 
     /// Select some data from SolrCloud. Return the response directly
@@ -328,14 +332,14 @@ impl AsyncSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn select_raw<B: AsRef<SelectQuery>, C: AsRef<str>>(
+    pub async fn select_raw<B: AsRef<SelectQuery>, D: Into<SelectDestination>>(
         &self,
         builder: B,
-        collection: C,
+        destination: D,
     ) -> Result<HashMap<String, Value>, Error> {
         builder
             .as_ref()
-            .execute_raw(&self.context, collection)
+            .execute_raw(&self.context, destination.into())
             .await
     }
 

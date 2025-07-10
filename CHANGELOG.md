@@ -1,3 +1,8 @@
+# v0.12.0
+* Allow overriding handler in select requests
+* Don't provide default start and rows parameters
+* Reorder arguments in constructor for SelectQuery in Python
+
 # v0.11.0
 * Make JsonQueryFacet `q` parameter optional
 

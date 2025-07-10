@@ -11,13 +11,13 @@ use pyo3::types::PyBytes;
 use pythonize::pythonize;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use solrstice::Error;
 use solrstice::FacetSetComponent;
 use solrstice::GroupingComponent;
 use solrstice::JsonFacetComponent;
 use solrstice::SelectQuery;
 use solrstice::SolrServerContext;
 use solrstice::{DefType, StatsComponent};
+use solrstice::{Error, SelectDestination};
 use std::collections::HashMap;
 
 #[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
@@ -97,12 +97,17 @@ impl SelectQueryWrapper {
         py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
+        let mut destination = SelectDestination::new(collection);
+        if let Some(handler) = handler {
+            destination = destination.handler(handler);
+        }
         pyo3_asyncio::tokio::future_into_py(py, async move {
             let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute(&context, &collection)
+                .execute(&context, &destination)
                 .await
                 .map_err(PyErrWrapper::from)?
                 .into();
@@ -115,12 +120,17 @@ impl SelectQueryWrapper {
         py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
+        let mut destination = SelectDestination::new(collection);
+        if let Some(handler) = handler {
+            destination = destination.handler(handler);
+        }
         let value = pyo3_asyncio::tokio::future_into_py(py, async move {
             let context: SolrServerContext = context.into();
             let result: HashMap<String, Value> = builder
-                .execute_raw(&context, &collection)
+                .execute_raw(&context, &destination)
                 .await
                 .map_err(PyErrWrapper::from)?;
             let result: PyObject =
@@ -136,12 +146,17 @@ impl SelectQueryWrapper {
         py: Python,
         context: SolrServerContextWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
+        let mut destination = SelectDestination::new(collection);
+        if let Some(handler) = handler {
+            destination = destination.handler(handler);
+        }
         py.allow_threads(move || {
             let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
-                .execute_blocking(&context, &collection)
+                .execute_blocking(&context, &destination)
                 .map_err(PyErrWrapper::from)?
                 .into();
             Ok(result)
@@ -153,12 +168,17 @@ impl SelectQueryWrapper {
         py: Python,
         context: SolrServerContextWrapper,
         collection: String,
+        handler: Option<String>,
     ) -> PyResult<PyObject> {
         let builder = self.0.clone();
+        let mut destination = SelectDestination::new(collection);
+        if let Some(handler) = handler {
+            destination = destination.handler(handler);
+        }
         let value: Result<HashMap<String, Value>, PyErrWrapper> = py.allow_threads(move || {
             let context: SolrServerContext = context.into();
             let result: HashMap<String, Value> = builder
-                .execute_blocking_raw(&context, &collection)
+                .execute_blocking_raw(&context, &destination)
                 .map_err(PyErrWrapper::from)?;
             Ok(result)
         });

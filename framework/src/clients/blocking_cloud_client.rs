@@ -13,6 +13,7 @@ use crate::queries::config::{
 };
 use crate::queries::index::{DeleteQuery, UpdateQuery};
 use crate::queries::select::SelectQuery;
+use crate::SelectDestination;
 use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -310,12 +311,14 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select<S: AsRef<str>, B: AsRef<SelectQuery>>(
+    pub fn select<D: Into<SelectDestination>, B: AsRef<SelectQuery>>(
         &self,
         builder: B,
-        collection: S,
+        destination: D,
     ) -> Result<SolrResponse, Error> {
-        builder.as_ref().execute_blocking(&self.context, collection)
+        builder
+            .as_ref()
+            .execute_blocking(&self.context, destination.into())
     }
 
     /// Select some data from SolrCloud. Return the response directly
@@ -333,14 +336,14 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select_raw<S: AsRef<str>, B: AsRef<SelectQuery>>(
+    pub fn select_raw<D: Into<SelectDestination>, B: AsRef<SelectQuery>>(
         &self,
         builder: B,
-        collection: S,
+        destination: D,
     ) -> Result<HashMap<String, Value>, Error> {
         builder
             .as_ref()
-            .execute_blocking_raw(&self.context, collection)
+            .execute_blocking_raw(&self.context, destination.into())
     }
 
     /// Delete some data from SolrCloud
