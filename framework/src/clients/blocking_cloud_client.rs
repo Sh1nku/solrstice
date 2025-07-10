@@ -311,14 +311,14 @@ impl BlockingSolrCloudClient {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select<D: AsRef<SelectDestination>, B: AsRef<SelectQuery>>(
+    pub fn select<D: Into<SelectDestination>, B: AsRef<SelectQuery>>(
         &self,
         builder: B,
         destination: D,
     ) -> Result<SolrResponse, Error> {
         builder
             .as_ref()
-            .execute_blocking(&self.context, destination.as_ref())
+            .execute_blocking(&self.context, destination.into())
     }
 
     /// Select some data from SolrCloud. Return the response directly

@@ -80,25 +80,37 @@ async def test_select_raw_blocking_gets_response(config: Config) -> None:
         await teardown_collection(config.context, name)
 
 
-# @pytest.mark.asyncio
-# async def test_overriding_handler_works(config: Config) -> None:
-#     name = "SelectHandlerOverride"
-#     wait_for_solr(config.solr_host, 30)
-#
-#     try:
-#         await setup_collection(config.context, name, config.config_path)
-#
-#         await index_test_data(config.context, name)
-#
-#         builder = SelectQuery(handler="select2")
-#         solr_response = await builder.execute(config.context, name)
-#         docs_response = solr_response.get_docs_response()
-#         assert docs_response is not None
-#         assert docs_response.get_num_found() > 0
-#         assert docs_response.get_start() == 0
-#         assert len(docs_response.get_docs()) > 4
-#     finally:
-#         await teardown_collection(config.context, name)
+@pytest.mark.asyncio
+async def test_overriding_handler_works(config: Config) -> None:
+    name = "SelectHandlerOverride"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        builder = SelectQuery()
+        solr_response = await builder.execute(config.context, name, "select2")
+        docs_response = solr_response.get_docs_response()
+        assert docs_response is not None
+    finally:
+        await teardown_collection(config.context, name)
+
+
+@pytest.mark.asyncio
+async def test_overriding_handler_fails_when_non_existent(config: Config) -> None:
+    name = "SelectHandlerOverride"
+    wait_for_solr(config.solr_host, 30)
+
+    try:
+        await setup_collection(config.context, name, config.config_path)
+
+        builder = SelectQuery()
+        with pytest.raises(Exception):
+            solr_response = await builder.execute(config.context, name, "select3")
+            docs_response = solr_response.get_docs_response()
+            assert docs_response is not None
+    finally:
+        await teardown_collection(config.context, name)
 
 
 @pytest.mark.asyncio
