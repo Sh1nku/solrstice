@@ -124,7 +124,7 @@ async fn select_works_using_cursor_mark() -> Result<(), Error> {
             .fq(["age:[* TO *]"])
             .rows(1)
             .cursor_mark(cursor_mark.as_str())
-            .sort(["id desc"])
+            .sort("id desc")
             .execute(&config.context, &config.collection_name)
             .await
             .unwrap();

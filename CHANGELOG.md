@@ -1,3 +1,6 @@
+# v0.13.0
+* Make `sort` parameter take a `String` instead of `Vec<String>` in `SelectQuery`
+
 # v0.12.0
 * Allow overriding handler in select requests
 * Don't provide default start and rows parameters
