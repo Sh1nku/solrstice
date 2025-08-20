@@ -7,7 +7,8 @@ from solrstice import (
     JsonQueryFacet,
     JsonStatFacet,
     JsonTermsFacet,
-    SelectQuery, JsonTermsFacetMethod,
+    JsonTermsFacetMethod,
+    SelectQuery,
 )
 
 from .helpers import (
@@ -88,9 +89,10 @@ async def test_json_terms_facet_extended(config: Config) -> None:
                         missing=True,
                         limit=10,
                         prefix="A",
-                        method=JsonTermsFacetMethod.DocValues
+                        method=JsonTermsFacetMethod.DocValues,
                     )
-                })
+                }
+            )
         )
         response = await config.async_client.select(select_builder, name)
         facets = response.get_json_facets()

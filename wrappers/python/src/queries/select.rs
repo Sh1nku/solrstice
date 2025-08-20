@@ -34,7 +34,7 @@ impl SelectQueryWrapper {
         fq: Option<Vec<String>>,
         rows: Option<usize>,
         start: Option<usize>,
-        sort: Option<Vec<String>>,
+        sort: Option<String>,
         cursor_mark: Option<String>,
         grouping: Option<GroupingComponentWrapper>,
         def_type: Option<DefTypeWrapper>,

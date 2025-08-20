@@ -1,4 +1,6 @@
-{pkgs ? import <nixpkgs> {}}:
+{pkgs ? import (fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/25.05.tar.gz";
+}) {}}:
 let
   overrides = builtins.fromTOML (builtins.readFile ./rust-toolchain.toml);
   libPath = with pkgs;

@@ -46,7 +46,9 @@ async def test_async_client_works(config: Config) -> None:
     assert docs is not None
     assert docs.get_num_found() == 1
 
-    response_raw = await client.select_raw(SelectQuery(fq=["id:example_document"]), name)
+    response_raw = await client.select_raw(
+        SelectQuery(fq=["id:example_document"]), name
+    )
     assert response_raw["response"]["numFound"] == 1
 
     await client.delete(DeleteQuery(ids=["example_document"]), name)

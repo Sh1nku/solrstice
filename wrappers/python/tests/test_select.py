@@ -148,7 +148,7 @@ async def test_select_works_with_cursor_mark(config: Config) -> None:
             if current_iteration > 100:
                 raise Exception("Cursor mark test failed. Too many iterations")
             builder = SelectQuery(
-                fq=["age:[* TO *]"], rows=1, sort=["id desc"], cursor_mark=cursor_mark
+                fq=["age:[* TO *]"], rows=1, sort="id desc", cursor_mark=cursor_mark
             )
             result = await builder.execute(config.context, name)
             if result.get_next_cursor_mark() is not None:

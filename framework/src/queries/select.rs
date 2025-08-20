@@ -43,7 +43,7 @@ pub struct SelectQuery {
     #[serde(skip_serializing_if = "Option::is_none")]
     fl: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    sort: Option<Vec<String>>,
+    sort: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rows: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,15 +146,10 @@ impl SelectQuery {
     ///Set the sort order
     ///```rust
     /// use solrstice::SelectQuery;
-    /// SelectQuery::new().sort(["id asc", "field1 desc"]);
+    /// SelectQuery::new().sort("id asc, field1 desc");
     /// ```
-    pub fn sort<S: Into<String>, V: IntoIterator<Item = S>, O: Into<Option<V>>>(
-        mut self,
-        sort: O,
-    ) -> Self {
-        self.sort = sort
-            .into()
-            .map(|x| x.into_iter().map(|x| x.into()).collect());
+    pub fn sort<S: Into<String>>(mut self, sort: S) -> Self {
+        self.sort = Some(sort.into());
         self
     }
 

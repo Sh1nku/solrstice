@@ -2,8 +2,16 @@ from typing import Generator
 
 import pytest
 
-from .helpers import Config, create_config, wait_for_solr, setup_collection, index_test_data, teardown_collection
 from solrstice import SelectQuery, StatsComponent
+
+from .helpers import (
+    Config,
+    create_config,
+    index_test_data,
+    setup_collection,
+    teardown_collection,
+    wait_for_solr,
+)
 
 
 @pytest.fixture()

@@ -13,7 +13,6 @@ __all__ = [
     "SolrResponse",
 ]
 
-
 class SolrFacetSetResult:
     """
     Gets the facet counts from a query
@@ -73,7 +72,6 @@ class SolrFacetSetResult:
 
         """
 
-
 class SolrPivotFacetResult:
     """
     Gets the pivot facet counts from a query
@@ -105,7 +103,6 @@ class SolrPivotFacetResult:
         :return: The count of the pivot
         """
 
-
 class SolrFieldFacetResult:
     def get_key(self) -> Any:
         """
@@ -120,7 +117,6 @@ class SolrFieldFacetResult:
         Gets the count of the facet
         :return: The count of the facet
         """
-
 
 class SolrGroupFieldResult:
     """
@@ -138,7 +134,6 @@ class SolrGroupFieldResult:
         Gets the document response from solr
         :return: Document response
         """
-
 
 class SolrGroupResult:
     """
@@ -197,7 +192,6 @@ class SolrGroupResult:
         :return: Number of groups
         """
 
-
 class SolrStatsFieldResult:
     def get_min(self) -> Any:
         """
@@ -247,14 +241,12 @@ class SolrStatsFieldResult:
         :return: The standard deviation
         """
 
-
 class SolrStatsResult:
     def get_fields(self) -> Dict[str, SolrStatsFieldResult]:
         """
         Gets the stats component fields from a query
         :return: The fields and their stats
         """
-
 
 class SolrJsonFacetResponse:
     """
@@ -351,7 +343,6 @@ class SolrJsonFacetResponse:
         :return: The count for this facet
         """
 
-
 class SolrDocsResponse:
     def get_num_found(self) -> int:
         """Get the number of documents found in the query"""
@@ -364,7 +355,6 @@ class SolrDocsResponse:
 
     def get_docs(self) -> List[Dict[str, Any]]:
         """Get the documents from the query"""
-
 
 class SolrResponse:
     """The response from a solr query"""
