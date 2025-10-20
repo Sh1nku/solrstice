@@ -20,6 +20,7 @@ class ReqwestClient:
     >>> client = AsyncSolrCloudClient(context)
     >>> async def config_exists() -> bool:
     ...     return await client.config_exists("config_name")
+
     """
 
     def __init__(
