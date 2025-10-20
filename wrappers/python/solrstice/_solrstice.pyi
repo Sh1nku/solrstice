@@ -47,6 +47,7 @@ __all__ = [
 ]
 
 if TYPE_CHECKING:
+    from solrstice.external import ReqwestClient
     from solrstice.models import SolrResponse
 
 # region auth
@@ -495,6 +496,7 @@ class SolrServerContext:
         host: Union[SolrHost, str],
         auth: Optional[SolrAuth] = None,
         logging_policy: Optional[LoggingPolicy] = None,
+        client: Optional["ReqwestClient"] = None,
     ):
         pass
 

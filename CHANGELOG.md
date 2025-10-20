@@ -1,3 +1,7 @@
+# V0.14.0
+* Allow specifying `ReqwestClient` for python, for e.g disabling TLS verification
+* Remove x86_64 macOS from binary wheels
+
 # v0.13.0
 * Make `sort` parameter take a `String` instead of `Vec<String>` in `SelectQuery`
 
