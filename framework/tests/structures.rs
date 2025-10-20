@@ -1,3 +1,4 @@
+use reqwest::ClientBuilder;
 use serde::{Deserialize, Serialize};
 use solrstice;
 use solrstice::models::SolrResponse;
@@ -49,9 +50,11 @@ impl BaseTestsBuildup {
 }
 
 pub struct ErrrorTestsSetup {
-    pub context: SolrServerContext,
+    pub http_context: SolrServerContext,
+    pub https_context: SolrServerContext,
     pub config_path: String,
-    pub host: SolrSingleServerHost,
+    pub http_host: SolrSingleServerHost,
+    pub https_host: SolrSingleServerHost,
     pub auth: Option<SolrBasicAuth>,
 }
 
@@ -67,22 +70,50 @@ impl ErrrorTestsSetup {
                 Some(password.as_str()),
             )),
         };
-        let error_nginx_hostname = std::env::var("ERROR_NGINX_HOST")
-            .unwrap()
-            .as_str()
-            .to_string();
-        let host = SolrSingleServerHost::new(&error_nginx_hostname);
-        let builder = SolrServerContextBuilder::new(host.clone());
-        let context = if let Some(auth) = auth.clone() {
-            builder.with_auth(auth).build()
-        } else {
-            builder.build()
+        let http_host = SolrSingleServerHost::new(
+            std::env::var("ERROR_NGINX_HTTP_HOST")
+                .unwrap()
+                .as_str()
+                .to_string(),
+        );
+
+        let http_context = {
+            let builder = SolrServerContextBuilder::new(http_host.clone());
+            if let Some(auth) = auth.clone() {
+                builder.with_auth(auth).build()
+            } else {
+                builder.build()
+            }
         };
-        wait_for_error_nginx(&error_nginx_hostname, Duration::from_secs(30)).await;
+        wait_for_error_nginx(&http_host.host, Duration::from_secs(30)).await;
+
+        let https_host = SolrSingleServerHost::new(
+            std::env::var("ERROR_NGINX_HTTPS_HOST")
+                .unwrap()
+                .as_str()
+                .to_string(),
+        );
+
+        let https_context = {
+            let builder = SolrServerContextBuilder::new(https_host.clone()).with_client(
+                ClientBuilder::new()
+                    .danger_accept_invalid_certs(true)
+                    .build()
+                    .unwrap(),
+            );
+            if let Some(auth) = auth.clone() {
+                builder.with_auth(auth).build()
+            } else {
+                builder.build()
+            }
+        };
+
         ErrrorTestsSetup {
-            context,
+            http_context,
+            https_context,
             config_path: "../test_setup/test_collection".to_string(),
-            host,
+            http_host,
+            https_host,
             auth,
         }
     }

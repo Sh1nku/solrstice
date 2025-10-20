@@ -18,13 +18,15 @@ from solrstice import (
 )
 from solrstice.collection import create_collection, delete_collection
 from solrstice.config import delete_config, upload_config
+from solrstice.external import ReqwestClient
 
 
 @dataclass
 class Config:
     solr_host: str
     speedbump_host: Optional[str]
-    error_nginx_host: Optional[str]
+    error_nginx_http_host: Optional[str]
+    error_nginx_https_host: Optional[str]
     solr_username: Optional[str]
     solr_password: Optional[str]
     solr_auth: Optional[SolrBasicAuth]
@@ -58,7 +60,9 @@ def create_config(logging: bool = False) -> Config:
     host = os.getenv("SOLR_HOST")
     assert host is not None
     speedbump_host = os.getenv("SPEEDBUMP_HOST")
-    error_nginx_host = os.getenv("ERROR_NGINX_HOST")
+    error_nginx_http_host = os.getenv("ERROR_NGINX_HTTP_HOST")
+    erro_nginx_https_host = os.getenv("ERROR_NGINX_HTTPS_HOST")
+
     solr_host = SolrSingleServerHost(host)
     context = SolrServerContext(
         solr_host, solr_auth, OffLoggingPolicy() if not logging else None
@@ -67,7 +71,8 @@ def create_config(logging: bool = False) -> Config:
     return Config(
         host,
         speedbump_host,
-        error_nginx_host,
+        error_nginx_http_host,
+        erro_nginx_https_host,
         solr_username,
         solr_password,
         solr_auth,
@@ -97,19 +102,36 @@ def wait_for_solr(host: str, max_time: int) -> None:
 
 @dataclass
 class ErrorTestsSetup:
-    error_nginx_host: str
-    context: SolrServerContext
-    async_client: AsyncSolrCloudClient
+    error_nginx_http_host: str
+    http_context: SolrServerContext
+    http_client: AsyncSolrCloudClient
+    error_nginx_https_host: str
+    https_context: SolrServerContext
+    https_client: AsyncSolrCloudClient
 
 
 def create_nginx_error_config() -> ErrorTestsSetup:
     path = os.path.join(get_path_prefix(), "test_setup/.env")
     load_dotenv(path)
-    error_nginx_host = os.getenv("ERROR_NGINX_HOST")
-    assert error_nginx_host is not None
-    context = SolrServerContext(SolrSingleServerHost(error_nginx_host))
-    wait_for_error_nginx(error_nginx_host, 30)
-    return ErrorTestsSetup(error_nginx_host, context, AsyncSolrCloudClient(context))
+    error_nginx_http_host = os.getenv("ERROR_NGINX_HTTP_HOST")
+    assert error_nginx_http_host is not None
+    http_context = SolrServerContext(SolrSingleServerHost(error_nginx_http_host))
+    wait_for_error_nginx(error_nginx_http_host, 30)
+    http_client = AsyncSolrCloudClient(http_context)
+
+    error_nginx_https_host = os.getenv("ERROR_NGINX_HTTPS_HOST")
+    assert error_nginx_https_host is not None
+    https_context = SolrServerContext(SolrSingleServerHost(error_nginx_https_host), client=ReqwestClient(danger_accept_invalid_certs=True))
+    https_client = AsyncSolrCloudClient(https_context)
+
+    return ErrorTestsSetup(
+        error_nginx_http_host,
+        http_context,
+        http_client,
+        error_nginx_https_host,
+        https_context,
+        https_client,
+    )
 
 
 def wait_for_error_nginx(host: str, max_time: int) -> None:

@@ -126,7 +126,7 @@ async fn logging_works_if_request_fails() -> Result<(), Error> {
 #[serial]
 async fn logging_works_if_request_never_reaches_solr() -> Result<(), Error> {
     let config = ErrrorTestsSetup::new().await;
-    let client = AsyncSolrCloudClient::new(config.context);
+    let client = AsyncSolrCloudClient::new(config.http_context);
 
     LOGGER_MESSAGES
         .get_or_init(init_logger)

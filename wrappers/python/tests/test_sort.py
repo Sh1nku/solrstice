@@ -1,6 +1,9 @@
 from typing import Generator
 
 import pytest
+
+from solrstice import SelectQuery
+
 from .helpers import (
     Config,
     create_config,
@@ -9,8 +12,6 @@ from .helpers import (
     teardown_collection,
     wait_for_solr,
 )
-
-from solrstice import SelectQuery
 
 
 @pytest.fixture()

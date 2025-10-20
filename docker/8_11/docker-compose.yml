@@ -30,11 +30,11 @@ services:
     command: --latency 2s --port 8984 solr1:8983
     restart: unless-stopped
   error_nginx:
-    image: nginx:alpine
-    volumes:
-      - '../error-nginx.conf:/etc/nginx/nginx.conf'
+    build: ../error-nginx
     ports:
       - '127.0.0.1:8985:80'
+      - '127.0.0.1:8986:443'
+    restart: unless-stopped
 volumes:
   zoo1_data:
   solr1_varsolr:

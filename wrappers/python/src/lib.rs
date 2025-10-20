@@ -1,9 +1,11 @@
 pub mod clients;
+pub mod external;
 pub mod hosts;
 pub mod models;
 pub mod queries;
 
 use crate::clients::{AsyncSolrCloudClientWrapper, BlockingSolrCloudClientWrapper};
+use crate::external::ReqwestClientWrapper;
 use crate::hosts::{
     SolrHostWrapper, SolrMultipleServerHostWrapper, SolrSingleServerHostWrapper,
     ZookeeperEnsembleHostConnectorWrapper, ZookeeperEnsembleHostWrapper,
@@ -56,6 +58,13 @@ fn models_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrGroupFieldResultWrapper>()?;
     m.add_class::<SolrStatsResultWrapper>()?;
     m.add_class::<SolrStatsFieldResultWrapper>()?;
+    Ok(())
+}
+
+#[pymodule]
+#[pyo3(name = "external")]
+fn external_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<ReqwestClientWrapper>()?;
     Ok(())
 }
 
@@ -128,6 +137,9 @@ fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     m.add_wrapped(wrap_pymodule!(models_module))?;
     sys_modules.set_item("solrstice.models", m.getattr("models")?)?;
+
+    m.add_wrapped(wrap_pymodule!(external_module))?;
+    sys_modules.set_item("solrstice.external", m.getattr("external")?)?;
 
     Ok(())
 }

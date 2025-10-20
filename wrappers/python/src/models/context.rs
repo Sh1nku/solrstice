@@ -1,3 +1,4 @@
+use crate::external::ReqwestClientWrapper;
 use crate::hosts::{SolrHostWrapper, SolrSingleServerHostWrapper};
 use crate::models::auth::SolrAuthWrapper;
 use pyo3::prelude::*;
@@ -22,6 +23,7 @@ impl SolrServerContextWrapper {
         host: SolrHostUnion,
         auth: Option<SolrAuthWrapper>,
         logging_policy: Option<LoggingPolicyWrapper>,
+        client: Option<ReqwestClientWrapper>,
     ) -> Self {
         let host = match host {
             SolrHostUnion::SolrHostWrapperEnumValue(h) => h,
@@ -34,6 +36,10 @@ impl SolrServerContextWrapper {
         };
         builder = match logging_policy {
             Some(logging_policy) => builder.with_logging_policy(logging_policy.into()),
+            None => builder,
+        };
+        builder = match client {
+            Some(client) => builder.with_client(client.0),
             None => builder,
         };
         SolrServerContextWrapper(builder.build())
