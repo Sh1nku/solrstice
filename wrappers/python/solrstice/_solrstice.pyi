@@ -387,7 +387,7 @@ class JsonQueryFacet(JsonFacetType):
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         sort: Optional[str] = None,
-        fq: Optional[str] = None,
+        fq: Optional[List[str]] = None,
         facets: Optional[Dict[str, JsonFacetType]] = None,
     ):
         pass
