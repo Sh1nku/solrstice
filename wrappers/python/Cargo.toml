@@ -11,10 +11,10 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = { workspace = true, features = ["extension-module", "serde", "abi3-py39"] }
 pyo3-asyncio = { workspace = true, features = ["attributes", "tokio-runtime"] }
-pyo3-log = "0.10.0"
+pyo3-log.workspace = true
 pythonize.workspace = true
 solrstice = { workspace = true, features = ["blocking"] }
 serde.workspace = true
 serde_json.workspace = true
-reqwest = { workspace = true, default-features = false, features = ["rustls-tls"] }
+reqwest = { workspace = true, default-features = false, features = ["json", "rustls", "query"] }
 async-trait.workspace = true

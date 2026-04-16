@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - id: loc
         name: Count lines of code
         uses: Sh1nku/count-loc-action@v1

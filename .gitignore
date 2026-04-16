@@ -1,4 +1,3 @@
 /target
-/Cargo.lock
 !shell.nix
 !rust-toolchain.toml
