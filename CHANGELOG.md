@@ -1,3 +1,7 @@
+# v0.15.1
+
+* Fix error where wheels were not uploaded to Pypi
+
 # v0.15.0
 
 * Add tests for Solr 10

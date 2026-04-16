@@ -1,5 +1,5 @@
 {pkgs ? import (fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/25.05.tar.gz";
+    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/25.11.tar.gz";
 }) {}}:
 let
   overrides = builtins.fromTOML (builtins.readFile ./rust-toolchain.toml);
@@ -44,10 +44,11 @@ in
         ''-I"${pkgs.glib.dev}/include/glib-2.0"''
         ''-I${pkgs.glib.out}/lib/glib-2.0/include/''
       ];
-    packages = with oldpkgs; [
-      python39
-      python39Packages.pip
-      python39Packages.virtualenv
-      python39Packages.setuptools
+    packages = [
+      pkgs.uv
+      oldpkgs.python39
+      oldpkgs.python39Packages.pip
+      oldpkgs.python39Packages.virtualenv
+      oldpkgs.python39Packages.setuptools
     ];
   }

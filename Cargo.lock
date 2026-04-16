@@ -1690,7 +1690,7 @@ dependencies = [
 
 [[package]]
 name = "solrstice"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "async-trait",
  "dotenv",
@@ -1714,7 +1714,7 @@ dependencies = [
 
 [[package]]
 name = "solrstice-py"
-version = "0.15.0"
+version = "0.15.1"
 dependencies = [
  "async-trait",
  "pyo3",
