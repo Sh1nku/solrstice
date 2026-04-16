@@ -1,24 +1,38 @@
-# V0.14.0
+# v0.15.0
+
+* Add tests for Solr 10
+* Add tests for Python 3.14
+* Fix wrong type hint for JsonQueryFacet in Python
+* Include Cargo.lock in git to allow CI to use consistent package versions
+* Update MSRV to 1.86.0
+* Update Reqwest to 0.13
+
+# v0.14.0
+
 * Allow specifying `ReqwestClient` for python, for e.g disabling TLS verification
 * Remove x86_64 macOS from binary wheels
 
 # v0.13.0
+
 * Make `sort` parameter take a `String` instead of `Vec<String>` in `SelectQuery`
 
 # v0.12.0
+
 * Allow overriding handler in select requests
 * Don't provide default start and rows parameters
 * Reorder arguments in constructor for SelectQuery in Python
 
 # v0.11.0
+
 * Make JsonQueryFacet `q` parameter optional
 
 # v0.10.0
+
 * Add support for returning raw response from Solr
 * Update MSRV to 1.82.0
 * Add stats component
-* Implemement all query fields in json facet
-  * Change sort parameter from string to ordered HashMap
+* Implement all query fields in json facet
+    * Change sort parameter from string to ordered HashMap
 
 # v0.9.0
 

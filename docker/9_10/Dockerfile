@@ -1,4 +1,4 @@
-FROM solr:9.8
+FROM solr:9.10
 
 COPY security.json security.json
 COPY solr-security.sh /usr/bin/solr-security.sh
