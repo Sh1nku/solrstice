@@ -420,6 +420,20 @@ impl From<JsonQueryFacet> for JsonFacetType {
     }
 }
 
+impl Default for JsonQueryFacet {
+    fn default() -> Self {
+        JsonQueryFacet {
+            type_: "query".to_string(),
+            q: None,
+            limit: None,
+            offset: None,
+            sort: None,
+            fq: None,
+            facet: None,
+        }
+    }
+}
+
 impl JsonQueryFacet {
     /// Create a new query facet
     /// # Examples
@@ -445,15 +459,7 @@ impl JsonQueryFacet {
     /// # }
     /// ```
     pub fn new() -> Self {
-        JsonQueryFacet {
-            type_: "query".to_string(),
-            q: None,
-            limit: None,
-            offset: None,
-            sort: None,
-            fq: None,
-            facet: None,
-        }
+        Self::default()
     }
 
     /// Set the query for the facet

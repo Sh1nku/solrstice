@@ -28,6 +28,7 @@ pub fn collection(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[pyfunction]
+#[pyo3(signature = (context, name, config, shards=None, replication_factor=None))]
 pub fn create_collection(
     py: Python,
     context: SolrServerContextWrapper,
@@ -36,7 +37,7 @@ pub fn create_collection(
     shards: Option<usize>,
     replication_factor: Option<usize>,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         create_collection_rs(
             &context,
@@ -52,6 +53,7 @@ pub fn create_collection(
 }
 
 #[pyfunction]
+#[pyo3(signature = (context, name, config, shards=None, replication_factor=None))]
 pub fn create_collection_blocking(
     py: Python,
     context: SolrServerContextWrapper,
@@ -76,7 +78,7 @@ pub fn create_collection_blocking(
 
 #[pyfunction]
 pub fn get_collections(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = get_collections_rs(&context)
             .await
@@ -103,7 +105,7 @@ pub fn collection_exists(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = collection_exists_rs(&context, name.as_str())
             .await
@@ -132,7 +134,7 @@ pub fn delete_collection(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         delete_collection_rs(&context, name.as_str())
             .await

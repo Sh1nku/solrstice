@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator};
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
-#[pyclass(name = "QueryOperator")]
+#[pyclass(name = "QueryOperator", eq, eq_int)]
 pub enum QueryOperatorWrapper {
     AND,
     OR,
@@ -60,6 +60,7 @@ pub struct LuceneQueryWrapper {}
 #[pymethods]
 impl LuceneQueryWrapper {
     #[new]
+    #[pyo3(signature = (q_op=None, df=None, sow=None))]
     pub fn new(
         q_op: Option<QueryOperatorWrapper>,
         df: Option<String>,
@@ -81,6 +82,7 @@ pub struct DismaxQueryWrapper {}
 impl DismaxQueryWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q_alt=None, qf=None, mm=None, pf=None, ps=None, qs=None, tie=None, bq=None, bf=None))]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,
@@ -114,6 +116,7 @@ pub struct EdismaxQueryWrapper {}
 impl EdismaxQueryWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q_alt=None, qf=None, mm=None, mm_auto_relax=None, pf=None, pf2=None, pf3=None, ps=None, ps2=None, ps3=None, qs=None, tie=None, bq=None, bf=None, sow=None, boost=None, lowercase_operators=None, stopwords=None, uf=None))]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,

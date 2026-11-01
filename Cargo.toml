@@ -7,7 +7,7 @@ members = [
 
 [workspace.package]
 edition = "2021"
-version = "0.15.1"
+version = "0.16.0"
 
 [workspace.dependencies]
 solrstice = { path = "framework" }
@@ -29,9 +29,9 @@ lazy_static = "1"
 dyn-clone = "1"
 regex = "1"
 dotenv = "0.15"
-pyo3 = "0.21"
-pyo3-asyncio = { package = "pyo3-asyncio-0-21", version = "0.21" }
-pyo3-log = "0.10.0"
-pythonize = "0.21"
+pyo3 = "0.22"
+pyo3-async-runtimes = "0.22"
+pyo3-log = "0.11"
+pythonize = "0.22"
 env_logger = "0.11.3"
 serial_test = "4"

@@ -12,6 +12,7 @@ pub struct JsonFacetComponentWrapper(JsonFacetComponent);
 #[pymethods]
 impl JsonFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (facets=None))]
     fn new(facets: Option<HashMap<String, JsonFacetTypeWrapper>>) -> Self {
         let mut component = JsonFacetComponent::new();
         if let Some(facets) = facets {
@@ -81,6 +82,7 @@ pub struct JsonTermsFacetWrapper {}
 impl JsonTermsFacetWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (field, offset=None, limit=None, sort=None, prelim_sort=None, overrequest=None, refine=None, overrefine=None, mincount=None, missing=None, num_buckets=None, all_buckets=None, prefix=None, facets=None, method=None))]
     fn new(
         field: String,
         offset: Option<usize>,
@@ -156,6 +158,7 @@ pub struct JsonQueryFacetWrapper {}
 impl JsonQueryFacetWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q=None, limit=None, offset=None, sort=None, fq=None, facets=None))]
     fn new(
         q: Option<String>,
         limit: Option<usize>,
@@ -207,7 +210,7 @@ impl JsonStatFacetWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetSortDirection")]
+#[pyclass(name = "JsonFacetSortDirection", eq, eq_int)]
 pub enum JsonFacetSortDirectionWrapper {
     Asc,
     Desc,
@@ -232,7 +235,7 @@ impl From<JsonFacetSortDirection> for JsonFacetSortDirectionWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacetMethod")]
+#[pyclass(name = "JsonTermsFacetMethod", eq, eq_int)]
 pub enum JsonTermsFacetMethodWrapper {
     DocValues,
     UnInvertedField,

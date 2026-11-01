@@ -54,6 +54,7 @@ impl AsyncSolrCloudClientWrapper {
         delete_config(py, context, name)
     }
 
+    #[pyo3(signature = (name, config, shards=None, replication_factor=None))]
     pub fn create_collection<'py>(
         &self,
         py: Python<'py>,
@@ -120,6 +121,7 @@ impl AsyncSolrCloudClientWrapper {
         builder.execute(py, context, collection, data)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select<'py>(
         &self,
         py: Python<'py>,
@@ -131,6 +133,7 @@ impl AsyncSolrCloudClientWrapper {
         builder.execute(py, context, collection, handler)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select_raw<'py>(
         &self,
         py: Python<'py>,
@@ -184,6 +187,7 @@ impl BlockingSolrCloudClientWrapper {
         delete_config_blocking(py, context, name)
     }
 
+    #[pyo3(signature = (name, config, shards=None, replication_factor=None))]
     pub fn create_collection(
         &self,
         py: Python,
@@ -242,6 +246,7 @@ impl BlockingSolrCloudClientWrapper {
         builder.execute_blocking(py, context, collection, data)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select(
         &self,
         py: Python,
@@ -253,6 +258,7 @@ impl BlockingSolrCloudClientWrapper {
         builder.execute_blocking(py, context, collection, handler)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select_raw(
         &self,
         py: Python,

@@ -12,12 +12,13 @@ pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 impl SolrJsonFacetResponseWrapper {
     pub fn get_val(&self) -> PyResult<Option<PyObject>> {
         Python::with_gil(|py| -> PyResult<Option<PyObject>> {
-            Ok(self
+            let value = self
                 .0
                 .get_val()
                 .map(|v| pythonize(py, v))
                 .transpose()
-                .map_err(PyErrWrapper::from)?)
+                .map_err(PyErrWrapper::from)?;
+            Ok(value.map(|obj| obj.unbind()))
         })
     }
 
@@ -47,7 +48,7 @@ impl SolrJsonFacetResponseWrapper {
                 .iter()
                 .map(|(k, v)| {
                     let py_obj = pythonize(py, v).map_err(PyErrWrapper::from)?;
-                    Ok((k.to_string(), py_obj))
+                    Ok((k.to_string(), py_obj.unbind()))
                 })
                 .collect()
         })

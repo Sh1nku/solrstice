@@ -28,6 +28,7 @@ pub struct SelectQueryWrapper(SelectQuery);
 impl SelectQueryWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q=None, fl=None, fq=None, rows=None, start=None, sort=None, cursor_mark=None, grouping=None, def_type=None, facet_set=None, json_facet=None, stats=None, additional_params=None))]
     fn new(
         q: Option<String>,
         fl: Option<Vec<String>>,
@@ -92,6 +93,7 @@ impl SelectQueryWrapper {
         Ok(Self(builder))
     }
 
+    #[pyo3(signature = (context, collection, handler=None))]
     pub fn execute<'py>(
         &self,
         py: Python<'py>,
@@ -104,7 +106,7 @@ impl SelectQueryWrapper {
         if let Some(handler) = handler {
             destination = destination.handler(handler);
         }
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
                 .execute(&context, &destination)
@@ -115,6 +117,7 @@ impl SelectQueryWrapper {
         })
     }
 
+    #[pyo3(signature = (context, collection, handler=None))]
     pub fn execute_raw<'py>(
         &self,
         py: Python<'py>,
@@ -127,20 +130,22 @@ impl SelectQueryWrapper {
         if let Some(handler) = handler {
             destination = destination.handler(handler);
         }
-        let value = pyo3_asyncio::tokio::future_into_py(py, async move {
+
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let context: SolrServerContext = context.into();
             let result: HashMap<String, Value> = builder
                 .execute_raw(&context, &destination)
                 .await
                 .map_err(PyErrWrapper::from)?;
-            let result: PyObject =
-                Python::with_gil(|py| pythonize(py, &result).map_err(PyErrWrapper::from))?;
-            Ok(Python::with_gil(|_| result))
-        });
-        let value = value?;
-        Python::with_gil(|_| -> PyResult<Bound<'py, PyAny>> { Ok(value) })
+
+            Python::with_gil(|py| -> PyResult<PyObject> {
+                let obj = pythonize(py, &result).map_err(PyErrWrapper::from)?;
+                Ok(obj.unbind())
+            })
+        })
     }
 
+    #[pyo3(signature = (context, collection, handler=None))]
     pub fn execute_blocking(
         &self,
         py: Python,
@@ -163,6 +168,7 @@ impl SelectQueryWrapper {
         })
     }
 
+    #[pyo3(signature = (context, collection, handler=None))]
     pub fn execute_blocking_raw(
         &self,
         py: Python,
@@ -183,13 +189,13 @@ impl SelectQueryWrapper {
             Ok(result)
         });
         let value = value?;
-        Python::with_gil(|py| -> PyResult<PyObject> { Ok(pythonize(py, &value)?) })
+        Python::with_gil(|py| -> PyResult<PyObject> { Ok(pythonize(py, &value)?.into()) })
     }
 
     pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
-        match state.extract::<&PyBytes>(py) {
+        match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
-                *self = serde_json::from_slice(s.as_bytes())
+                *self = serde_json::from_slice(s)
                     .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())

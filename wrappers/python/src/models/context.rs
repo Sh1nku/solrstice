@@ -19,6 +19,7 @@ pub struct SolrServerContextWrapper(SolrServerContext);
 #[pymethods]
 impl SolrServerContextWrapper {
     #[new]
+    #[pyo3(signature = (host, auth=None, logging_policy=None, client=None))]
     pub fn new(
         host: SolrHostUnion,
         auth: Option<SolrAuthWrapper>,

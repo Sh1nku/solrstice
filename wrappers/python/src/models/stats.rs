@@ -55,7 +55,7 @@ impl SolrStatsFieldResultWrapper {
                 .0
                 .get_min::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 
@@ -65,7 +65,7 @@ impl SolrStatsFieldResultWrapper {
                 .0
                 .get_max::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 
@@ -85,7 +85,7 @@ impl SolrStatsFieldResultWrapper {
         Python::with_gil(|py| -> PyResult<Option<PyObject>> {
             match self.0.get_mean::<serde_json::Value>() {
                 Some(result) => match result {
-                    Ok(value) => Ok(Some(pythonize(py, &value)?)),
+                    Ok(value) => Ok(Some(pythonize(py, &value)?.into())),
                     Err(e) => Err(PyErrWrapper::from(e).into()),
                 },
                 None => Ok(None),

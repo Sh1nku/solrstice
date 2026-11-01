@@ -31,7 +31,7 @@ pub fn alias(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[pyfunction]
 pub fn get_aliases(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
     let context: SolrServerContext = context.into();
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let result = get_aliases_rs(context).await.map_err(PyErrWrapper::from)?;
         Ok(Python::with_gil(|_| result))
     })
@@ -56,7 +56,7 @@ pub fn create_alias(
     name: String,
     collections: Vec<String>,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         Ok(create_alias_rs(
             &context,
@@ -100,7 +100,7 @@ pub fn alias_exists(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = alias_exists_rs(&context, name.as_str())
             .await
@@ -129,7 +129,7 @@ pub fn delete_alias(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         delete_alias_rs(&context, name.as_str())
             .await

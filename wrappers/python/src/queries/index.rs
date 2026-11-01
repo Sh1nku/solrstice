@@ -3,15 +3,15 @@ use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pythonize::depythonize_bound;
+use pythonize::depythonize;
 use serde::{Deserialize, Serialize};
 use solrstice::CommitType;
 use solrstice::Error;
 use solrstice::SolrServerContext;
 use solrstice::{DeleteQuery, UpdateQuery};
 
-#[pyclass(name = "CommitType")]
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[pyclass(name = "CommitType", eq, eq_int)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum CommitTypeWrapper {
     Hard,
     Soft,
@@ -24,6 +24,7 @@ pub struct UpdateQueryWrapper(UpdateQuery);
 #[pymethods]
 impl UpdateQueryWrapper {
     #[new]
+    #[pyo3(signature = (handler=None, commit_type=None))]
     pub fn new(handler: Option<String>, commit_type: Option<CommitTypeWrapper>) -> Self {
         let mut builder = UpdateQuery::new();
         if let Some(handler) = handler {
@@ -45,10 +46,10 @@ impl UpdateQueryWrapper {
         let builder = self.0.clone();
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
+            .map(|x| depythonize(&x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
-        pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute(&context, collection.as_str(), data.as_slice())
@@ -58,16 +59,16 @@ impl UpdateQueryWrapper {
         })
     }
 
-    pub fn execute_blocking(
+    pub fn execute_blocking<'py>(
         &self,
-        py: Python,
+        py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
         data: Vec<PyObject>,
     ) -> PyResult<SolrResponseWrapper> {
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
+            .map(|x| depythonize(&x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
         let builder = self.0.clone();
@@ -81,9 +82,9 @@ impl UpdateQueryWrapper {
     }
 
     pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
-        match state.extract::<&PyBytes>(py) {
+        match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
-                *self = serde_json::from_slice(s.as_bytes())
+                *self = serde_json::from_slice(s)
                     .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
@@ -129,6 +130,7 @@ pub struct DeleteQueryWrapper(DeleteQuery);
 #[pymethods]
 impl DeleteQueryWrapper {
     #[new]
+    #[pyo3(signature = (handler=None, commit_type=None, ids=None, queries=None))]
     pub fn new(
         handler: Option<String>,
         commit_type: Option<CommitTypeWrapper>,
@@ -159,7 +161,7 @@ impl DeleteQueryWrapper {
         collection: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
-        pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute(&context, collection.as_str())
@@ -186,9 +188,9 @@ impl DeleteQueryWrapper {
     }
 
     pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
-        match state.extract::<&PyBytes>(py) {
+        match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
-                *self = serde_json::from_slice(s.as_bytes())
+                *self = serde_json::from_slice(s)
                     .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())

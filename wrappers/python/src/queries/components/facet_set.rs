@@ -11,6 +11,7 @@ pub struct FacetSetComponentWrapper(FacetSetComponent);
 #[pymethods]
 impl FacetSetComponentWrapper {
     #[new]
+    #[pyo3(signature = (queries=None, fields=None, pivots=None))]
     pub fn new(
         queries: Option<Vec<String>>,
         fields: Option<FieldFacetComponentWrapper>,
@@ -61,6 +62,7 @@ pub struct PivotFacetComponentWrapper(PivotFacetComponent);
 #[pymethods]
 impl PivotFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (pivots, min_count=None))]
     pub fn new(pivots: Vec<String>, min_count: Option<usize>) -> Self {
         let mut component = PivotFacetComponent::new(pivots);
         if let Some(min_count) = min_count {
@@ -101,6 +103,7 @@ pub struct FieldFacetComponentWrapper(FieldFacetComponent);
 #[pymethods]
 impl FieldFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (fields, exclude_terms=None))]
     pub fn new(fields: Vec<FieldFacetEntryWrapper>, exclude_terms: Option<String>) -> Self {
         let mut component = FieldFacetComponent::new(fields);
         if let Some(exclude_terms) = exclude_terms {
@@ -135,7 +138,7 @@ impl From<&FieldFacetComponent> for FieldFacetComponentWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetSort")]
+#[pyclass(name = "FieldFacetSort", eq, eq_int)]
 pub enum FieldFacetSortWrapper {
     Count,
     Index,
@@ -160,7 +163,7 @@ impl From<FieldFacetSort> for FieldFacetSortWrapper {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetMethod")]
+#[pyclass(name = "FieldFacetMethod", eq, eq_int)]
 pub enum FieldFacetMethodWrapper {
     Enum,
     Fc,
@@ -194,6 +197,7 @@ pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 #[pymethods]
 impl FieldFacetEntryWrapper {
     #[new]
+    #[pyo3(signature = (field, prefix=None, contains=None, contains_ignore_case=None, sort=None, limit=None, offset=None, min_count=None, missing=None, method=None, enum_cache_min_df=None, exists=None))]
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         field: String,

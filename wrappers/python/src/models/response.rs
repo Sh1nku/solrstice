@@ -57,10 +57,13 @@ impl SolrDocsResponseWrapper {
                 .get_docs::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
             docs.into_iter()
-                .map(|doc| pythonize(py, &doc).map_err(PyErrWrapper::from))
+                .map(|doc| {
+                    let obj = pythonize(py, &doc).map_err(PyErrWrapper::from)?;
+                    Ok(obj.unbind())
+                })
                 .collect::<Result<Vec<_>, _>>()
         })
-        .map_err(|e| e.into())
+            .map_err(|e| e.into())
     }
 }
 

@@ -18,8 +18,8 @@ impl<'a> From<&'a GroupingComponentWrapper> for &'a GroupingComponent {
     }
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
-#[pyclass(name = "GroupFormatting")]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[pyclass(name = "GroupFormatting", eq, eq_int)]
 pub enum GroupFormattingWrapper {
     Simple,
     Grouped,
@@ -47,6 +47,7 @@ impl From<GroupFormatting> for GroupFormattingWrapper {
 impl GroupingComponentWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (fields=None, queries=None, limit=None, offset=None, sort=None, format=None, main=None, n_groups=None, truncate=None, facet=None))]
     pub fn new(
         fields: Option<Vec<String>>,
         queries: Option<Vec<String>>,

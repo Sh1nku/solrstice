@@ -67,7 +67,7 @@ impl SolrPivotFacetResultWrapper {
                 .0
                 .get_value::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 
@@ -120,7 +120,7 @@ impl SolrFieldFacetResultWrapper {
                 .0
                 .get_key::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 

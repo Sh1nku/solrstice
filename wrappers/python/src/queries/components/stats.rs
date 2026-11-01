@@ -8,6 +8,7 @@ pub struct StatsComponentWrapper(StatsComponent);
 #[pymethods]
 impl StatsComponentWrapper {
     #[new]
+    #[pyo3(signature = (fields=None))]
     pub fn new(fields: Option<Vec<String>>) -> Self {
         let mut component = StatsComponent::new();
         if let Some(fields) = fields {

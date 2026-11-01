@@ -21,6 +21,7 @@ pub struct SolrBasicAuthWrapper {}
 #[pymethods]
 impl SolrBasicAuthWrapper {
     #[new]
+    #[pyo3(signature = (username, password=None))]
     pub fn new(username: String, password: Option<String>) -> (Self, SolrAuthWrapper) {
         (
             SolrBasicAuthWrapper {},

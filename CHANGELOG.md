@@ -1,3 +1,7 @@
+# v0.16.0
+* Update pyo3 version
+* Update rust package versions
+
 # v0.15.1
 
 * Fix error where wheels were not uploaded to Pypi

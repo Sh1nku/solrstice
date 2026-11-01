@@ -83,7 +83,7 @@ impl ZookeeperEnsembleHostConnectorWrapper {
 
     pub fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let connector = self.0.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let host = SolrHostWrapper {
                 solr_host: Arc::new(connector.connect().await.map_err(PyErrWrapper::from)?),
             };
