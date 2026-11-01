@@ -21,7 +21,7 @@ thiserror = "2"
 zookeeper-async = "5"
 fastrand = "2"
 log = "0.4"
-zip = { version = "4", default-features = false }
+zip = { version = "9", default-features = false }
 tempfile = "3"
 walkdir = "2"
 tokio = "1"
@@ -34,4 +34,4 @@ pyo3-asyncio = { package = "pyo3-asyncio-0-21", version = "0.21" }
 pyo3-log = "0.10.0"
 pythonize = "0.21"
 env_logger = "0.11.3"
-serial_test = "3.1.1"
+serial_test = "4"
