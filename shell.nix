@@ -1,5 +1,5 @@
 {pkgs ? import (fetchTarball {
-    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/25.11.tar.gz";
+    url = "https://github.com/NixOS/nixpkgs/archive/refs/tags/26.05.tar.gz";
 }) {}}:
 let
   overrides = builtins.fromTOML (builtins.readFile ./rust-toolchain.toml);

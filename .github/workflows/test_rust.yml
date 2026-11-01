@@ -2,7 +2,7 @@ name: Unit tests, linting, and formatting
 on: [ push ]
 jobs:
   msrv:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
       - name: Update Rust
@@ -14,7 +14,7 @@ jobs:
       - name: Check MSRV
         run: cargo msrv verify --all-features --path framework/
   format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
       - name: Update Rust
@@ -27,7 +27,7 @@ jobs:
         run: cargo fmt --check
 
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         docker-version: [ "8_0", "8_11", "9_0", "9_10", "10_0", "10_latest" ]
