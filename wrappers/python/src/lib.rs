@@ -73,7 +73,7 @@ fn external_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     pyo3_log::init();
 
-    let sys = PyModule::import_bound(_py, "sys")?;
+    let sys = PyModule::import(_py, "sys")?;
     let sys_modules = sys.getattr("modules")?;
     let sys_modules: &Bound<'_, PyDict> = sys_modules.downcast()?;
 

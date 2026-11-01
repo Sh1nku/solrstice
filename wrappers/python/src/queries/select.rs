@@ -75,7 +75,7 @@ impl SelectQueryWrapper {
             // Import the json module and convert the PyObject to a string, then to a serde_json::Value
             let converted_params = Python::with_gil(|py| -> PyResult<HashMap<String, Value>> {
                 let mut converted_params = HashMap::new();
-                let json = py.import_bound("json")?;
+                let json = py.import("json")?;
                 for (key, value) in additional_params {
                     let value = json
                         .call_method1("dumps", (value,))
@@ -204,14 +204,13 @@ impl SelectQueryWrapper {
         }
     }
 
-    pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new_bound(
+    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        Ok(PyBytes::new(
             py,
             serde_json::to_string(&self)
                 .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
-        )
-        .to_object(py))
+        ))
     }
 }

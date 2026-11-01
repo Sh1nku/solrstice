@@ -93,15 +93,14 @@ impl UpdateQueryWrapper {
         }
     }
 
-    pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new_bound(
+    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        Ok(PyBytes::new(
             py,
             serde_json::to_string(&self)
                 .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
-        )
-        .to_object(py))
+        ))
     }
 }
 
@@ -199,14 +198,13 @@ impl DeleteQueryWrapper {
         }
     }
 
-    pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new_bound(
+    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        Ok(PyBytes::new(
             py,
             serde_json::to_string(&self)
                 .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
-        )
-        .to_object(py))
+        ))
     }
 }
