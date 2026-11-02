@@ -18,7 +18,7 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-#[pyclass(name = "AsyncSolrCloudClient", module = "solrstice", subclass)]
+#[pyclass(name = "AsyncSolrCloudClient", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct AsyncSolrCloudClientWrapper(SolrServerContextWrapper);
 
@@ -156,7 +156,7 @@ impl AsyncSolrCloudClientWrapper {
     }
 }
 
-#[pyclass(name = "BlockingSolrCloudClient", module = "solrstice", subclass)]
+#[pyclass(name = "BlockingSolrCloudClient", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct BlockingSolrCloudClientWrapper(SolrServerContextWrapper);
 

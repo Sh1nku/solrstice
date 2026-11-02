@@ -2,8 +2,8 @@ use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator};
 
-#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
-#[pyclass(name = "QueryOperator", eq, eq_int)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[pyclass(name = "QueryOperator", eq, eq_int, from_py_object)]
 pub enum QueryOperatorWrapper {
     AND,
     OR,
@@ -27,7 +27,7 @@ impl From<QueryOperator> for QueryOperatorWrapper {
     }
 }
 
-#[pyclass(name = "DefType", module = "solrstice", subclass)]
+#[pyclass(name = "DefType", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DefTypeWrapper(DefType);
 
@@ -53,7 +53,7 @@ impl DefTypeWrapper {
     }
 }
 
-#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LuceneQueryWrapper {}
 
@@ -74,7 +74,7 @@ impl LuceneQueryWrapper {
     }
 }
 
-#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DismaxQueryWrapper {}
 
@@ -108,7 +108,7 @@ impl DismaxQueryWrapper {
     }
 }
 
-#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EdismaxQueryWrapper {}
 

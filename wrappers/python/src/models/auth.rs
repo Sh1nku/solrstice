@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use solrstice::{SolrAuth, SolrBasicAuth};
 use std::sync::Arc;
 
-#[pyclass(name = "SolrAuth", module = "solrstice", subclass)]
+#[pyclass(name = "SolrAuth", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrAuthWrapper {
     pub solr_auth: Arc<dyn SolrAuth + Send + Sync>,
@@ -14,7 +14,7 @@ impl SolrAuth for SolrAuthWrapper {
     }
 }
 
-#[pyclass(name = "SolrBasicAuth", extends=SolrAuthWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "SolrBasicAuth", extends=SolrAuthWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrBasicAuthWrapper {}
 

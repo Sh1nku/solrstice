@@ -10,15 +10,15 @@ use solrstice::Error;
 use solrstice::SolrServerContext;
 use solrstice::{DeleteQuery, UpdateQuery};
 
-#[pyclass(name = "CommitType", eq, eq_int)]
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[pyclass(name = "CommitType", eq, eq_int, from_py_object)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub enum CommitTypeWrapper {
     Hard,
     Soft,
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "UpdateQuery", module = "solrstice", subclass)]
+#[pyclass(name = "UpdateQuery", module = "solrstice", subclass, from_py_object)]
 pub struct UpdateQueryWrapper(UpdateQuery);
 
 #[pymethods]
@@ -123,7 +123,7 @@ impl From<CommitType> for CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "DeleteQuery", module = "solrstice", subclass)]
+#[pyclass(name = "DeleteQuery", module = "solrstice", subclass, from_py_object)]
 pub struct DeleteQueryWrapper(DeleteQuery);
 
 #[pymethods]

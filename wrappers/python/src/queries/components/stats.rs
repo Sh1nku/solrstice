@@ -2,7 +2,7 @@ use pyo3::{pyclass, pymethods};
 use solrstice::StatsComponent;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "StatsComponent", module = "solrstice", subclass)]
+#[pyclass(name = "StatsComponent", module = "solrstice", subclass, from_py_object)]
 pub struct StatsComponentWrapper(StatsComponent);
 
 #[pymethods]

@@ -6,7 +6,7 @@ use solrstice::{
 use std::collections::{BTreeMap, HashMap};
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetComponent", module = "solrstice", subclass)]
+#[pyclass(name = "JsonFacetComponent", module = "solrstice", subclass, from_py_object)]
 pub struct JsonFacetComponentWrapper(JsonFacetComponent);
 
 #[pymethods]
@@ -47,7 +47,7 @@ impl From<&JsonFacetComponent> for JsonFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetType", module = "solrstice", subclass)]
+#[pyclass(name = "JsonFacetType", module = "solrstice", subclass, from_py_object)]
 pub struct JsonFacetTypeWrapper(JsonFacetType);
 
 impl From<JsonFacetTypeWrapper> for JsonFacetType {
@@ -75,7 +75,7 @@ impl From<&JsonFacetType> for JsonFacetTypeWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonTermsFacetWrapper {}
 
 #[pymethods]
@@ -151,7 +151,7 @@ impl JsonTermsFacetWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonQueryFacetWrapper {}
 
 #[pymethods]
@@ -195,7 +195,7 @@ impl JsonQueryFacetWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonStatFacetWrapper {}
 
 #[pymethods]
@@ -209,8 +209,8 @@ impl JsonStatFacetWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetSortDirection", eq, eq_int)]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "JsonFacetSortDirection", eq, eq_int, from_py_object)]
 pub enum JsonFacetSortDirectionWrapper {
     Asc,
     Desc,
@@ -234,8 +234,8 @@ impl From<JsonFacetSortDirection> for JsonFacetSortDirectionWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacetMethod", eq, eq_int)]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "JsonTermsFacetMethod", eq, eq_int, from_py_object)]
 pub enum JsonTermsFacetMethodWrapper {
     DocValues,
     UnInvertedField,

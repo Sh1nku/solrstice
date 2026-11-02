@@ -3,7 +3,7 @@ use pyo3::prelude::*;
 use solrstice::Error;
 use std::time::Duration;
 
-#[pyclass(name = "ReqwestClient", module = "solrstice.external")]
+#[pyclass(name = "ReqwestClient", module = "solrstice.external", from_py_object)]
 #[derive(Clone)]
 pub struct ReqwestClientWrapper(pub reqwest::Client);
 

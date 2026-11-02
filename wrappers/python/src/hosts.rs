@@ -9,7 +9,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 
-#[pyclass(name = "SolrHost", module = "solrstice", subclass)]
+#[pyclass(name = "SolrHost", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrHostWrapper {
     pub solr_host: Arc<dyn SolrHost + Send + Sync>,
@@ -22,7 +22,7 @@ impl SolrHost for SolrHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrSingleServerHostWrapper;
 
@@ -39,7 +39,7 @@ impl SolrSingleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrMultipleServerHostWrapper;
 
@@ -59,14 +59,15 @@ impl SolrMultipleServerHostWrapper {
     }
 }
 
-#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostWrapper;
 
 #[pyclass(
     name = "ZookeeperEnsembleHostConnector",
     module = "solrstice",
-    subclass
+    subclass,
+    from_py_object
 )]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostConnectorWrapper(ZookeeperEnsembleHostConnector);

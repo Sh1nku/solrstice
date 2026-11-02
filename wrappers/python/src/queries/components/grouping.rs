@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 use solrstice::{GroupFormatting, GroupingComponent};
 
-#[pyclass(name = "GroupingComponent", module = "solrstice", subclass)]
+#[pyclass(name = "GroupingComponent", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct GroupingComponentWrapper(GroupingComponent);
 
@@ -18,8 +18,8 @@ impl<'a> From<&'a GroupingComponentWrapper> for &'a GroupingComponent {
     }
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
-#[pyclass(name = "GroupFormatting", eq, eq_int)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
+#[pyclass(name = "GroupFormatting", eq, eq_int, from_py_object)]
 pub enum GroupFormattingWrapper {
     Simple,
     Grouped,

@@ -5,7 +5,7 @@ use solrstice::models::SolrJsonFacetResponse;
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrJsonFacetResponse", module = "solrstice.models", subclass)]
+#[pyclass(name = "SolrJsonFacetResponse", module = "solrstice.models", subclass, from_py_object)]
 pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]

@@ -5,7 +5,7 @@ use solrstice::{
 };
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FacetSetComponent", module = "solrstice", subclass)]
+#[pyclass(name = "FacetSetComponent", module = "solrstice", subclass, from_py_object)]
 pub struct FacetSetComponentWrapper(FacetSetComponent);
 
 #[pymethods]
@@ -56,7 +56,7 @@ impl From<&FacetSetComponent> for FacetSetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "PivotFacetComponent", module = "solrstice", subclass)]
+#[pyclass(name = "PivotFacetComponent", module = "solrstice", subclass, from_py_object)]
 pub struct PivotFacetComponentWrapper(PivotFacetComponent);
 
 #[pymethods]
@@ -97,7 +97,7 @@ impl From<&PivotFacetComponent> for PivotFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetComponent", module = "solrstice", subclass)]
+#[pyclass(name = "FieldFacetComponent", module = "solrstice", subclass, from_py_object)]
 pub struct FieldFacetComponentWrapper(FieldFacetComponent);
 
 #[pymethods]
@@ -137,8 +137,8 @@ impl From<&FieldFacetComponent> for FieldFacetComponentWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetSort", eq, eq_int)]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "FieldFacetSort", eq, eq_int, from_py_object)]
 pub enum FieldFacetSortWrapper {
     Count,
     Index,
@@ -162,8 +162,8 @@ impl From<FieldFacetSort> for FieldFacetSortWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetMethod", eq, eq_int)]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "FieldFacetMethod", eq, eq_int, from_py_object)]
 pub enum FieldFacetMethodWrapper {
     Enum,
     Fc,
@@ -191,7 +191,7 @@ impl From<FieldFacetMethod> for FieldFacetMethodWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetEntry", module = "solrstice", subclass)]
+#[pyclass(name = "FieldFacetEntry", module = "solrstice", subclass, from_py_object)]
 pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 
 #[pymethods]

@@ -9,7 +9,7 @@ use solrstice::models::{SolrDocsResponse, SolrResponse};
 use std::collections::HashMap;
 
 #[derive(Clone)]
-#[pyclass(name = "SolrDocsResponse", module = "solrstice.models", subclass)]
+#[pyclass(name = "SolrDocsResponse", module = "solrstice.models", subclass, from_py_object)]
 pub struct SolrDocsResponseWrapper(SolrDocsResponse);
 
 impl From<SolrDocsResponse> for SolrDocsResponseWrapper {
@@ -68,7 +68,7 @@ impl SolrDocsResponseWrapper {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrResponse", module = "solrstice.models", subclass)]
+#[pyclass(name = "SolrResponse", module = "solrstice.models", subclass, from_py_object)]
 pub struct SolrResponseWrapper(SolrResponse);
 
 impl From<SolrResponse> for SolrResponseWrapper {

@@ -20,7 +20,7 @@ use solrstice::{DefType, StatsComponent};
 use solrstice::{Error, SelectDestination};
 use std::collections::HashMap;
 
-#[pyclass(name = "SelectQuery", module = "solrstice", subclass)]
+#[pyclass(name = "SelectQuery", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SelectQueryWrapper(SelectQuery);
 
