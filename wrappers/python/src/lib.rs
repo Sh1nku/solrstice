@@ -75,7 +75,7 @@ fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     let sys = PyModule::import(_py, "sys")?;
     let sys_modules = sys.getattr("modules")?;
-    let sys_modules: &Bound<'_, PyDict> = sys_modules.downcast()?;
+    let sys_modules: &Bound<'_, PyDict> = sys_modules.cast()?;
 
     m.add_class::<SolrAuthWrapper>()?;
     m.add_class::<SolrBasicAuthWrapper>()?;

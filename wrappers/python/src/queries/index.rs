@@ -89,7 +89,7 @@ impl UpdateQueryWrapper {
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 
@@ -194,7 +194,7 @@ impl DeleteQueryWrapper {
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 

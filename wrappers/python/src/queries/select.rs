@@ -200,7 +200,7 @@ impl SelectQueryWrapper {
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 

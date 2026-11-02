@@ -1,3 +1,4 @@
+use pyo3::CastError;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 use pythonize::PythonizeError;
@@ -19,6 +20,12 @@ impl From<PyErrWrapper> for PyErr {
 
 impl From<PythonizeError> for PyErrWrapper {
     fn from(err: PythonizeError) -> Self {
+        PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
+    }
+}
+
+impl From<CastError<'_, '_>> for PyErrWrapper {
+    fn from(err: CastError) -> Self {
         PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
     }
 }
