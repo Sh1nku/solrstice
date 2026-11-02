@@ -61,8 +61,8 @@ pub struct SolrPivotFacetResultWrapper(SolrPivotFacetResult);
 
 #[pymethods]
 impl SolrPivotFacetResultWrapper {
-    pub fn get_value(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_value(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_value::<serde_json::Value>()
@@ -114,8 +114,8 @@ pub struct SolrFieldFacetResultWrapper(SolrFieldFacetResult);
 
 #[pymethods]
 impl SolrFieldFacetResultWrapper {
-    pub fn get_key(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_key(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_key::<serde_json::Value>()

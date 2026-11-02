@@ -57,8 +57,8 @@ pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
 
 #[pymethods]
 impl SolrGroupFieldResultWrapper {
-    pub fn get_group_value(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_group_value(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_group_value::<serde_json::Value>()

@@ -33,7 +33,7 @@ pub fn get_aliases(py: Python, context: SolrServerContextWrapper) -> PyResult<Bo
     let context: SolrServerContext = context.into();
     pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let result = get_aliases_rs(context).await.map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -42,7 +42,7 @@ pub fn get_aliases_blocking(
     py: Python,
     context: SolrServerContextWrapper,
 ) -> PyResult<HashMap<String, Vec<String>>> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result = get_aliases_blocking_rs(context).map_err(PyErrWrapper::from)?;
         Ok(result)
@@ -79,7 +79,7 @@ pub fn create_alias_blocking(
     name: String,
     collections: Vec<String>,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         Ok(create_alias_blocking_rs(
             &context,
@@ -105,7 +105,7 @@ pub fn alias_exists(
         let result = alias_exists_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -115,7 +115,7 @@ pub fn alias_exists_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<bool> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result =
             alias_exists_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
@@ -144,7 +144,7 @@ pub fn delete_alias_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         delete_alias_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
         Ok(())

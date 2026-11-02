@@ -87,7 +87,7 @@ impl ZookeeperEnsembleHostConnectorWrapper {
             let host = SolrHostWrapper {
                 solr_host: Arc::new(connector.connect().await.map_err(PyErrWrapper::from)?),
             };
-            Ok(Python::with_gil(|_| host))
+            Ok(Python::attach(|_| host))
         })
     }
 
@@ -100,6 +100,6 @@ impl ZookeeperEnsembleHostConnectorWrapper {
                     .map_err(PyErrWrapper::from)?,
             ),
         };
-        Ok(Python::with_gil(|_| host))
+        Ok(Python::attach(|_| host))
     }
 }

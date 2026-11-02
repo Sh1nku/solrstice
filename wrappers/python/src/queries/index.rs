@@ -41,7 +41,7 @@ impl UpdateQueryWrapper {
         py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
@@ -55,7 +55,7 @@ impl UpdateQueryWrapper {
                 .execute(&context, collection.as_str(), data.as_slice())
                 .await
                 .map_err(PyErrWrapper::from)?;
-            Ok(Python::with_gil(|_| result.into()))
+            Ok(Python::attach(|_| result.into()))
         })
     }
 
@@ -64,7 +64,7 @@ impl UpdateQueryWrapper {
         py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<SolrResponseWrapper> {
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
@@ -72,7 +72,7 @@ impl UpdateQueryWrapper {
             .collect();
         let data = data?;
         let builder = self.0.clone();
-        py.allow_threads(move || {
+        py.detach(move || {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute_blocking(&context, collection.as_str(), data.as_slice())
@@ -81,7 +81,7 @@ impl UpdateQueryWrapper {
         })
     }
 
-    pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
+    pub fn __setstate__(&mut self, py: Python, state: Py<PyAny>) -> PyResult<()> {
         match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
                 *self = serde_json::from_slice(s)
@@ -166,7 +166,7 @@ impl DeleteQueryWrapper {
                 .execute(&context, collection.as_str())
                 .await
                 .map_err(PyErrWrapper::from)?;
-            Ok(Python::with_gil(|_| result.into()))
+            Ok(Python::attach(|_| result.into()))
         })
     }
 
@@ -177,7 +177,7 @@ impl DeleteQueryWrapper {
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
-        py.allow_threads(move || {
+        py.detach(move || {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute_blocking(&context, collection.as_str())
@@ -186,7 +186,7 @@ impl DeleteQueryWrapper {
         })
     }
 
-    pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
+    pub fn __setstate__(&mut self, py: Python, state: Py<PyAny>) -> PyResult<()> {
         match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
                 *self = serde_json::from_slice(s)

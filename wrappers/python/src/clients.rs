@@ -115,7 +115,7 @@ impl AsyncSolrCloudClientWrapper {
         py: Python<'py>,
         builder: UpdateQueryWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         builder.execute(py, context, collection, data)
@@ -240,7 +240,7 @@ impl BlockingSolrCloudClientWrapper {
         py: Python,
         builder: UpdateQueryWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<SolrResponseWrapper> {
         let context = self.0.clone();
         builder.execute_blocking(py, context, collection, data)
@@ -265,7 +265,7 @@ impl BlockingSolrCloudClientWrapper {
         builder: &SelectQueryWrapper,
         collection: String,
         handler: Option<String>,
-    ) -> PyResult<PyObject> {
+    ) -> PyResult<Py<PyAny>> {
         let context = self.0.clone();
         builder.execute_blocking_raw(py, context, collection, handler)
     }

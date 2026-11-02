@@ -50,8 +50,8 @@ impl SolrDocsResponseWrapper {
         self.0.get_num_found_exact()
     }
 
-    pub fn get_docs(&self) -> PyResult<Vec<PyObject>> {
-        Python::with_gil(|py| -> Result<Vec<PyObject>, PyErrWrapper> {
+    pub fn get_docs(&self) -> PyResult<Vec<Py<PyAny>>> {
+        Python::attach(|py| -> Result<Vec<Py<PyAny>>, PyErrWrapper> {
             let docs = self
                 .0
                 .get_docs::<serde_json::Value>()

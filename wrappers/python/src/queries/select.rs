@@ -42,7 +42,7 @@ impl SelectQueryWrapper {
         facet_set: Option<FacetSetComponentWrapper>,
         json_facet: Option<JsonFacetComponentWrapper>,
         stats: Option<StatsComponentWrapper>,
-        additional_params: Option<HashMap<String, PyObject>>,
+        additional_params: Option<HashMap<String, Py<PyAny>>>,
     ) -> PyResult<Self> {
         let mut builder = SelectQuery::new();
         if let Some(q) = q {
@@ -73,7 +73,7 @@ impl SelectQueryWrapper {
         );
         if let Some(additional_params) = additional_params {
             // Import the json module and convert the PyObject to a string, then to a serde_json::Value
-            let converted_params = Python::with_gil(|py| -> PyResult<HashMap<String, Value>> {
+            let converted_params = Python::attach(|py| -> PyResult<HashMap<String, Value>> {
                 let mut converted_params = HashMap::new();
                 let json = py.import("json")?;
                 for (key, value) in additional_params {
@@ -113,7 +113,7 @@ impl SelectQueryWrapper {
                 .await
                 .map_err(PyErrWrapper::from)?
                 .into();
-            Ok(Python::with_gil(|_| result))
+            Ok(Python::attach(|_| result))
         })
     }
 
@@ -138,7 +138,7 @@ impl SelectQueryWrapper {
                 .await
                 .map_err(PyErrWrapper::from)?;
 
-            Python::with_gil(|py| -> PyResult<PyObject> {
+            Python::attach(|py| -> PyResult<Py<PyAny>> {
                 let obj = pythonize(py, &result).map_err(PyErrWrapper::from)?;
                 Ok(obj.unbind())
             })
@@ -158,7 +158,7 @@ impl SelectQueryWrapper {
         if let Some(handler) = handler {
             destination = destination.handler(handler);
         }
-        py.allow_threads(move || {
+        py.detach(move || {
             let context: SolrServerContext = context.into();
             let result: SolrResponseWrapper = builder
                 .execute_blocking(&context, &destination)
@@ -175,13 +175,13 @@ impl SelectQueryWrapper {
         context: SolrServerContextWrapper,
         collection: String,
         handler: Option<String>,
-    ) -> PyResult<PyObject> {
+    ) -> PyResult<Py<PyAny>> {
         let builder = self.0.clone();
         let mut destination = SelectDestination::new(collection);
         if let Some(handler) = handler {
             destination = destination.handler(handler);
         }
-        let value: Result<HashMap<String, Value>, PyErrWrapper> = py.allow_threads(move || {
+        let value: Result<HashMap<String, Value>, PyErrWrapper> = py.detach(move || {
             let context: SolrServerContext = context.into();
             let result: HashMap<String, Value> = builder
                 .execute_blocking_raw(&context, &destination)
@@ -189,10 +189,10 @@ impl SelectQueryWrapper {
             Ok(result)
         });
         let value = value?;
-        Python::with_gil(|py| -> PyResult<PyObject> { Ok(pythonize(py, &value)?.into()) })
+        Python::attach(|py| -> PyResult<Py<PyAny>> { Ok(pythonize(py, &value)?.into()) })
     }
 
-    pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
+    pub fn __setstate__(&mut self, py: Python, state: Py<PyAny>) -> PyResult<()> {
         match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
                 *self = serde_json::from_slice(s)

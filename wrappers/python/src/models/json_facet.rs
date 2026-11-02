@@ -10,8 +10,8 @@ pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]
 impl SolrJsonFacetResponseWrapper {
-    pub fn get_val(&self) -> PyResult<Option<PyObject>> {
-        Python::with_gil(|py| -> PyResult<Option<PyObject>> {
+    pub fn get_val(&self) -> PyResult<Option<Py<PyAny>>> {
+        Python::attach(|py| -> PyResult<Option<Py<PyAny>>> {
             let value = self
                 .0
                 .get_val()
@@ -41,8 +41,8 @@ impl SolrJsonFacetResponseWrapper {
         self.0.get_all_buckets()
     }
 
-    pub fn get_flat_facets(&self) -> PyResult<HashMap<String, PyObject>> {
-        Python::with_gil(|py| -> PyResult<HashMap<String, PyObject>> {
+    pub fn get_flat_facets(&self) -> PyResult<HashMap<String, Py<PyAny>>> {
+        Python::attach(|py| -> PyResult<HashMap<String, Py<PyAny>>> {
             self.0
                 .get_flat_facets()
                 .iter()
