@@ -65,12 +65,12 @@ impl LuceneQueryWrapper {
         q_op: Option<QueryOperatorWrapper>,
         df: Option<String>,
         sow: Option<bool>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut lucene = LuceneQuery::new();
         lucene.q_op = q_op.map(|q| q.into());
         lucene.df = df;
         lucene.sow = sow;
-        (Self {}, DefTypeWrapper(DefType::Lucene(lucene)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Lucene(lucene))).add_subclass(Self {})
     }
 }
 
@@ -93,7 +93,7 @@ impl DismaxQueryWrapper {
         tie: Option<String>,
         bq: Option<Vec<String>>,
         bf: Option<Vec<String>>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut dismax = DismaxQuery::new();
         dismax.q_alt = q_alt;
         dismax.qf = qf;
@@ -104,7 +104,7 @@ impl DismaxQueryWrapper {
         dismax.tie = tie;
         dismax.bq = bq;
         dismax.bf = bf;
-        (Self {}, DefTypeWrapper(DefType::Dismax(dismax)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Dismax(dismax))).add_subclass(Self {})
     }
 }
 
@@ -137,7 +137,7 @@ impl EdismaxQueryWrapper {
         lowercase_operators: Option<bool>,
         stopwords: Option<bool>,
         uf: Option<String>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut edismax = EdismaxQuery::new();
         edismax.q_alt = q_alt;
         edismax.qf = qf;
@@ -158,6 +158,6 @@ impl EdismaxQueryWrapper {
         edismax.lowercase_operators = lowercase_operators;
         edismax.stopwords = stopwords;
         edismax.uf = uf;
-        (Self {}, DefTypeWrapper(DefType::Edismax(edismax)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Edismax(edismax))).add_subclass(Self {})
     }
 }

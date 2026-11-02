@@ -99,7 +99,7 @@ impl JsonTermsFacetWrapper {
         prefix: Option<String>,
         facets: Option<HashMap<String, JsonFacetTypeWrapper>>,
         method: Option<JsonTermsFacetMethodWrapper>,
-    ) -> (Self, JsonFacetTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut terms = JsonTermsFacet::new(field);
         if let Some(offset) = offset {
             terms = terms.offset(offset);
@@ -143,10 +143,7 @@ impl JsonTermsFacetWrapper {
         if let Some(method) = method {
             terms = terms.method(JsonTermsFacetMethod::from(method));
         }
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms))),
-        )
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms)))).add_subclass(Self {})
     }
 }
 
@@ -166,7 +163,7 @@ impl JsonQueryFacetWrapper {
         sort: Option<String>,
         fq: Option<Vec<String>>,
         facets: Option<HashMap<String, JsonFacetTypeWrapper>>,
-    ) -> (Self, JsonFacetTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut query_facet = JsonQueryFacet::new();
         if let Some(q) = q {
             query_facet = query_facet.q(q);
@@ -187,10 +184,7 @@ impl JsonQueryFacetWrapper {
             query_facet =
                 query_facet.facets(facets.iter().map(|(k, v)| (k, JsonFacetType::from(v))));
         }
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(query_facet))),
-        )
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(query_facet)))).add_subclass(Self {})
     }
 }
 
@@ -201,11 +195,8 @@ pub struct JsonStatFacetWrapper {}
 #[pymethods]
 impl JsonStatFacetWrapper {
     #[new]
-    fn new(query: String) -> (Self, JsonFacetTypeWrapper) {
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Stat(JsonStatFacet::new(query))),
-        )
+    fn new(query: String) -> PyClassInitializer<Self> {
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Stat(JsonStatFacet::new(query)))).add_subclass(Self {})
     }
 }
 

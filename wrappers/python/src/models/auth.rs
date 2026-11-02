@@ -22,12 +22,10 @@ pub struct SolrBasicAuthWrapper {}
 impl SolrBasicAuthWrapper {
     #[new]
     #[pyo3(signature = (username, password=None))]
-    pub fn new(username: String, password: Option<String>) -> (Self, SolrAuthWrapper) {
-        (
-            SolrBasicAuthWrapper {},
-            SolrAuthWrapper {
-                solr_auth: Arc::new(SolrBasicAuth { username, password }),
-            },
-        )
+    pub fn new(username: String, password: Option<String>) -> PyClassInitializer<Self> {
+        let base = SolrAuthWrapper {
+            solr_auth: Arc::new(SolrBasicAuth { username, password }),
+        };
+        PyClassInitializer::from(base).add_subclass(Self {})
     }
 }

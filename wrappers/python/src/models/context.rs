@@ -1,9 +1,9 @@
 use crate::external::ReqwestClientWrapper;
-use crate::hosts::{SolrHostWrapper, SolrSingleServerHostWrapper};
+use crate::hosts::{SolrHostWrapper};
 use crate::models::auth::SolrAuthWrapper;
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use solrstice::LoggingPolicy;
+use solrstice::{LoggingPolicy, SolrSingleServerHost};
 use solrstice::{SolrServerContext, SolrServerContextBuilder};
 
 #[derive(FromPyObject)]
@@ -26,11 +26,10 @@ impl SolrServerContextWrapper {
         logging_policy: Option<LoggingPolicyWrapper>,
         client: Option<ReqwestClientWrapper>,
     ) -> Self {
-        let host = match host {
-            SolrHostUnion::SolrHostWrapperEnumValue(h) => h,
-            SolrHostUnion::String(s) => SolrSingleServerHostWrapper::new(s).1,
+        let mut builder = match host {
+            SolrHostUnion::SolrHostWrapperEnumValue(h) => SolrServerContextBuilder::new(h),
+            SolrHostUnion::String(s) => SolrServerContextBuilder::new(SolrSingleServerHost::new(s)),
         };
-        let mut builder = SolrServerContextBuilder::new(host);
         builder = match auth {
             Some(auth) => builder.with_auth(auth),
             None => builder,
@@ -82,8 +81,8 @@ pub struct OffLoggingPolicyWrapper {}
 #[pymethods]
 impl OffLoggingPolicyWrapper {
     #[new]
-    pub fn new() -> (Self, LoggingPolicyWrapper) {
-        (Self {}, LoggingPolicyWrapper(LoggingPolicy::Off))
+    pub fn new() -> PyClassInitializer<Self> {
+        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Off)).add_subclass(Self {})
     }
 }
 
@@ -94,11 +93,8 @@ pub struct FastLoggingPolicyWrapper {}
 #[pymethods]
 impl FastLoggingPolicyWrapper {
     #[new]
-    pub fn new(max_body_length: usize) -> (Self, LoggingPolicyWrapper) {
-        (
-            Self {},
-            LoggingPolicyWrapper(LoggingPolicy::Fast(max_body_length)),
-        )
+    pub fn new(max_body_length: usize) -> PyClassInitializer<Self> {
+        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Fast(max_body_length))).add_subclass(Self {})
     }
 }
 
@@ -109,10 +105,7 @@ pub struct PrettyLoggingPolicyWrapper {}
 #[pymethods]
 impl PrettyLoggingPolicyWrapper {
     #[new]
-    pub fn new(max_body_length: usize) -> (Self, LoggingPolicyWrapper) {
-        (
-            Self {},
-            LoggingPolicyWrapper(LoggingPolicy::Pretty(max_body_length)),
-        )
+    pub fn new(max_body_length: usize) -> PyClassInitializer<Self> {
+        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Pretty(max_body_length))).add_subclass(Self {})
     }
 }

@@ -29,13 +29,11 @@ pub struct SolrSingleServerHostWrapper;
 #[pymethods]
 impl SolrSingleServerHostWrapper {
     #[new]
-    pub fn new(host: String) -> (Self, SolrHostWrapper) {
-        (
-            SolrSingleServerHostWrapper {},
-            SolrHostWrapper {
-                solr_host: Arc::new(SolrSingleServerHost::new(host.as_str())),
-            },
-        )
+    pub fn new(host: String) -> PyClassInitializer<Self> {
+        let base = SolrHostWrapper {
+            solr_host: Arc::new(SolrSingleServerHost::new(host.as_str())),
+        };
+        PyClassInitializer::from(base).add_subclass(Self)
     }
 }
 
@@ -46,16 +44,14 @@ pub struct SolrMultipleServerHostWrapper;
 #[pymethods]
 impl SolrMultipleServerHostWrapper {
     #[new]
-    pub fn new(hosts: Vec<String>, timeout: f32) -> (Self, SolrHostWrapper) {
-        (
-            SolrMultipleServerHostWrapper {},
-            SolrHostWrapper {
-                solr_host: Arc::new(SolrMultipleServerHost::new(
-                    hosts,
-                    Duration::from_secs_f32(timeout),
-                )),
-            },
-        )
+    pub fn new(hosts: Vec<String>, timeout: f32) -> PyClassInitializer<Self> {
+        let base = SolrHostWrapper {
+            solr_host: Arc::new(SolrMultipleServerHost::new(
+                hosts,
+                Duration::from_secs_f32(timeout),
+            )),
+        };
+        PyClassInitializer::from(base).add_subclass(Self)
     }
 }
 
