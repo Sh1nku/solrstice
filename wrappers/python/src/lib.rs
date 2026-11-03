@@ -44,7 +44,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::wrap_pymodule;
 
-#[pymodule]
+#[pymodule(gil_used = true)]
 #[pyo3(name = "models")]
 fn models_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SolrFacetSetResultWrapper>()?;
@@ -61,7 +61,7 @@ fn models_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
-#[pymodule]
+#[pymodule(gil_used = true)]
 #[pyo3(name = "external")]
 fn external_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<ReqwestClientWrapper>()?;
@@ -69,13 +69,13 @@ fn external_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 /// A Python module implemented in Rust.
-#[pymodule]
+#[pymodule(gil_used = true)]
 fn _solrstice(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     pyo3_log::init();
 
-    let sys = PyModule::import_bound(_py, "sys")?;
+    let sys = PyModule::import(_py, "sys")?;
     let sys_modules = sys.getattr("modules")?;
-    let sys_modules: &Bound<'_, PyDict> = sys_modules.downcast()?;
+    let sys_modules: &Bound<'_, PyDict> = sys_modules.cast()?;
 
     m.add_class::<SolrAuthWrapper>()?;
     m.add_class::<SolrBasicAuthWrapper>()?;

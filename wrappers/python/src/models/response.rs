@@ -9,7 +9,12 @@ use solrstice::models::{SolrDocsResponse, SolrResponse};
 use std::collections::HashMap;
 
 #[derive(Clone)]
-#[pyclass(name = "SolrDocsResponse", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrDocsResponse",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrDocsResponseWrapper(SolrDocsResponse);
 
 impl From<SolrDocsResponse> for SolrDocsResponseWrapper {
@@ -50,14 +55,17 @@ impl SolrDocsResponseWrapper {
         self.0.get_num_found_exact()
     }
 
-    pub fn get_docs(&self) -> PyResult<Vec<PyObject>> {
-        Python::with_gil(|py| -> Result<Vec<PyObject>, PyErrWrapper> {
+    pub fn get_docs(&self) -> PyResult<Vec<Py<PyAny>>> {
+        Python::attach(|py| -> Result<Vec<Py<PyAny>>, PyErrWrapper> {
             let docs = self
                 .0
                 .get_docs::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
             docs.into_iter()
-                .map(|doc| pythonize(py, &doc).map_err(PyErrWrapper::from))
+                .map(|doc| {
+                    let obj = pythonize(py, &doc).map_err(PyErrWrapper::from)?;
+                    Ok(obj.unbind())
+                })
                 .collect::<Result<Vec<_>, _>>()
         })
         .map_err(|e| e.into())
@@ -65,7 +73,12 @@ impl SolrDocsResponseWrapper {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrResponse", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrResponse",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrResponseWrapper(SolrResponse);
 
 impl From<SolrResponse> for SolrResponseWrapper {

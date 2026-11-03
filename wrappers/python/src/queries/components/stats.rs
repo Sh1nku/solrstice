@@ -2,12 +2,18 @@ use pyo3::{pyclass, pymethods};
 use solrstice::StatsComponent;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "StatsComponent", module = "solrstice", subclass)]
+#[pyclass(
+    name = "StatsComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct StatsComponentWrapper(StatsComponent);
 
 #[pymethods]
 impl StatsComponentWrapper {
     #[new]
+    #[pyo3(signature = (fields=None))]
     pub fn new(fields: Option<Vec<String>>) -> Self {
         let mut component = StatsComponent::new();
         if let Some(fields) = fields {

@@ -5,7 +5,12 @@ use pythonize::pythonize;
 use solrstice::models::{SolrGroupFieldResult, SolrGroupResult};
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupResult", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrGroupResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrGroupResultWrapper(SolrGroupResult);
 
 #[pymethods]
@@ -52,18 +57,23 @@ impl From<SolrGroupResultWrapper> for SolrGroupResult {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrGroupFieldResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
 
 #[pymethods]
 impl SolrGroupFieldResultWrapper {
-    pub fn get_group_value(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_group_value(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_group_value::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 

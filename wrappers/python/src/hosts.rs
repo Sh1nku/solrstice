@@ -9,7 +9,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 
-#[pyclass(name = "SolrHost", module = "solrstice", subclass)]
+#[pyclass(name = "SolrHost", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrHostWrapper {
     pub solr_host: Arc<dyn SolrHost + Send + Sync>,
@@ -22,51 +22,48 @@ impl SolrHost for SolrHostWrapper {
     }
 }
 
-#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "SolrSingleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrSingleServerHostWrapper;
 
 #[pymethods]
 impl SolrSingleServerHostWrapper {
     #[new]
-    pub fn new(host: String) -> (Self, SolrHostWrapper) {
-        (
-            SolrSingleServerHostWrapper {},
-            SolrHostWrapper {
-                solr_host: Arc::new(SolrSingleServerHost::new(host.as_str())),
-            },
-        )
+    pub fn new(host: String) -> PyClassInitializer<Self> {
+        let base = SolrHostWrapper {
+            solr_host: Arc::new(SolrSingleServerHost::new(host.as_str())),
+        };
+        PyClassInitializer::from(base).add_subclass(Self)
     }
 }
 
-#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "SolrMultipleServerHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct SolrMultipleServerHostWrapper;
 
 #[pymethods]
 impl SolrMultipleServerHostWrapper {
     #[new]
-    pub fn new(hosts: Vec<String>, timeout: f32) -> (Self, SolrHostWrapper) {
-        (
-            SolrMultipleServerHostWrapper {},
-            SolrHostWrapper {
-                solr_host: Arc::new(SolrMultipleServerHost::new(
-                    hosts,
-                    Duration::from_secs_f32(timeout),
-                )),
-            },
-        )
+    pub fn new(hosts: Vec<String>, timeout: f32) -> PyClassInitializer<Self> {
+        let base = SolrHostWrapper {
+            solr_host: Arc::new(SolrMultipleServerHost::new(
+                hosts,
+                Duration::from_secs_f32(timeout),
+            )),
+        };
+        PyClassInitializer::from(base).add_subclass(Self)
     }
 }
 
-#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "ZookeeperEnsembleHost", extends = SolrHostWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostWrapper;
 
 #[pyclass(
     name = "ZookeeperEnsembleHostConnector",
     module = "solrstice",
-    subclass
+    subclass,
+    from_py_object
 )]
 #[derive(Clone)]
 pub struct ZookeeperEnsembleHostConnectorWrapper(ZookeeperEnsembleHostConnector);
@@ -83,11 +80,11 @@ impl ZookeeperEnsembleHostConnectorWrapper {
 
     pub fn connect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let connector = self.0.clone();
-        pyo3_asyncio::tokio::future_into_py(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             let host = SolrHostWrapper {
                 solr_host: Arc::new(connector.connect().await.map_err(PyErrWrapper::from)?),
             };
-            Ok(Python::with_gil(|_| host))
+            Ok(Python::attach(|_| host))
         })
     }
 
@@ -100,6 +97,6 @@ impl ZookeeperEnsembleHostConnectorWrapper {
                     .map_err(PyErrWrapper::from)?,
             ),
         };
-        Ok(Python::with_gil(|_| host))
+        Ok(Python::attach(|_| host))
     }
 }

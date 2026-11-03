@@ -1,6 +1,6 @@
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
-use pyo3::PyDowncastError;
+use pyo3::CastError;
 use pythonize::PythonizeError;
 use solrstice::Error;
 
@@ -24,8 +24,8 @@ impl From<PythonizeError> for PyErrWrapper {
     }
 }
 
-impl From<PyDowncastError<'_>> for PyErrWrapper {
-    fn from(err: PyDowncastError) -> Self {
+impl From<CastError<'_, '_>> for PyErrWrapper {
+    fn from(err: CastError) -> Self {
         PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
     }
 }

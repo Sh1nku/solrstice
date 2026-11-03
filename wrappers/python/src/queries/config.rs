@@ -35,7 +35,7 @@ pub fn upload_config(
     name: String,
     path: PathBuf,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         upload_config_rs(&context, name.as_str(), path.as_path())
             .await
@@ -51,7 +51,7 @@ pub fn upload_config_blocking(
     name: String,
     path: PathBuf,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         upload_config_blocking_rs(&context, name.as_str(), path.as_path())
             .map_err(PyErrWrapper::from)?;
@@ -61,10 +61,10 @@ pub fn upload_config_blocking(
 
 #[pyfunction]
 pub fn get_configs(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = get_configs_rs(&context).await.map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -73,7 +73,7 @@ pub fn get_configs_blocking(
     py: Python,
     context: SolrServerContextWrapper,
 ) -> PyResult<Vec<String>> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result = get_configs_blocking_rs(&context).map_err(PyErrWrapper::from)?;
         Ok(result)
@@ -86,12 +86,12 @@ pub fn config_exists(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = config_exists_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -101,7 +101,7 @@ pub fn config_exists_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<bool> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result =
             config_exists_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
@@ -115,7 +115,7 @@ pub fn delete_config(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         delete_config_rs(&context, name.as_str())
             .await
@@ -130,7 +130,7 @@ pub fn delete_config_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         delete_config_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
         Ok(())

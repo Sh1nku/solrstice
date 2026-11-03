@@ -18,7 +18,12 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-#[pyclass(name = "AsyncSolrCloudClient", module = "solrstice", subclass)]
+#[pyclass(
+    name = "AsyncSolrCloudClient",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 #[derive(Clone)]
 pub struct AsyncSolrCloudClientWrapper(SolrServerContextWrapper);
 
@@ -54,6 +59,7 @@ impl AsyncSolrCloudClientWrapper {
         delete_config(py, context, name)
     }
 
+    #[pyo3(signature = (name, config, shards=None, replication_factor=None))]
     pub fn create_collection<'py>(
         &self,
         py: Python<'py>,
@@ -114,12 +120,13 @@ impl AsyncSolrCloudClientWrapper {
         py: Python<'py>,
         builder: UpdateQueryWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let context = self.0.clone();
         builder.execute(py, context, collection, data)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select<'py>(
         &self,
         py: Python<'py>,
@@ -131,6 +138,7 @@ impl AsyncSolrCloudClientWrapper {
         builder.execute(py, context, collection, handler)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select_raw<'py>(
         &self,
         py: Python<'py>,
@@ -153,7 +161,12 @@ impl AsyncSolrCloudClientWrapper {
     }
 }
 
-#[pyclass(name = "BlockingSolrCloudClient", module = "solrstice", subclass)]
+#[pyclass(
+    name = "BlockingSolrCloudClient",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 #[derive(Clone)]
 pub struct BlockingSolrCloudClientWrapper(SolrServerContextWrapper);
 
@@ -184,6 +197,7 @@ impl BlockingSolrCloudClientWrapper {
         delete_config_blocking(py, context, name)
     }
 
+    #[pyo3(signature = (name, config, shards=None, replication_factor=None))]
     pub fn create_collection(
         &self,
         py: Python,
@@ -236,12 +250,13 @@ impl BlockingSolrCloudClientWrapper {
         py: Python,
         builder: UpdateQueryWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<SolrResponseWrapper> {
         let context = self.0.clone();
         builder.execute_blocking(py, context, collection, data)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select(
         &self,
         py: Python,
@@ -253,13 +268,14 @@ impl BlockingSolrCloudClientWrapper {
         builder.execute_blocking(py, context, collection, handler)
     }
 
+    #[pyo3(signature = (builder, collection, handler=None))]
     pub fn select_raw(
         &self,
         py: Python,
         builder: &SelectQueryWrapper,
         collection: String,
         handler: Option<String>,
-    ) -> PyResult<PyObject> {
+    ) -> PyResult<Py<PyAny>> {
         let context = self.0.clone();
         builder.execute_blocking_raw(py, context, collection, handler)
     }

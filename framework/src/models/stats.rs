@@ -52,7 +52,7 @@ impl SolrStatsFieldResult {
     pub fn get_mean<T: DeserializeOwned>(&self) -> Option<Result<T, Error>> {
         self.mean
             .as_ref()
-            .map(|mean| serde_json::from_value::<T>(mean.clone()).map_err(|e| Error::from(e)))
+            .map(|mean| serde_json::from_value::<T>(mean.clone()).map_err(Error::from))
     }
 
     pub fn get_sum_of_squares(&self) -> Option<f64> {

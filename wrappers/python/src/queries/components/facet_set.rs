@@ -5,12 +5,18 @@ use solrstice::{
 };
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FacetSetComponent", module = "solrstice", subclass)]
+#[pyclass(
+    name = "FacetSetComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct FacetSetComponentWrapper(FacetSetComponent);
 
 #[pymethods]
 impl FacetSetComponentWrapper {
     #[new]
+    #[pyo3(signature = (queries=None, fields=None, pivots=None))]
     pub fn new(
         queries: Option<Vec<String>>,
         fields: Option<FieldFacetComponentWrapper>,
@@ -55,12 +61,18 @@ impl From<&FacetSetComponent> for FacetSetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "PivotFacetComponent", module = "solrstice", subclass)]
+#[pyclass(
+    name = "PivotFacetComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct PivotFacetComponentWrapper(PivotFacetComponent);
 
 #[pymethods]
 impl PivotFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (pivots, min_count=None))]
     pub fn new(pivots: Vec<String>, min_count: Option<usize>) -> Self {
         let mut component = PivotFacetComponent::new(pivots);
         if let Some(min_count) = min_count {
@@ -95,12 +107,18 @@ impl From<&PivotFacetComponent> for PivotFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetComponent", module = "solrstice", subclass)]
+#[pyclass(
+    name = "FieldFacetComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct FieldFacetComponentWrapper(FieldFacetComponent);
 
 #[pymethods]
 impl FieldFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (fields, exclude_terms=None))]
     pub fn new(fields: Vec<FieldFacetEntryWrapper>, exclude_terms: Option<String>) -> Self {
         let mut component = FieldFacetComponent::new(fields);
         if let Some(exclude_terms) = exclude_terms {
@@ -134,8 +152,8 @@ impl From<&FieldFacetComponent> for FieldFacetComponentWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetSort")]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "FieldFacetSort", eq, eq_int, from_py_object)]
 pub enum FieldFacetSortWrapper {
     Count,
     Index,
@@ -159,8 +177,8 @@ impl From<FieldFacetSort> for FieldFacetSortWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetMethod")]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "FieldFacetMethod", eq, eq_int, from_py_object)]
 pub enum FieldFacetMethodWrapper {
     Enum,
     Fc,
@@ -188,12 +206,18 @@ impl From<FieldFacetMethod> for FieldFacetMethodWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "FieldFacetEntry", module = "solrstice", subclass)]
+#[pyclass(
+    name = "FieldFacetEntry",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct FieldFacetEntryWrapper(FieldFacetEntry);
 
 #[pymethods]
 impl FieldFacetEntryWrapper {
     #[new]
+    #[pyo3(signature = (field, prefix=None, contains=None, contains_ignore_case=None, sort=None, limit=None, offset=None, min_count=None, missing=None, method=None, enum_cache_min_df=None, exists=None))]
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         field: String,

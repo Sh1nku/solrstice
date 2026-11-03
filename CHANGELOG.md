@@ -1,3 +1,8 @@
+# v0.16.0
+* Update MSRV to 1.89.0
+* Update pyo3 version from v0.21 to v0.29
+* Update rust package versions with security fixes
+
 # v0.15.1
 
 * Fix error where wheels were not uploaded to Pypi

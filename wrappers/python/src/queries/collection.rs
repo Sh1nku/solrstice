@@ -28,6 +28,7 @@ pub fn collection(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 #[pyfunction]
+#[pyo3(signature = (context, name, config, shards=None, replication_factor=None))]
 pub fn create_collection(
     py: Python,
     context: SolrServerContextWrapper,
@@ -36,7 +37,7 @@ pub fn create_collection(
     shards: Option<usize>,
     replication_factor: Option<usize>,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         create_collection_rs(
             &context,
@@ -52,6 +53,7 @@ pub fn create_collection(
 }
 
 #[pyfunction]
+#[pyo3(signature = (context, name, config, shards=None, replication_factor=None))]
 pub fn create_collection_blocking(
     py: Python,
     context: SolrServerContextWrapper,
@@ -60,7 +62,7 @@ pub fn create_collection_blocking(
     shards: Option<usize>,
     replication_factor: Option<usize>,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         create_collection_blocking_rs(
             &context,
@@ -76,12 +78,12 @@ pub fn create_collection_blocking(
 
 #[pyfunction]
 pub fn get_collections(py: Python, context: SolrServerContextWrapper) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = get_collections_rs(&context)
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -90,7 +92,7 @@ pub fn get_collections_blocking(
     py: Python,
     context: SolrServerContextWrapper,
 ) -> PyResult<Vec<String>> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result = get_collections_blocking_rs(&context).map_err(PyErrWrapper::from)?;
         Ok(result)
@@ -103,12 +105,12 @@ pub fn collection_exists(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         let result = collection_exists_rs(&context, name.as_str())
             .await
             .map_err(PyErrWrapper::from)?;
-        Ok(Python::with_gil(|_| result))
+        Ok(Python::attach(|_| result))
     })
 }
 
@@ -118,7 +120,7 @@ pub fn collection_exists_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<bool> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         let result =
             collection_exists_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
@@ -132,7 +134,7 @@ pub fn delete_collection(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<Bound<PyAny>> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+    pyo3_async_runtimes::tokio::future_into_py(py, async move {
         let context: SolrServerContext = context.into();
         delete_collection_rs(&context, name.as_str())
             .await
@@ -147,7 +149,7 @@ pub fn delete_collection_blocking(
     context: SolrServerContextWrapper,
     name: String,
 ) -> PyResult<()> {
-    py.allow_threads(move || {
+    py.detach(move || {
         let context: SolrServerContext = context.into();
         delete_collection_blocking_rs(&context, name.as_str()).map_err(PyErrWrapper::from)?;
         Ok(())

@@ -6,12 +6,18 @@ use solrstice::{
 use std::collections::{BTreeMap, HashMap};
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetComponent", module = "solrstice", subclass)]
+#[pyclass(
+    name = "JsonFacetComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct JsonFacetComponentWrapper(JsonFacetComponent);
 
 #[pymethods]
 impl JsonFacetComponentWrapper {
     #[new]
+    #[pyo3(signature = (facets=None))]
     fn new(facets: Option<HashMap<String, JsonFacetTypeWrapper>>) -> Self {
         let mut component = JsonFacetComponent::new();
         if let Some(facets) = facets {
@@ -46,7 +52,7 @@ impl From<&JsonFacetComponent> for JsonFacetComponentWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetType", module = "solrstice", subclass)]
+#[pyclass(name = "JsonFacetType", module = "solrstice", subclass, from_py_object)]
 pub struct JsonFacetTypeWrapper(JsonFacetType);
 
 impl From<JsonFacetTypeWrapper> for JsonFacetType {
@@ -74,13 +80,14 @@ impl From<&JsonFacetType> for JsonFacetTypeWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonTermsFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonTermsFacetWrapper {}
 
 #[pymethods]
 impl JsonTermsFacetWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (field, offset=None, limit=None, sort=None, prelim_sort=None, overrequest=None, refine=None, overrefine=None, mincount=None, missing=None, num_buckets=None, all_buckets=None, prefix=None, facets=None, method=None))]
     fn new(
         field: String,
         offset: Option<usize>,
@@ -97,7 +104,7 @@ impl JsonTermsFacetWrapper {
         prefix: Option<String>,
         facets: Option<HashMap<String, JsonFacetTypeWrapper>>,
         method: Option<JsonTermsFacetMethodWrapper>,
-    ) -> (Self, JsonFacetTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut terms = JsonTermsFacet::new(field);
         if let Some(offset) = offset {
             terms = terms.offset(offset);
@@ -141,21 +148,20 @@ impl JsonTermsFacetWrapper {
         if let Some(method) = method {
             terms = terms.method(JsonTermsFacetMethod::from(method));
         }
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms))),
-        )
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms))))
+            .add_subclass(Self {})
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonQueryFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonQueryFacetWrapper {}
 
 #[pymethods]
 impl JsonQueryFacetWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q=None, limit=None, offset=None, sort=None, fq=None, facets=None))]
     fn new(
         q: Option<String>,
         limit: Option<usize>,
@@ -163,7 +169,7 @@ impl JsonQueryFacetWrapper {
         sort: Option<String>,
         fq: Option<Vec<String>>,
         facets: Option<HashMap<String, JsonFacetTypeWrapper>>,
-    ) -> (Self, JsonFacetTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut query_facet = JsonQueryFacet::new();
         if let Some(q) = q {
             query_facet = query_facet.q(q);
@@ -184,30 +190,30 @@ impl JsonQueryFacetWrapper {
             query_facet =
                 query_facet.facets(facets.iter().map(|(k, v)| (k, JsonFacetType::from(v))));
         }
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(query_facet))),
-        )
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(
+            query_facet,
+        ))))
+        .add_subclass(Self {})
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "JsonStatFacet", extends = JsonFacetTypeWrapper, module = "solrstice", subclass, from_py_object)]
 pub struct JsonStatFacetWrapper {}
 
 #[pymethods]
 impl JsonStatFacetWrapper {
     #[new]
-    fn new(query: String) -> (Self, JsonFacetTypeWrapper) {
-        (
-            Self {},
-            JsonFacetTypeWrapper(JsonFacetType::Stat(JsonStatFacet::new(query))),
-        )
+    fn new(query: String) -> PyClassInitializer<Self> {
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Stat(
+            JsonStatFacet::new(query),
+        )))
+        .add_subclass(Self {})
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetSortDirection")]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "JsonFacetSortDirection", eq, eq_int, from_py_object)]
 pub enum JsonFacetSortDirectionWrapper {
     Asc,
     Desc,
@@ -231,8 +237,8 @@ impl From<JsonFacetSortDirection> for JsonFacetSortDirectionWrapper {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[pyclass(name = "JsonTermsFacetMethod")]
+#[derive(Clone, Debug, PartialEq)]
+#[pyclass(name = "JsonTermsFacetMethod", eq, eq_int, from_py_object)]
 pub enum JsonTermsFacetMethodWrapper {
     DocValues,
     UnInvertedField,

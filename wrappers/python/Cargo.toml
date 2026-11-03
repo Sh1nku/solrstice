@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = { workspace = true, features = ["extension-module", "serde", "abi3-py39"] }
-pyo3-asyncio = { workspace = true, features = ["attributes", "tokio-runtime"] }
+pyo3-async-runtimes = { workspace = true, features = ["attributes", "tokio-runtime"] }
 pyo3-log.workspace = true
 pythonize.workspace = true
 solrstice = { workspace = true, features = ["blocking"] }

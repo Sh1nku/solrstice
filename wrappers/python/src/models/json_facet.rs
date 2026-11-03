@@ -5,19 +5,25 @@ use solrstice::models::SolrJsonFacetResponse;
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrJsonFacetResponse", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrJsonFacetResponse",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrJsonFacetResponseWrapper(SolrJsonFacetResponse);
 
 #[pymethods]
 impl SolrJsonFacetResponseWrapper {
-    pub fn get_val(&self) -> PyResult<Option<PyObject>> {
-        Python::with_gil(|py| -> PyResult<Option<PyObject>> {
-            Ok(self
+    pub fn get_val(&self) -> PyResult<Option<Py<PyAny>>> {
+        Python::attach(|py| -> PyResult<Option<Py<PyAny>>> {
+            let value = self
                 .0
                 .get_val()
                 .map(|v| pythonize(py, v))
                 .transpose()
-                .map_err(PyErrWrapper::from)?)
+                .map_err(PyErrWrapper::from)?;
+            Ok(value.map(|obj| obj.unbind()))
         })
     }
 
@@ -40,14 +46,14 @@ impl SolrJsonFacetResponseWrapper {
         self.0.get_all_buckets()
     }
 
-    pub fn get_flat_facets(&self) -> PyResult<HashMap<String, PyObject>> {
-        Python::with_gil(|py| -> PyResult<HashMap<String, PyObject>> {
+    pub fn get_flat_facets(&self) -> PyResult<HashMap<String, Py<PyAny>>> {
+        Python::attach(|py| -> PyResult<HashMap<String, Py<PyAny>>> {
             self.0
                 .get_flat_facets()
                 .iter()
                 .map(|(k, v)| {
                     let py_obj = pythonize(py, v).map_err(PyErrWrapper::from)?;
-                    Ok((k.to_string(), py_obj))
+                    Ok((k.to_string(), py_obj.unbind()))
                 })
                 .collect()
         })

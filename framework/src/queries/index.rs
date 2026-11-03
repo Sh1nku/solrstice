@@ -265,7 +265,7 @@ impl DeleteQuery {
 
         SolrRequestBuilder::new(
             context.as_ref(),
-            format!("/solr/{}/{}", &collection.as_ref(), &self.handler).as_str(),
+            format!("/solr/{}/{}", collection.as_ref(), self.handler).as_str(),
         )
         .with_query_params(query_params.as_ref())
         .with_headers(vec![("Content-Type", "application/xml")])

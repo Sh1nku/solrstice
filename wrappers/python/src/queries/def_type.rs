@@ -2,8 +2,8 @@ use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 use solrstice::{DefType, DismaxQuery, EdismaxQuery, LuceneQuery, QueryOperator};
 
-#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq)]
-#[pyclass(name = "QueryOperator")]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[pyclass(name = "QueryOperator", eq, eq_int, from_py_object)]
 pub enum QueryOperatorWrapper {
     AND,
     OR,
@@ -27,7 +27,7 @@ impl From<QueryOperator> for QueryOperatorWrapper {
     }
 }
 
-#[pyclass(name = "DefType", module = "solrstice", subclass)]
+#[pyclass(name = "DefType", module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DefTypeWrapper(DefType);
 
@@ -53,27 +53,28 @@ impl DefTypeWrapper {
     }
 }
 
-#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "LuceneQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct LuceneQueryWrapper {}
 
 #[pymethods]
 impl LuceneQueryWrapper {
     #[new]
+    #[pyo3(signature = (q_op=None, df=None, sow=None))]
     pub fn new(
         q_op: Option<QueryOperatorWrapper>,
         df: Option<String>,
         sow: Option<bool>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut lucene = LuceneQuery::new();
         lucene.q_op = q_op.map(|q| q.into());
         lucene.df = df;
         lucene.sow = sow;
-        (Self {}, DefTypeWrapper(DefType::Lucene(lucene)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Lucene(lucene))).add_subclass(Self {})
     }
 }
 
-#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "DismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct DismaxQueryWrapper {}
 
@@ -81,6 +82,7 @@ pub struct DismaxQueryWrapper {}
 impl DismaxQueryWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q_alt=None, qf=None, mm=None, pf=None, ps=None, qs=None, tie=None, bq=None, bf=None))]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,
@@ -91,7 +93,7 @@ impl DismaxQueryWrapper {
         tie: Option<String>,
         bq: Option<Vec<String>>,
         bf: Option<Vec<String>>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut dismax = DismaxQuery::new();
         dismax.q_alt = q_alt;
         dismax.qf = qf;
@@ -102,11 +104,11 @@ impl DismaxQueryWrapper {
         dismax.tie = tie;
         dismax.bq = bq;
         dismax.bf = bf;
-        (Self {}, DefTypeWrapper(DefType::Dismax(dismax)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Dismax(dismax))).add_subclass(Self {})
     }
 }
 
-#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass)]
+#[pyclass(name = "EdismaxQuery", extends=DefTypeWrapper, module = "solrstice", subclass, from_py_object)]
 #[derive(Clone, Serialize, Deserialize)]
 pub struct EdismaxQueryWrapper {}
 
@@ -114,6 +116,7 @@ pub struct EdismaxQueryWrapper {}
 impl EdismaxQueryWrapper {
     #[new]
     #[allow(clippy::too_many_arguments)]
+    #[pyo3(signature = (q_alt=None, qf=None, mm=None, mm_auto_relax=None, pf=None, pf2=None, pf3=None, ps=None, ps2=None, ps3=None, qs=None, tie=None, bq=None, bf=None, sow=None, boost=None, lowercase_operators=None, stopwords=None, uf=None))]
     pub fn new(
         q_alt: Option<String>,
         qf: Option<String>,
@@ -134,7 +137,7 @@ impl EdismaxQueryWrapper {
         lowercase_operators: Option<bool>,
         stopwords: Option<bool>,
         uf: Option<String>,
-    ) -> (Self, DefTypeWrapper) {
+    ) -> PyClassInitializer<Self> {
         let mut edismax = EdismaxQuery::new();
         edismax.q_alt = q_alt;
         edismax.qf = qf;
@@ -155,6 +158,6 @@ impl EdismaxQueryWrapper {
         edismax.lowercase_operators = lowercase_operators;
         edismax.stopwords = stopwords;
         edismax.uf = uf;
-        (Self {}, DefTypeWrapper(DefType::Edismax(edismax)))
+        PyClassInitializer::from(DefTypeWrapper(DefType::Edismax(edismax))).add_subclass(Self {})
     }
 }

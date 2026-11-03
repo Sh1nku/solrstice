@@ -1,11 +1,16 @@
 use crate::models::error::PyErrWrapper;
-use pyo3::{pyclass, pymethods, PyObject, PyResult, Python};
+use pyo3::prelude::*;
 use pythonize::pythonize;
 use solrstice::models::{SolrStatsFieldResult, SolrStatsResult};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrStatsResult", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrStatsResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrStatsResultWrapper(SolrStatsResult);
 
 #[pymethods]
@@ -44,28 +49,33 @@ impl From<&SolrStatsResult> for SolrStatsResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrStatsFieldResult", module = "solrstice.models", subclass)]
+#[pyclass(
+    name = "SolrStatsFieldResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrStatsFieldResultWrapper(SolrStatsFieldResult);
 
 #[pymethods]
 impl SolrStatsFieldResultWrapper {
-    pub fn get_min(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_min(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_min::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 
-    pub fn get_max(&self) -> PyResult<PyObject> {
-        Python::with_gil(|py| -> PyResult<PyObject> {
+    pub fn get_max(&self) -> PyResult<Py<PyAny>> {
+        Python::attach(|py| -> PyResult<Py<PyAny>> {
             let value = self
                 .0
                 .get_max::<serde_json::Value>()
                 .map_err(PyErrWrapper::from)?;
-            Ok(pythonize(py, &value)?)
+            Ok(pythonize(py, &value)?.into())
         })
     }
 
@@ -81,11 +91,11 @@ impl SolrStatsFieldResultWrapper {
         self.0.get_sum()
     }
 
-    pub fn get_mean(&self) -> PyResult<Option<PyObject>> {
-        Python::with_gil(|py| -> PyResult<Option<PyObject>> {
+    pub fn get_mean(&self) -> PyResult<Option<Py<PyAny>>> {
+        Python::attach(|py| -> PyResult<Option<Py<PyAny>>> {
             match self.0.get_mean::<serde_json::Value>() {
                 Some(result) => match result {
-                    Ok(value) => Ok(Some(pythonize(py, &value)?)),
+                    Ok(value) => Ok(Some(pythonize(py, &value)?.into())),
                     Err(e) => Err(PyErrWrapper::from(e).into()),
                 },
                 None => Ok(None),

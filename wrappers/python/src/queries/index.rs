@@ -3,27 +3,28 @@ use crate::models::error::PyErrWrapper;
 use crate::models::response::SolrResponseWrapper;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pythonize::depythonize_bound;
+use pythonize::depythonize;
 use serde::{Deserialize, Serialize};
 use solrstice::CommitType;
 use solrstice::Error;
 use solrstice::SolrServerContext;
 use solrstice::{DeleteQuery, UpdateQuery};
 
-#[pyclass(name = "CommitType")]
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[pyclass(name = "CommitType", eq, eq_int, from_py_object)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub enum CommitTypeWrapper {
     Hard,
     Soft,
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "UpdateQuery", module = "solrstice", subclass)]
+#[pyclass(name = "UpdateQuery", module = "solrstice", subclass, from_py_object)]
 pub struct UpdateQueryWrapper(UpdateQuery);
 
 #[pymethods]
 impl UpdateQueryWrapper {
     #[new]
+    #[pyo3(signature = (handler=None, commit_type=None))]
     pub fn new(handler: Option<String>, commit_type: Option<CommitTypeWrapper>) -> Self {
         let mut builder = UpdateQuery::new();
         if let Some(handler) = handler {
@@ -40,38 +41,38 @@ impl UpdateQueryWrapper {
         py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
+            .map(|x| depythonize(&x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
-        pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute(&context, collection.as_str(), data.as_slice())
                 .await
                 .map_err(PyErrWrapper::from)?;
-            Ok(Python::with_gil(|_| result.into()))
+            Ok(Python::attach(|_| result.into()))
         })
     }
 
-    pub fn execute_blocking(
+    pub fn execute_blocking<'py>(
         &self,
-        py: Python,
+        py: Python<'py>,
         context: SolrServerContextWrapper,
         collection: String,
-        data: Vec<PyObject>,
+        data: Vec<Py<PyAny>>,
     ) -> PyResult<SolrResponseWrapper> {
         let data: Result<Vec<serde_json::Value>, PyErrWrapper> = data
             .into_iter()
-            .map(|x| depythonize_bound(x.into_bound(py)).map_err(PyErrWrapper::from))
+            .map(|x| depythonize(&x.into_bound(py)).map_err(PyErrWrapper::from))
             .collect();
         let data = data?;
         let builder = self.0.clone();
-        py.allow_threads(move || {
+        py.detach(move || {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute_blocking(&context, collection.as_str(), data.as_slice())
@@ -80,27 +81,26 @@ impl UpdateQueryWrapper {
         })
     }
 
-    pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
-        match state.extract::<&PyBytes>(py) {
+    pub fn __setstate__(&mut self, py: Python, state: Py<PyAny>) -> PyResult<()> {
+        match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
-                *self = serde_json::from_slice(s.as_bytes())
+                *self = serde_json::from_slice(s)
                     .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 
-    pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new_bound(
+    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        Ok(PyBytes::new(
             py,
             serde_json::to_string(&self)
                 .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
-        )
-        .to_object(py))
+        ))
     }
 }
 
@@ -123,12 +123,13 @@ impl From<CommitType> for CommitTypeWrapper {
 }
 
 #[derive(Clone, Default, Serialize, Deserialize)]
-#[pyclass(name = "DeleteQuery", module = "solrstice", subclass)]
+#[pyclass(name = "DeleteQuery", module = "solrstice", subclass, from_py_object)]
 pub struct DeleteQueryWrapper(DeleteQuery);
 
 #[pymethods]
 impl DeleteQueryWrapper {
     #[new]
+    #[pyo3(signature = (handler=None, commit_type=None, ids=None, queries=None))]
     pub fn new(
         handler: Option<String>,
         commit_type: Option<CommitTypeWrapper>,
@@ -159,13 +160,13 @@ impl DeleteQueryWrapper {
         collection: String,
     ) -> PyResult<Bound<'py, PyAny>> {
         let builder = self.0.clone();
-        pyo3_asyncio::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py::<_, SolrResponseWrapper>(py, async move {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute(&context, collection.as_str())
                 .await
                 .map_err(PyErrWrapper::from)?;
-            Ok(Python::with_gil(|_| result.into()))
+            Ok(Python::attach(|_| result.into()))
         })
     }
 
@@ -176,7 +177,7 @@ impl DeleteQueryWrapper {
         collection: String,
     ) -> PyResult<SolrResponseWrapper> {
         let builder = self.0.clone();
-        py.allow_threads(move || {
+        py.detach(move || {
             let context: SolrServerContext = context.into();
             let result = builder
                 .execute_blocking(&context, collection.as_str())
@@ -185,26 +186,25 @@ impl DeleteQueryWrapper {
         })
     }
 
-    pub fn __setstate__(&mut self, py: Python, state: PyObject) -> PyResult<()> {
-        match state.extract::<&PyBytes>(py) {
+    pub fn __setstate__(&mut self, py: Python, state: Py<PyAny>) -> PyResult<()> {
+        match state.bind(py).extract::<&[u8]>() {
             Ok(s) => {
-                *self = serde_json::from_slice(s.as_bytes())
+                *self = serde_json::from_slice(s)
                     .map_err(Error::from)
                     .map_err(PyErrWrapper::from)?;
                 Ok(())
             }
-            Err(e) => Err(e),
+            Err(e) => Err(e.into()),
         }
     }
 
-    pub fn __getstate__(&self, py: Python) -> PyResult<PyObject> {
-        Ok(PyBytes::new_bound(
+    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        Ok(PyBytes::new(
             py,
             serde_json::to_string(&self)
                 .map_err(Error::from)
                 .map_err(PyErrWrapper::from)?
                 .as_bytes(),
-        )
-        .to_object(py))
+        ))
     }
 }

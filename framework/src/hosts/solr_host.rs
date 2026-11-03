@@ -4,6 +4,7 @@ use dyn_clone::DynClone;
 use std::borrow::Cow;
 
 /// SolrHost specifies how to connect to a solr server.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait SolrHost: DynClone {
     async fn get_solr_node<'a>(&'a self) -> Result<Cow<'a, str>, Error>;
