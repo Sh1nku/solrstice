@@ -1,6 +1,7 @@
 # v0.16.0
-* Update pyo3 version
-* Update rust package versions
+* Update MSRV to 1.88.0
+* Update pyo3 version from v0.21 to v0.29
+* Update rust package versions with security fixes
 
 # v0.15.1
 

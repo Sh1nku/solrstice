@@ -5,7 +5,12 @@ use solrstice::models::{SolrFacetSetResult, SolrFieldFacetResult, SolrPivotFacet
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq, Default)]
-#[pyclass(name = "SolrFacetSetResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrFacetSetResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrFacetSetResultWrapper(SolrFacetSetResult);
 
 #[pymethods]
@@ -56,7 +61,12 @@ impl From<&SolrFacetSetResult> for SolrFacetSetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrPivotFacetResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrPivotFacetResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrPivotFacetResultWrapper(SolrPivotFacetResult);
 
 #[pymethods]
@@ -109,7 +119,12 @@ impl From<&SolrPivotFacetResult> for SolrPivotFacetResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrFieldFacetResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrFieldFacetResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrFieldFacetResultWrapper(SolrFieldFacetResult);
 
 #[pymethods]

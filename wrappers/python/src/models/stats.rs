@@ -5,7 +5,12 @@ use solrstice::models::{SolrStatsFieldResult, SolrStatsResult};
 use std::collections::HashMap;
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrStatsResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrStatsResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrStatsResultWrapper(SolrStatsResult);
 
 #[pymethods]
@@ -44,7 +49,12 @@ impl From<&SolrStatsResult> for SolrStatsResultWrapper {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "SolrStatsFieldResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrStatsFieldResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrStatsFieldResultWrapper(SolrStatsFieldResult);
 
 #[pymethods]

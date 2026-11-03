@@ -1,6 +1,6 @@
-use pyo3::CastError;
 use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
+use pyo3::CastError;
 use pythonize::PythonizeError;
 use solrstice::Error;
 
@@ -29,7 +29,6 @@ impl From<CastError<'_, '_>> for PyErrWrapper {
         PyErrWrapper(PyRuntimeError::new_err(err.to_string()))
     }
 }
-
 
 impl From<pyo3::PyErr> for PyErrWrapper {
     fn from(err: pyo3::PyErr) -> Self {

@@ -6,7 +6,12 @@ use solrstice::{
 use std::collections::{BTreeMap, HashMap};
 
 #[derive(Clone, Debug, PartialEq)]
-#[pyclass(name = "JsonFacetComponent", module = "solrstice", subclass, from_py_object)]
+#[pyclass(
+    name = "JsonFacetComponent",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 pub struct JsonFacetComponentWrapper(JsonFacetComponent);
 
 #[pymethods]
@@ -143,7 +148,8 @@ impl JsonTermsFacetWrapper {
         if let Some(method) = method {
             terms = terms.method(JsonTermsFacetMethod::from(method));
         }
-        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms)))).add_subclass(Self {})
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Terms(Box::new(terms))))
+            .add_subclass(Self {})
     }
 }
 
@@ -184,7 +190,10 @@ impl JsonQueryFacetWrapper {
             query_facet =
                 query_facet.facets(facets.iter().map(|(k, v)| (k, JsonFacetType::from(v))));
         }
-        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(query_facet)))).add_subclass(Self {})
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Query(Box::new(
+            query_facet,
+        ))))
+        .add_subclass(Self {})
     }
 }
 
@@ -196,7 +205,10 @@ pub struct JsonStatFacetWrapper {}
 impl JsonStatFacetWrapper {
     #[new]
     fn new(query: String) -> PyClassInitializer<Self> {
-        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Stat(JsonStatFacet::new(query)))).add_subclass(Self {})
+        PyClassInitializer::from(JsonFacetTypeWrapper(JsonFacetType::Stat(
+            JsonStatFacet::new(query),
+        )))
+        .add_subclass(Self {})
     }
 }
 

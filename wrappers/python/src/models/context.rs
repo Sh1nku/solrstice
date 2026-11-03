@@ -1,5 +1,5 @@
 use crate::external::ReqwestClientWrapper;
-use crate::hosts::{SolrHostWrapper};
+use crate::hosts::SolrHostWrapper;
 use crate::models::auth::SolrAuthWrapper;
 use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -12,7 +12,12 @@ pub enum SolrHostUnion {
     String(String),
 }
 
-#[pyclass(name = "SolrServerContext", module = "solrstice", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrServerContext",
+    module = "solrstice",
+    subclass,
+    from_py_object
+)]
 #[derive(Clone)]
 pub struct SolrServerContextWrapper(SolrServerContext);
 
@@ -94,7 +99,8 @@ pub struct FastLoggingPolicyWrapper {}
 impl FastLoggingPolicyWrapper {
     #[new]
     pub fn new(max_body_length: usize) -> PyClassInitializer<Self> {
-        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Fast(max_body_length))).add_subclass(Self {})
+        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Fast(max_body_length)))
+            .add_subclass(Self {})
     }
 }
 
@@ -106,6 +112,7 @@ pub struct PrettyLoggingPolicyWrapper {}
 impl PrettyLoggingPolicyWrapper {
     #[new]
     pub fn new(max_body_length: usize) -> PyClassInitializer<Self> {
-        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Pretty(max_body_length))).add_subclass(Self {})
+        PyClassInitializer::from(LoggingPolicyWrapper(LoggingPolicy::Pretty(max_body_length)))
+            .add_subclass(Self {})
     }
 }

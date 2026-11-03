@@ -5,7 +5,12 @@ use pythonize::pythonize;
 use solrstice::models::{SolrGroupFieldResult, SolrGroupResult};
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrGroupResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrGroupResultWrapper(SolrGroupResult);
 
 #[pymethods]
@@ -52,7 +57,12 @@ impl From<SolrGroupResultWrapper> for SolrGroupResult {
 }
 
 #[derive(Clone)]
-#[pyclass(name = "SolrGroupFieldResult", module = "solrstice.models", subclass, from_py_object)]
+#[pyclass(
+    name = "SolrGroupFieldResult",
+    module = "solrstice.models",
+    subclass,
+    from_py_object
+)]
 pub struct SolrGroupFieldResultWrapper(SolrGroupFieldResult);
 
 #[pymethods]
